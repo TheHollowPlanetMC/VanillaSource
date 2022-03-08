@@ -1,0 +1,16 @@
+name: 'THP-Engine'
+version: ${project.version}
+main: thpmc.engine.THPEngine
+api-version: 1.15
+softdepend: [WorldEdit, Multiverse-Core, Cinema4C]
+load: STARTUP
+#--------------------------------------
+commands:
+  parallel:
+    description: Type /parallel help
+    usage: Type /parallel help
+    permission: parallel.admin
+#--------------------------------------
+permissions:
+  parallel.admin:
+    description: admin command.
