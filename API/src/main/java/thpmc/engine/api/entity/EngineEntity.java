@@ -11,9 +11,7 @@ import thpmc.engine.api.entity.tick.EntityTracker;
 import thpmc.engine.api.nms.INMSHandler;
 import thpmc.engine.api.nms.entity.NMSEntity;
 import thpmc.engine.api.player.EnginePlayer;
-import thpmc.engine.api.util.collision.CollideOption;
-import thpmc.engine.api.util.collision.EngineBoundingBox;
-import thpmc.engine.api.util.collision.PerformCollisionResult;
+import thpmc.engine.api.util.collision.*;
 import thpmc.engine.api.util.math.Vec2f;
 import thpmc.engine.api.world.ChunkUtil;
 import thpmc.engine.api.world.EngineLocation;
@@ -141,6 +139,23 @@ public abstract class EngineEntity implements TickBase {
      * @return Whether this entity is dead or not.
      */
     public boolean isDead(){return dead;}
+
+    /**
+     * Kill this entity.
+     */
+    public void kill(){
+        dead = true;
+
+        //remove from chunk
+        if(chunk != null) {
+            int sectionIndex = ChunkUtil.getSectionIndex(NumberConversions.floor(y));
+            Set<EngineEntity> entities = chunk.getEntitiesInSection(sectionIndex);
+
+            if(entities.size() != 0){
+                entities.remove(this);
+            }
+        }
+    }
     
     /**
      * Gets if the entity is standing on the ground.
@@ -168,9 +183,9 @@ public abstract class EngineEntity implements TickBase {
     
     /**
      * Gets entity bounding box.
-     * @return {@link EngineBoundingBox}
+     * @return {@link EngineEntityBoundingBox}
      */
-    public @Nullable EngineBoundingBox getBoundingBox(){
+    public @Nullable EngineEntityBoundingBox getBoundingBox(){
         if(nmsEntity == null) return null;
         return nmsEntity.getEngineBoundingBox(this);
     }
@@ -210,7 +225,19 @@ public abstract class EngineEntity implements TickBase {
      * @param velocity Velocity of the entity
      */
     public void setVelocity(Vector velocity) {this.velocity = velocity;}
-    
+
+    /**
+     * Gets collide option for movement.
+     * @return {@link CollideOption}
+     */
+    public CollideOption getMovementCollideOption() {return movementCollideOption;}
+
+    /**
+     * Sets collide option fot movement.
+     * @param movementCollideOption {@link CollideOption}
+     */
+    public void setMovementCollideOption(CollideOption movementCollideOption) {this.movementCollideOption = movementCollideOption;}
+
     /**
      * Moves this entity by the specified amount.
      * @param movement Vector to move an entity
@@ -225,37 +252,39 @@ public abstract class EngineEntity implements TickBase {
         if(originalBoundingBox == null) return MovementResult.EMPTY_MOVEMENT_RESULT;
         
         if(movement.equals(new Vector(0.0, 0.0, 0.0))) return MovementResult.EMPTY_MOVEMENT_RESULT;
-        
-        double negativeX = Math.abs(Math.min(movement.getX(), 0.0));
-        double negativeY = Math.abs(Math.min(movement.getY(), 0.0));
-        double negativeZ = Math.abs(Math.min(movement.getZ(), 0.0));
-        double positiveX = Math.max(movement.getX(), 0.0);
-        double positiveY = Math.max(movement.getY(), 0.0);
-        double positiveZ = Math.max(movement.getZ(), 0.0);
-        EngineBoundingBox entityBox = (EngineBoundingBox) originalBoundingBox.clone().expand(negativeX, negativeY, negativeZ, positiveX, positiveY, positiveZ);
-    
+
+        EngineBoundingBox entityBox = originalBoundingBox.clone().expandForMovement(movement);
+        entityBox.expand(movementCollideOption.getBoundingBoxGrow());
+        entityBox.expand(1.5);
+
         //collect collisions
         Set<EngineBoundingBox> boxList = new HashSet<>();
     
         //get block collisions
-        int startX = NumberConversions.floor(entityBox.getMinX() - 1.5);
-        int startY = NumberConversions.floor(entityBox.getMinY() - 1.5);
-        int startZ = NumberConversions.floor(entityBox.getMinZ() - 1.5);
+        int startX = NumberConversions.floor(entityBox.getMinX());
+        int startY = NumberConversions.floor(entityBox.getMinY());
+        int startZ = NumberConversions.floor(entityBox.getMinZ());
     
-        int endX = NumberConversions.floor(entityBox.getMaxX() + 1.5);
-        int endY = NumberConversions.floor(entityBox.getMaxY() + 1.5);
-        int endZ = NumberConversions.floor(entityBox.getMaxZ() + 1.5);
+        int endX = NumberConversions.floor(entityBox.getMaxX());
+        int endY = NumberConversions.floor(entityBox.getMaxY());
+        int endZ = NumberConversions.floor(entityBox.getMaxZ());
     
         INMSHandler nmsHandler = THPEngineAPI.getInstance().getNMSHandler();
-        
+
+        EngineChunk chunk = null;
+
         for(int x = startX; x < endX; x++){
             for(int y = startY; y < endY; y++){
                 for(int z = startZ; z < endZ; z++){
                     int chunkX = x >> 4;
                     int chunkZ = z >> 4;
-                    
+
                     //get chunk cache
-                    EngineChunk chunk = world.getChunkAt(chunkX, chunkZ);
+                    if(chunk == null) {
+                        chunk = world.getChunkAt(chunkX, chunkZ);
+                    }else if(chunk.getChunkX() != chunkX || chunk.getChunkZ() != chunkZ){
+                        chunk = world.getChunkAt(chunkX, chunkZ);
+                    }
                     if(chunk == null){
                         boxList.add(EngineBoundingBox.getBoundingBoxForUnloadChunk(chunkX, chunkZ));
                         continue;
@@ -276,6 +305,28 @@ public abstract class EngineEntity implements TickBase {
         }
     
         entityBox = originalBoundingBox;
+
+        //apply collision option
+        boxList.removeIf(boundingBox -> {
+            if(movementCollideOption.getCollideBoundingBoxFunction() != null){
+                if(!movementCollideOption.getCollideBoundingBoxFunction().apply(boundingBox)){
+                    return true;
+                }
+            }
+            if(movementCollideOption.getCollideBlockFunction() != null){
+                if(boundingBox instanceof EngineBlockBoundingBox) {
+                    if (!movementCollideOption.getCollideBlockFunction().apply(((EngineBlockBoundingBox) boundingBox).getBlock())){
+                        return true;
+                    }
+                }
+            }
+            if(movementCollideOption.getCollideEntityFunction() != null){
+                if(boundingBox instanceof EngineEntityBoundingBox){
+                    return !movementCollideOption.getCollideEntityFunction().apply(((EngineEntityBoundingBox) boundingBox).getEntity());
+                }
+            }
+            return false;
+        });
     
         //perform movement
         PerformCollisionResult result = entityBox.performCollisions(movement, boxList);

@@ -188,9 +188,18 @@ public class EngineBoundingBox extends BoundingBox implements Cloneable {
         
         return new PerformCollisionResult(new Vector(deltaX, deltaY, deltaZ), hitBoundingBoxList);
     }
+
+    public EngineBoundingBox expandForMovement(Vector movement){
+        double negativeX = Math.abs(Math.min(movement.getX(), 0.0));
+        double negativeY = Math.abs(Math.min(movement.getY(), 0.0));
+        double negativeZ = Math.abs(Math.min(movement.getZ(), 0.0));
+        double positiveX = Math.max(movement.getX(), 0.0);
+        double positiveY = Math.max(movement.getY(), 0.0);
+        double positiveZ = Math.max(movement.getZ(), 0.0);
+
+        return (EngineBoundingBox) super.expand(negativeX, negativeY, negativeZ, positiveX, positiveY, positiveZ);
+    }
     
     @Override
-    public @NotNull EngineBoundingBox clone() {
-        return (EngineBoundingBox) super.clone();
-    }
+    public @NotNull EngineBoundingBox clone() {return (EngineBoundingBox) super.clone();}
 }

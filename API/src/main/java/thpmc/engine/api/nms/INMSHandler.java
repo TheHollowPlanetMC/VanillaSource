@@ -78,6 +78,6 @@ public interface INMSHandler {
     
     void collectBlockCollisions(EngineBlock engineBlock, Collection<EngineBoundingBox> boundingBoxCollection, CollideOption collideOption);
     
-    boolean hasCollision(Object iBlockData);
+    boolean hasCollision(EngineBlock engineBlock, CollideOption collideOption);
     
 }

@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class TickRunner implements Runnable {
@@ -25,7 +27,10 @@ public class TickRunner implements Runnable {
     
     public static final int TPS = 20;
     public static final long TIME = 1000 / TPS;
-    
+
+    //tick executor
+    private final ExecutorService tickExecutor = Executors.newSingleThreadExecutor();
+
     private final Set<EngineEntity> entities = new HashSet<>();
     
     private final Set<TickBase> tickOnlyEntities = new HashSet<>();
@@ -147,6 +152,16 @@ public class TickRunner implements Runnable {
         i++;
     }
     
-    public void cancel() {isStopped = true;}
+    public void cancel() {
+        isStopped = true;
+        MainThreadTimer.instance.removeTickRunner(this);
+        tickExecutor.shutdown();
+    }
+
+    public void start(){
+        MainThreadTimer.instance.addTickRunner(this);}
+
+    public void tickAtAsync(){tickExecutor.submit(this);}
+
 }
 

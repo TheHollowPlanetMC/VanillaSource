@@ -40,6 +40,7 @@ public class TestListener implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event){
         Player player = event.getPlayer();
+        if(!event.getMessage().equals("spawn")) return;
         
         TaskHandler.runSync(() -> {
             Location location = player.getLocation();
@@ -48,10 +49,16 @@ public class TestListener implements Listener {
             GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
             NMSEntity entityPlayer = nmsHandler.createNMSEntity(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
             entityPlayer.setPositionRaw(location.getX(), location.getY(), location.getZ());
+
+            CollideOption collideOption = new CollideOption(FluidCollisionMode.ALWAYS, false);
+            collideOption.setCollideBlockFunction(engineBlock -> {
+                return engineBlock.getMaterial() != Material.GLASS;
+            });
     
             THPEngineAPI.getInstance().getTickRunnerPool().spawn(tickRunner -> {
                 EnginePlayerEntity npc = new EnginePlayerEntity(tickRunner.getThreadLocalCache().getWorld(location.getWorld().getName()), (NMSEntityPlayer) entityPlayer, tickRunner, true);
                 npc.getGoalSelector().registerGoal(0, new EntityFollowGoal(player));
+                npc.setMovementCollideOption(collideOption);
                 tickRunner.addEntity(npc);
             });
         });
@@ -102,7 +109,7 @@ public class TestListener implements Listener {
             collideOption.setCollideBlockFunction(engineBlock -> {
                 return engineBlock.getMaterial() != Material.OAK_LEAVES;
             });
-            EngineRayTraceResult rayTraceResult = world.rayTraceBlocksForShort(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection(), 20, collideOption);
+            EngineRayTraceResult rayTraceResult = world.rayTrace(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection(), 20, collideOption);
             if(rayTraceResult == null){
                 player.sendMessage("NOT HIT!");
             }else{

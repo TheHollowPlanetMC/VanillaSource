@@ -3,6 +3,7 @@ package thpmc.engine.api.entity.ai.pathfinding;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import thpmc.engine.api.util.collision.CollideOption;
 import thpmc.engine.api.world.cache.EngineWorld;
 
 import java.util.*;
@@ -32,6 +33,8 @@ public class AsyncAStarMachine {
     private final int maxIteration;
     //avoid entity collision
     private final boolean avoidEntityCollision;
+    //collision option
+    private final CollideOption collideOption;
     
     
     /**
@@ -42,8 +45,9 @@ public class AsyncAStarMachine {
      * @param descendingHeight Height to which it can descend
      * @param jumpHeight Height to which it can jump
      * @param maxIteration Max iteration to give up
+     * @param collideOption Option for collision
      */
-    public AsyncAStarMachine(EngineWorld world, BlockPosition start, BlockPosition goal, int descendingHeight, int jumpHeight, int maxIteration, boolean avoidEntityCollision){
+    public AsyncAStarMachine(EngineWorld world, BlockPosition start, BlockPosition goal, int descendingHeight, int jumpHeight, int maxIteration, boolean avoidEntityCollision, CollideOption collideOption){
         this.world = world;
         this.start = start;
         this.goal = goal;
@@ -51,6 +55,7 @@ public class AsyncAStarMachine {
         this.jumpHeight = jumpHeight;
         this.maxIteration = maxIteration;
         this.avoidEntityCollision = avoidEntityCollision;
+        this.collideOption = collideOption;
     }
     
     
@@ -109,7 +114,7 @@ public class AsyncAStarMachine {
             NodeData finalCurrentNode = currentNode;
             //Bukkit.getOnlinePlayers().forEach(player -> player.sendBlockChange(new Location(Bukkit.getWorld(world.getName()), finalCurrentNode.blockPosition.x, finalCurrentNode.blockPosition.y, finalCurrentNode.blockPosition.z), Material.GLASS.createBlockData()));
             
-            for(BlockPosition blockPosition : currentNode.getNeighbourBlockPosition(descendingHeight, jumpHeight, world)){
+            for(BlockPosition blockPosition : currentNode.getNeighbourBlockPosition(descendingHeight, jumpHeight, world, collideOption)){
                 
                 //Check if closed
                 NodeData newNode = openNode(currentNode, blockPosition);

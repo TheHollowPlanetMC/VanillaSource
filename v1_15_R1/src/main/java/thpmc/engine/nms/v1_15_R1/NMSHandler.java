@@ -27,6 +27,7 @@ import thpmc.engine.api.util.collision.CollideOption;
 import thpmc.engine.api.util.collision.EngineBlockBoundingBox;
 import thpmc.engine.api.util.collision.EngineBoundingBox;
 import thpmc.engine.api.world.block.EngineBlock;
+import thpmc.engine.api.world.cache.EngineChunk;
 import thpmc.engine.api.world.cache.EngineWorld;
 import thpmc.engine.nms.v1_15_R1.entity.EntityManager;
 import thpmc.engine.nms.v1_15_R1.packet.PacketManager;
@@ -151,18 +152,54 @@ public class NMSHandler implements INMSHandler {
     }
     
     private boolean checkUpperBlockHasFluid(Fluid fluid, EngineBlock block){
-        EngineWorld world = block.getWorld();
-        IBlockData upperBlockData = (IBlockData) world.getNMSBlockData(block.getX(), block.getY() + 1, block.getZ());
+        EngineChunk chunk = block.getChunk();
+        IBlockData upperBlockData = (IBlockData) chunk.getNMSBlockData(block.getX(), block.getY() + 1, block.getZ());
         if(upperBlockData == null) return false;
         
         return fluid.getType().a(upperBlockData.getFluid().getType());
     }
     
     @Override
-    public boolean hasCollision(Object iBlockData) {
-        IBlockData nmsBlockData = (IBlockData) iBlockData;
-        if(nmsBlockData.isAir()) return false;
-        return !nmsBlockData.getCollisionShape(null, null).isEmpty();
+    public boolean hasCollision(EngineBlock engineBlock, CollideOption collideOption) {
+        IBlockData iBlockData = ((IBlockData) engineBlock.getNMSBlockData());
+        boolean hasCollision = false;
+
+        int blockX = engineBlock.getX();
+        int blockY = engineBlock.getY();
+        int blockZ = engineBlock.getZ();
+        BlockPosition blockPosition = new BlockPosition.MutableBlockPosition(blockX, blockY, blockZ);
+
+        if(collideOption.isIgnorePassableBlocks()){
+            if(!iBlockData.getCollisionShape(null, blockPosition).isEmpty()){
+                hasCollision = true;
+            }
+        }else{
+            if(!iBlockData.getShape(null, blockPosition).isEmpty()){
+                hasCollision = true;
+            }
+        }
+
+        Fluid fluid = iBlockData.getFluid();
+        if(!fluid.isEmpty()) {
+            switch (collideOption.getFluidCollisionMode()) {
+                case ALWAYS: {
+                    if(!getFluidVoxelShape(fluid, engineBlock).isEmpty()){
+                        hasCollision = true;
+                    }
+                    break;
+                }
+                case SOURCE_ONLY: {
+                    if (fluid.isSource()) {
+                        if(!getFluidVoxelShape(fluid, engineBlock).isEmpty()){
+                            hasCollision = true;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        return hasCollision;
     }
     
     @Override

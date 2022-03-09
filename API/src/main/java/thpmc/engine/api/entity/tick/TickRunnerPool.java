@@ -12,13 +12,9 @@ import java.util.function.Consumer;
 
 public class TickRunnerPool {
     
-    private final ScheduledExecutorService executorService;
-    
     private final List<TickRunner> asyncTickRunnerList;
     
     public TickRunnerPool(int poolSize){
-        executorService = Executors.newScheduledThreadPool(poolSize);
-        
         asyncTickRunnerList = new ArrayList<>();
         for(int i = 0; i < poolSize; i++){
             asyncTickRunnerList.add(new TickRunner(i));
@@ -26,12 +22,11 @@ public class TickRunnerPool {
     }
     
     public void startAll(){
-        asyncTickRunnerList.forEach(runner -> executorService.scheduleAtFixedRate(runner, 0, TickRunner.TIME, TimeUnit.MILLISECONDS));
+        asyncTickRunnerList.forEach(TickRunner::start);
     }
     
     public void cancelAll(){
         asyncTickRunnerList.forEach(TickRunner::cancel);
-        executorService.shutdown();
     }
     
     public List<TickRunner> getAsyncTickRunnerList() {return asyncTickRunnerList;}

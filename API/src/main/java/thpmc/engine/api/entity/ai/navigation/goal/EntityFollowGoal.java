@@ -11,6 +11,8 @@ import thpmc.engine.api.entity.ai.navigation.GoalSelector;
 import thpmc.engine.api.entity.ai.navigation.Navigator;
 import thpmc.engine.api.entity.ai.pathfinding.BlockPosition;
 import thpmc.engine.api.nms.INMSHandler;
+import thpmc.engine.api.world.block.EngineBlock;
+import thpmc.engine.api.world.cache.EngineChunk;
 import thpmc.engine.api.world.cache.EngineWorld;
 
 import java.util.Random;
@@ -44,12 +46,15 @@ public class EntityFollowGoal implements PathfindingGoal{
         if(!world.getName().equals(target.getWorld().getName())) return;
         
         Location location = target.getLocation();
+        EngineChunk chunk = world.getChunkAt(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        if(chunk == null) return;
+
         for (int dy = 0; dy < 5; dy++) {
             Location l = location.clone().add(new Vector(0, -dy, 0));
             Object nmsBlockData = world.getNMSBlockData(l.getBlockX(), l.getBlockY(), l.getBlockZ());
             if(nmsBlockData == null) continue;
             
-            if (nmsHandler.hasCollision(nmsBlockData)) {
+            if (nmsHandler.hasCollision(new EngineBlock(world, chunk, l.getBlockX(), l.getBlockY(), l.getBlockZ(), nmsBlockData), navigator.getEntity().getMovementCollideOption())) {
                 //Goal set
                 navigator.setNavigationGoal(new BlockPosition(l.getBlockX(), l.getBlockY() + 1, l.getBlockZ()));
                 break;

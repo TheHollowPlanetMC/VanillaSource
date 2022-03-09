@@ -2,6 +2,7 @@ package thpmc.engine;
 
 import be4rjp.artgui.ArtGUI;
 import be4rjp.parallel.Config;
+import thpmc.engine.api.entity.tick.MainThreadTimer;
 import thpmc.engine.listener.PlayerJoinQuitListener;
 import be4rjp.parallel.command.parallelCommandExecutor;
 import be4rjp.parallel.util.TaskHandler;
@@ -34,7 +35,10 @@ public final class THPEngine extends JavaPlugin {
         
         //Create api instance
         api = new ImplTHPEngineAPI(this, NMSManager.getNMSHandler(), 24);
-        TaskHandler.runSync(() -> api.startAsyncThreads());
+        TaskHandler.runSync(() -> {
+            MainThreadTimer.instance.runTaskTimer(this, 0, 1);
+            api.startAsyncThreads();
+        });
 
         artGUI = new ArtGUI(this);
 

@@ -50,7 +50,7 @@ public class ImplEntityPlayer extends EntityPlayer implements NMSEntityPlayer {
     }
     
     @Override
-    public EngineBoundingBox getEngineBoundingBox(EngineEntity entity) {
+    public EngineEntityBoundingBox getEngineBoundingBox(EngineEntity entity) {
         AxisAlignedBB aabb = super.getBoundingBox();
         return new EngineEntityBoundingBox(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ, entity);
     }

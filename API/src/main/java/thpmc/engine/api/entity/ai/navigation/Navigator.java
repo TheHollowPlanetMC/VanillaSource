@@ -203,7 +203,7 @@ public class Navigator {
         
         if(!asyncPathfinding){
             BlockPosition start = new BlockPosition(locX, locY, locZ);
-            List<BlockPosition> paths = new AsyncAStarMachine(entity.getWorld(), start, navigationGoal, descendingHeight, (int) jumpHeight, 50, avoidEntityCollision).runPathFinding();
+            List<BlockPosition> paths = new AsyncAStarMachine(entity.getWorld(), start, navigationGoal, descendingHeight, (int) jumpHeight, 50, avoidEntityCollision, entity.getMovementCollideOption()).runPathFinding();
             
             //merge
             currentPaths = new ArrayList<>();
@@ -236,7 +236,7 @@ public class Navigator {
         
         //Start AsyncAStarMachine
         BlockPosition start = new BlockPosition(locX, locY, locZ);
-        AsyncAStarMachine asyncAStarMachine = new AsyncAStarMachine(entity.getWorld(), start, navigationGoal, descendingHeight, (int) jumpHeight, 500, avoidEntityCollision);
+        AsyncAStarMachine asyncAStarMachine = new AsyncAStarMachine(entity.getWorld(), start, navigationGoal, descendingHeight, (int) jumpHeight, 500, avoidEntityCollision, entity.getMovementCollideOption());
         this.pathfindingTask = asyncAStarMachine.runPathfindingAsync();
         
         //Then finish pathfinding

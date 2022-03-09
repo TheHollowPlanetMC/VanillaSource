@@ -2,6 +2,7 @@ package thpmc.engine.api.world;
 
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thpmc.engine.api.entity.EngineEntity;
 
@@ -26,7 +27,7 @@ public interface IChunk {
      * @param sectionIndex Section array index.
      * @return Entities in a section.
      */
-    Set<EngineEntity> getEntitiesInSection(int sectionIndex);
+    @NotNull Set<EngineEntity> getEntitiesInSection(int sectionIndex);
     
     /**
      * Get the material for a block in this chunk.

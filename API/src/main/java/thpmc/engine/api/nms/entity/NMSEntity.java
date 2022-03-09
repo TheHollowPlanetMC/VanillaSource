@@ -4,6 +4,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import thpmc.engine.api.entity.EngineEntity;
 import thpmc.engine.api.util.collision.EngineBoundingBox;
+import thpmc.engine.api.util.collision.EngineEntityBoundingBox;
 import thpmc.engine.api.util.math.Vec2f;
 
 /**
@@ -50,9 +51,9 @@ public interface NMSEntity {
     
     /**
      * Get entity bounding box.
-     * @return {@link EngineBoundingBox}
+     * @return {@link EngineEntityBoundingBox}
      */
-    EngineBoundingBox getEngineBoundingBox(EngineEntity entity);
+    EngineEntityBoundingBox getEngineBoundingBox(EngineEntity entity);
     
     /**
      * Recalculate the BoundingBox after the entity has moved.

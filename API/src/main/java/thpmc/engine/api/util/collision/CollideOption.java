@@ -13,8 +13,8 @@ import java.util.function.Function;
  */
 public class CollideOption {
     
-    private final FluidCollisionMode fluidCollisionMode;
-    private final boolean ignorePassableBlocks;
+    private FluidCollisionMode fluidCollisionMode;
+    private boolean ignorePassableBlocks;
     private double boundingBoxGrow = 0.0;
     private Function<EngineBlock, Boolean> collideBlockFunction = null;
     private Function<EngineEntity, Boolean> collideEntityFunction = null;
@@ -25,7 +25,7 @@ public class CollideOption {
      * @param fluidCollisionMode {@link FluidCollisionMode}
      * @param ignorePassableBlocks Whether to ignore passable blocks (water, grass, etc...).
      */
-    public CollideOption(FluidCollisionMode fluidCollisionMode, boolean ignorePassableBlocks) {
+    public CollideOption(@NotNull FluidCollisionMode fluidCollisionMode, boolean ignorePassableBlocks) {
         this.fluidCollisionMode = fluidCollisionMode;
         this.ignorePassableBlocks = ignorePassableBlocks;
     }
@@ -42,7 +42,7 @@ public class CollideOption {
      * @param collideBoundingBoxFunction The operation to be performed during collision processing.
      *                                   If false is returned for a {@link EngineBoundingBox}, that BoundingBox is excluded from collision processing.
      */
-    public CollideOption(FluidCollisionMode fluidCollisionMode, boolean ignorePassableBlocks, double boundingBoxGrow,
+    public CollideOption(@NotNull FluidCollisionMode fluidCollisionMode, boolean ignorePassableBlocks, double boundingBoxGrow,
                          @Nullable Function<EngineBlock, Boolean> collideBlockFunction,
                          @Nullable Function<EngineEntity, Boolean> collideEntityFunction,
                          @Nullable Function<EngineBoundingBox, Boolean> collideBoundingBoxFunction) {
@@ -64,7 +64,11 @@ public class CollideOption {
     public @Nullable Function<EngineBoundingBox, Boolean> getCollideBoundingBoxFunction() {return collideBoundingBoxFunction;}
     
     public @Nullable Function<EngineEntity, Boolean> getCollideEntityFunction() {return collideEntityFunction;}
-    
+
+    public void setFluidCollisionMode(FluidCollisionMode fluidCollisionMode) {this.fluidCollisionMode = fluidCollisionMode;}
+
+    public void setIgnorePassableBlocks(boolean ignorePassableBlocks) {this.ignorePassableBlocks = ignorePassableBlocks;}
+
     /**
      * Expands the BoundingBox by the specified value when processing collisions.
      * In the case of raytrace, it works in the same way as the thickness of a ray.

@@ -149,12 +149,48 @@ public class NMSHandler implements INMSHandler {
         
         return fluid.getType().a(upperBlockData.getFluid().getType());
     }
-    
+
     @Override
-    public boolean hasCollision(Object iBlockData) {
-        IBlockData nmsBlockData = (IBlockData) iBlockData;
-        if(nmsBlockData.isAir()) return false;
-        return !nmsBlockData.getCollisionShape(null, null).isEmpty();
+    public boolean hasCollision(EngineBlock engineBlock, CollideOption collideOption) {
+        IBlockData iBlockData = ((IBlockData) engineBlock.getNMSBlockData());
+        boolean hasCollision = false;
+
+        int blockX = engineBlock.getX();
+        int blockY = engineBlock.getY();
+        int blockZ = engineBlock.getZ();
+        BlockPosition blockPosition = new BlockPosition.MutableBlockPosition(blockX, blockY, blockZ);
+
+        if(collideOption.isIgnorePassableBlocks()){
+            if(!iBlockData.getCollisionShape(null, blockPosition).isEmpty()){
+                hasCollision = true;
+            }
+        }else{
+            if(!iBlockData.getShape(null, blockPosition).isEmpty()){
+                hasCollision = true;
+            }
+        }
+
+        Fluid fluid = iBlockData.getFluid();
+        if(!fluid.isEmpty()) {
+            switch (collideOption.getFluidCollisionMode()) {
+                case ALWAYS: {
+                    if(!getFluidVoxelShape(fluid, engineBlock).isEmpty()){
+                        hasCollision = true;
+                    }
+                    break;
+                }
+                case SOURCE_ONLY: {
+                    if (fluid.isSource()) {
+                        if(!getFluidVoxelShape(fluid, engineBlock).isEmpty()){
+                            hasCollision = true;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        return hasCollision;
     }
     
     @Override
