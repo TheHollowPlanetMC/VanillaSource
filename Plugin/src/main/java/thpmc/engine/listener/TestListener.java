@@ -109,7 +109,8 @@ public class TestListener implements Listener {
             collideOption.setCollideBlockFunction(engineBlock -> {
                 return engineBlock.getMaterial() != Material.OAK_LEAVES;
             });
-            EngineRayTraceResult rayTraceResult = world.rayTrace(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection(), 20, collideOption);
+            collideOption.setBoundingBoxGrow(0.2);
+            EngineRayTraceResult rayTraceResult = world.rayTraceEntities(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection(), 20, collideOption);
             if(rayTraceResult == null){
                 player.sendMessage("NOT HIT!");
             }else{

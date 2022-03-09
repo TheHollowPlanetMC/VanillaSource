@@ -89,9 +89,9 @@ public interface EngineWorld extends IWorld {
 
             EngineRayTraceResult nearestResult = null;
 
-            for(double index = 0; index <= distance; index += 1.0){
+            for(double index = 0; index <= distance; index += 16.0){
                 Vector start = startPosition.clone().add(normalizedVector.clone().multiply(index));
-                EngineRayTraceResult result = rayTraceEntitiesForShortRange(start, normalizedVector, 1.0, collideOption);
+                EngineRayTraceResult result = rayTraceEntitiesForShortRange(start, normalizedVector, 16.0, collideOption);
                 if(result == null) continue;
                 if(result.getHitPosition().distanceSquared(startPosition) > distanceSquared) continue;
 
@@ -143,9 +143,9 @@ public interface EngineWorld extends IWorld {
 
         Set<EngineEntity> entities = new HashSet<>();
 
-        for(int chunkX = minX; chunkX < maxX; chunkX++){
-            for(int chunkY = minY; chunkY < maxY; chunkY++){
-                for(int chunkZ = minZ; chunkZ < maxZ; chunkZ++){
+        for(int chunkX = minX; chunkX <= maxX; chunkX++){
+            for(int chunkY = minY; chunkY <= maxY; chunkY++){
+                for(int chunkZ = minZ; chunkZ <= maxZ; chunkZ++){
                     EngineChunk chunk = this.getChunkAt(chunkX, chunkZ);
                     if(chunk == null) continue;
 

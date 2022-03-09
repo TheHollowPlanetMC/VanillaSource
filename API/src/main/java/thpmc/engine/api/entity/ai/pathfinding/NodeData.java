@@ -47,16 +47,16 @@ public class NodeData {
         boolean p3 = addIfCanStand(neighbour, new BlockPosition(blockPosition.x - 1, blockPosition.y, blockPosition.z), world, collideOption);
         boolean p4 = addIfCanStand(neighbour, new BlockPosition(blockPosition.x, blockPosition.y, blockPosition.z - 1), world, collideOption);
         
-        if(!p1 || !p2){
+        if(p1 || p2){
             addIfCanStand(neighbour, new BlockPosition(blockPosition.x + 1, blockPosition.y, blockPosition.z + 1), world, collideOption);
         }
-        if(!p2 || !p3){
+        if(p2 || p3){
             addIfCanStand(neighbour, new BlockPosition(blockPosition.x - 1, blockPosition.y, blockPosition.z + 1), world, collideOption);
         }
-        if(!p3 || !p4){
+        if(p3 || p4){
             addIfCanStand(neighbour, new BlockPosition(blockPosition.x - 1, blockPosition.y, blockPosition.z - 1), world, collideOption);
         }
-        if(!p4 ||! p1){
+        if(p4 || p1){
             addIfCanStand(neighbour, new BlockPosition(blockPosition.x + 1, blockPosition.y, blockPosition.z - 1), world, collideOption);
         }
         
