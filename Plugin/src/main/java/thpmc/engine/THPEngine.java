@@ -1,15 +1,19 @@
 package thpmc.engine;
 
 import be4rjp.artgui.ArtGUI;
-import be4rjp.parallel.Config;
+import org.bukkit.Material;
+import org.bukkit.scheduler.BukkitRunnable;
 import thpmc.engine.api.entity.tick.MainThreadTimer;
+import thpmc.engine.api.natives.NativeBridge;
+import thpmc.engine.config.ImplTHPESettings;
 import thpmc.engine.listener.PlayerJoinQuitListener;
-import be4rjp.parallel.command.parallelCommandExecutor;
-import be4rjp.parallel.util.TaskHandler;
+import thpmc.engine.command.parallelCommandExecutor;
+import thpmc.engine.natives.NativeManager;
+import thpmc.engine.util.TaskHandler;
 import thpmc.engine.impl.ImplTHPEngineAPI;
-import be4rjp.parallel.nms.NMSManager;
-import be4rjp.parallel.structure.ParallelStructure;
-import be4rjp.parallel.structure.ImplStructureData;
+import thpmc.engine.nms.NMSManager;
+import thpmc.engine.structure.ParallelStructure;
+import thpmc.engine.structure.ImplStructureData;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,9 +33,20 @@ public final class THPEngine extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         plugin = this;
-    
+        
+        //Load config
+        ImplTHPESettings.load();
+        
+        //Load native library
+        NativeManager.loadNativeLibrary();
+        
+        
+        
         //NMS setup
         NMSManager.setup();
+        
+        NMSManager.getNMSHandler().registerBlocksForNative();
+        NativeBridge.test2(7767);
         
         //Create api instance
         api = new ImplTHPEngineAPI(this, NMSManager.getNMSHandler(), 24);
@@ -42,8 +57,7 @@ public final class THPEngine extends JavaPlugin {
 
         artGUI = new ArtGUI(this);
 
-        //Load config
-        Config.load();
+        
     
         //Register event listeners
         getLogger().info("Registering event listeners...");
@@ -68,7 +82,7 @@ public final class THPEngine extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        api.stopAsyncThreads();
+        if(api != null) api.stopAsyncThreads();
     }
     
     

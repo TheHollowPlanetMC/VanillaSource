@@ -1,11 +1,11 @@
 package thpmc.engine.listener;
 
-import be4rjp.parallel.ParallelUniverse;
-import be4rjp.parallel.chiyogami.ChiyogamiManager;
+import thpmc.engine.api.world.parallel.ParallelUniverse;
+import thpmc.engine.chiyogami.ChiyogamiManager;
 import thpmc.engine.api.player.EnginePlayer;
 import thpmc.engine.impl.ImplEnginePlayer;
-import be4rjp.parallel.nms.NMSManager;
-import be4rjp.parallel.nms.PacketHandler;
+import thpmc.engine.nms.NMSManager;
+import thpmc.engine.nms.PacketHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import org.bukkit.entity.Player;

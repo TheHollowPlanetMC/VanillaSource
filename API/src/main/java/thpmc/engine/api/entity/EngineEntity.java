@@ -81,6 +81,8 @@ public abstract class EngineEntity implements TickBase {
             Vec2f yawPitch = nmsEntity.getYawPitch();
             this.yaw = yawPitch.x;
             this.pitch = yawPitch.y;
+            
+            this.chunk = world.getChunkAt(NumberConversions.floor(x) >> 4, NumberConversions.floor(z) >> 4);
         }else{
             this.x = 0.0;
             this.y = 0.0;

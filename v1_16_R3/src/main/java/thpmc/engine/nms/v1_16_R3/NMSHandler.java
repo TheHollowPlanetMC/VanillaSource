@@ -1,11 +1,11 @@
 package thpmc.engine.nms.v1_16_R3;
 
-import be4rjp.parallel.ParallelChunk;
-import be4rjp.parallel.ParallelWorld;
+import thpmc.engine.api.world.parallel.ParallelChunk;
+import thpmc.engine.api.world.parallel.ParallelWorld;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import thpmc.engine.api.nms.INMSHandler;
-import be4rjp.parallel.util.BlockPosition3i;
+import thpmc.engine.util.BlockPosition3i;
 import io.netty.channel.Channel;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.block.data.BlockData;
@@ -191,6 +191,11 @@ public class NMSHandler implements INMSHandler {
         }
 
         return hasCollision;
+    }
+    
+    @Override
+    public void registerBlocksForNative() {
+    
     }
     
     @Override

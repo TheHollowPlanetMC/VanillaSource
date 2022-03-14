@@ -1,14 +1,11 @@
-# 動作モードの設定
-# NORMAL or ONLY_ONE
-# ONLY_ONEに設定した場合は全てのプレイヤーに対して同じParallelWorldが使われるようになります
-work-type: NORMAL
+# Setting whether to use cache when rewriting chunk packets.
+# If there is a possibility that block changes will be made outside this plugin, false is recommended.
+use-cached-chunk-packet: false
 
-# パフォーマンスモードを使用するかどうかの設定
-# このプラグイン以外でブロックの設置が行われる可能性のある場合は false 推奨
-performance-mode: false
-
-## ライトパケットへの介入を行うかどうかの設定
+# Setting whether to rewrite light packets.
 rewrite-light-packet: true
 
-# 読み込まれていないチャンクのパケットを送信しようとしたときに警告を表示するかどうかの設定
-show-chunk-packet-warning: true
+# Settings related to jni libraries.
+# Enabling the feature speeds up some processing only in some supported environments.
+jni-library:
+  use-jni-pathfinding: true

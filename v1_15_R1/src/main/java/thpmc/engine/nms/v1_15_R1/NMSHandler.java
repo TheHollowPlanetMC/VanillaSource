@@ -1,22 +1,15 @@
 package thpmc.engine.nms.v1_15_R1;
 
-import be4rjp.parallel.ParallelChunk;
-import be4rjp.parallel.ParallelWorld;
-import com.google.common.collect.Maps;
+import thpmc.engine.api.natives.NativeBridge;
+import thpmc.engine.api.world.parallel.ParallelChunk;
+import thpmc.engine.api.world.parallel.ParallelWorld;
 import org.bukkit.entity.EntityType;
 import thpmc.engine.api.nms.INMSHandler;
-import be4rjp.parallel.util.BlockPosition3i;
-import be4rjp.parallel.util.ChunkPosition;
-import be4rjp.parallel.util.SectionLevelArray;
-import be4rjp.parallel.util.SectionTypeArray;
+import thpmc.engine.util.BlockPosition3i;
 import io.netty.channel.Channel;
 import net.minecraft.server.v1_15_R1.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -28,7 +21,6 @@ import thpmc.engine.api.util.collision.EngineBlockBoundingBox;
 import thpmc.engine.api.util.collision.EngineBoundingBox;
 import thpmc.engine.api.world.block.EngineBlock;
 import thpmc.engine.api.world.cache.EngineChunk;
-import thpmc.engine.api.world.cache.EngineWorld;
 import thpmc.engine.nms.v1_15_R1.entity.EntityManager;
 import thpmc.engine.nms.v1_15_R1.packet.PacketManager;
 
@@ -200,6 +192,39 @@ public class NMSHandler implements INMSHandler {
         }
 
         return hasCollision;
+    }
+    
+    @Override
+    public void registerBlocksForNative() {
+        for(int id = 0; id < Block.REGISTRY_ID.a(); id++) {
+            IBlockData iBlockData = Block.REGISTRY_ID.fromId(id);
+            if(iBlockData == null){
+                throw new IllegalStateException("NULL!!");
+            }
+            
+            VoxelShape voxelShape;
+            try{
+                voxelShape = iBlockData.getCollisionShape(null, new BlockPosition.MutableBlockPosition(0, 0, 0));
+            }catch (NullPointerException e){
+                voxelShape = VoxelShapes.a();
+            }
+            
+            List<AxisAlignedBB> aabbList = voxelShape.d();
+            int length = aabbList.size() * 6;
+            double[] array = new double[length];
+    
+            for (int i = 0; i < aabbList.size(); i++) {
+                AxisAlignedBB aabb = aabbList.get(i);
+                array[i * 6] = aabb.minX;
+                array[i * 6 + 1] = aabb.minY;
+                array[i * 6 + 2] = aabb.minZ;
+                array[i * 6 + 3] = aabb.maxX;
+                array[i * 6 + 4] = aabb.maxY;
+                array[i * 6 + 5] = aabb.maxZ;
+            }
+    
+            NativeBridge.registerBlockInOrder(id, array);
+        }
     }
     
     @Override

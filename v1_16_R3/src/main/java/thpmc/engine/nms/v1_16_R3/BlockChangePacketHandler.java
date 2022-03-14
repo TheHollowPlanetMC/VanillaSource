@@ -1,7 +1,7 @@
 package thpmc.engine.nms.v1_16_R3;
 
-import be4rjp.parallel.ParallelUniverse;
-import be4rjp.parallel.ParallelWorld;
+import thpmc.engine.api.world.parallel.ParallelUniverse;
+import thpmc.engine.api.world.parallel.ParallelWorld;
 import thpmc.engine.api.nms.IPacketHandler;
 import thpmc.engine.api.player.EnginePlayer;
 import net.minecraft.server.v1_16_R3.BlockPosition;

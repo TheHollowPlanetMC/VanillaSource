@@ -1,8 +1,8 @@
 package thpmc.engine.api.nms;
 
-import be4rjp.parallel.ParallelChunk;
-import be4rjp.parallel.ParallelWorld;
-import be4rjp.parallel.util.BlockPosition3i;
+import thpmc.engine.api.world.parallel.ParallelChunk;
+import thpmc.engine.api.world.parallel.ParallelWorld;
+import thpmc.engine.util.BlockPosition3i;
 import io.netty.channel.Channel;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -11,13 +11,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import thpmc.engine.api.nms.entity.NMSEntity;
 import thpmc.engine.api.nms.enums.WrappedPlayerInfoAction;
-import thpmc.engine.api.player.EnginePlayer;
 import thpmc.engine.api.util.collision.CollideOption;
 import thpmc.engine.api.util.collision.EngineBoundingBox;
 import thpmc.engine.api.world.block.EngineBlock;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 public interface INMSHandler {
@@ -79,5 +77,7 @@ public interface INMSHandler {
     void collectBlockCollisions(EngineBlock engineBlock, Collection<EngineBoundingBox> boundingBoxCollection, CollideOption collideOption);
     
     boolean hasCollision(EngineBlock engineBlock, CollideOption collideOption);
+    
+    void registerBlocksForNative();
     
 }

@@ -1,6 +1,6 @@
 package thpmc.engine.api;
 
-import be4rjp.parallel.ParallelUniverse;
+import thpmc.engine.api.world.parallel.ParallelUniverse;
 import thpmc.engine.api.entity.tick.TickRunnerPool;
 import thpmc.engine.api.entity.tick.TickWatchDog;
 import thpmc.engine.api.nms.INMSHandler;
@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public abstract class THPEngineAPI {
     

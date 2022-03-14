@@ -1,6 +1,6 @@
 package thpmc.engine.listener;
 
-import be4rjp.parallel.util.TaskHandler;
+import thpmc.engine.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -21,15 +21,10 @@ import thpmc.engine.api.nms.INMSHandler;
 import thpmc.engine.api.nms.entity.NMSEntity;
 import thpmc.engine.api.nms.entity.NMSEntityPlayer;
 import thpmc.engine.api.util.collision.CollideOption;
-import thpmc.engine.api.util.collision.EngineBoundingBox;
-import thpmc.engine.api.world.block.EngineBlock;
 import thpmc.engine.api.world.cache.AsyncWorldCache;
-import thpmc.engine.api.world.cache.EngineChunk;
 import thpmc.engine.api.world.cache.EngineRayTraceResult;
 import thpmc.engine.api.world.cache.EngineWorld;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class TestListener implements Listener {

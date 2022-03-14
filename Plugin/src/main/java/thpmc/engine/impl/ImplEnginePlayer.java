@@ -1,10 +1,8 @@
 package thpmc.engine.impl;
 
-import be4rjp.parallel.ParallelChunk;
-import be4rjp.parallel.ParallelUniverse;
-import be4rjp.parallel.ParallelWorld;
-import be4rjp.parallel.impl.ImplParallelChunk;
-import be4rjp.parallel.impl.ImplParallelUniverse;
+import thpmc.engine.api.world.parallel.ParallelChunk;
+import thpmc.engine.api.world.parallel.ParallelUniverse;
+import thpmc.engine.api.world.parallel.ParallelWorld;
 import thpmc.engine.api.player.EnginePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

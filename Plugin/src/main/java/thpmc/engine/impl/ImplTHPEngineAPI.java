@@ -1,10 +1,9 @@
 package thpmc.engine.impl;
 
-import be4rjp.parallel.impl.ImplParallelUniverse;
-import be4rjp.parallel.nms.NMSManager;
+import thpmc.engine.nms.NMSManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import thpmc.engine.api.THPEngineAPI;
-import be4rjp.parallel.ParallelUniverse;
+import thpmc.engine.api.world.parallel.ParallelUniverse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thpmc.engine.api.nms.INMSHandler;

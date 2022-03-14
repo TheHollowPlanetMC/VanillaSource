@@ -1,6 +1,6 @@
 package thpmc.engine.api.player;
 
-import be4rjp.parallel.ParallelUniverse;
+import thpmc.engine.api.world.parallel.ParallelUniverse;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import thpmc.engine.api.THPEngineAPI;
