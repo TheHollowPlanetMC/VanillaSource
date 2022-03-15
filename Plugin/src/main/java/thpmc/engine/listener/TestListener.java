@@ -1,5 +1,6 @@
 package thpmc.engine.listener;
 
+import thpmc.engine.api.natives.NativeBridge;
 import thpmc.engine.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.FluidCollisionMode;
@@ -63,6 +64,10 @@ public class TestListener implements Listener {
     public void onPlayerClick(PlayerAnimationEvent event){
         Player player = event.getPlayer();
         if(!player.isSneaking()) return;
+        
+        Location loc = player.getLocation();
+        NativeBridge.test2(player.getWorld().getName().toCharArray(), loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ());
+        player.sendMessage("click!");
     
         /*
         List<EngineBoundingBox> list = new ArrayList<>();
@@ -97,7 +102,7 @@ public class TestListener implements Listener {
         }*/
         
     
-        
+        /*
         TaskHandler.runAsync(() -> {
             EngineWorld world = AsyncWorldCache.getAsyncWorld(player.getWorld().getName());
             CollideOption collideOption = new CollideOption(FluidCollisionMode.ALWAYS, false);
@@ -115,7 +120,7 @@ public class TestListener implements Listener {
                 player.spawnParticle(Particle.FLAME, hitPosition.getX(), hitPosition.getY(), hitPosition.getZ(), 0);
                 player.sendMessage("Hit face : " + hitFace);
             }
-        });
+        });*/
         
     
         /*

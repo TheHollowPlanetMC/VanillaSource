@@ -1,5 +1,6 @@
 package thpmc.engine.api.nms;
 
+import thpmc.engine.api.world.cache.AsyncEngineChunk;
 import thpmc.engine.api.world.parallel.ParallelChunk;
 import thpmc.engine.api.world.parallel.ParallelWorld;
 import thpmc.engine.util.BlockPosition3i;
@@ -79,5 +80,7 @@ public interface INMSHandler {
     boolean hasCollision(EngineBlock engineBlock, CollideOption collideOption);
     
     void registerBlocksForNative();
+    
+    void registerChunkForNative(String worldName, AsyncEngineChunk chunk);
     
 }

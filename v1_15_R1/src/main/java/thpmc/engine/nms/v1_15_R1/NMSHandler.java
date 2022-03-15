@@ -1,6 +1,6 @@
 package thpmc.engine.nms.v1_15_R1;
 
-import thpmc.engine.api.natives.NativeBridge;
+import thpmc.engine.api.world.cache.AsyncEngineChunk;
 import thpmc.engine.api.world.parallel.ParallelChunk;
 import thpmc.engine.api.world.parallel.ParallelWorld;
 import org.bukkit.entity.EntityType;
@@ -201,30 +201,13 @@ public class NMSHandler implements INMSHandler {
             if(iBlockData == null){
                 throw new IllegalStateException("NULL!!");
             }
-            
-            VoxelShape voxelShape;
-            try{
-                voxelShape = iBlockData.getCollisionShape(null, new BlockPosition.MutableBlockPosition(0, 0, 0));
-            }catch (NullPointerException e){
-                voxelShape = VoxelShapes.a();
-            }
-            
-            List<AxisAlignedBB> aabbList = voxelShape.d();
-            int length = aabbList.size() * 6;
-            double[] array = new double[length];
-    
-            for (int i = 0; i < aabbList.size(); i++) {
-                AxisAlignedBB aabb = aabbList.get(i);
-                array[i * 6] = aabb.minX;
-                array[i * 6 + 1] = aabb.minY;
-                array[i * 6 + 2] = aabb.minZ;
-                array[i * 6 + 3] = aabb.maxX;
-                array[i * 6 + 4] = aabb.maxY;
-                array[i * 6 + 5] = aabb.maxZ;
-            }
-    
-            NativeBridge.registerBlockInOrder(id, array);
+            NativeBlockRegister.registerInOrder(iBlockData);
         }
+    }
+    
+    @Override
+    public void registerChunkForNative(String worldName, AsyncEngineChunk chunk) {
+        NativeBlockRegister.registerChunk(worldName, chunk);
     }
     
     @Override

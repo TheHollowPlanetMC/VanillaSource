@@ -1,5 +1,6 @@
 package thpmc.engine.nms.v1_16_R3;
 
+import thpmc.engine.api.world.cache.AsyncEngineChunk;
 import thpmc.engine.api.world.parallel.ParallelChunk;
 import thpmc.engine.api.world.parallel.ParallelWorld;
 import org.bukkit.World;
@@ -195,6 +196,11 @@ public class NMSHandler implements INMSHandler {
     
     @Override
     public void registerBlocksForNative() {
+    
+    }
+    
+    @Override
+    public void registerChunkForNative(String worldName, AsyncEngineChunk chunk) {
     
     }
     

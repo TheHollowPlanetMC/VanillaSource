@@ -1,6 +1,7 @@
-use std::collections::HashMap;
-use std::sync::RwLock;
-use once_cell::sync::Lazy;
+use once_cell::unsync::Lazy;
+use crate::minecraft;
+use crate::minecraft::blocks;
+use crate::minecraft::blocks::NoiseDirection::{NONE, XYZ};
 use crate::minecraft::bounding_box::VoxelShape;
 
 //Static block registry
@@ -30,19 +31,72 @@ impl BlockRegistry {
     fn get_block_data(&self, id: i32) -> &BlockData{
         return &self.data_storage[id as usize];
     }
-
 }
 
 pub struct BlockData {
-    pub block_id: i32,
-    pub collision_shape: VoxelShape
+    block_id: i32,
+    collision_shape: NoisedShape,
+    shape: NoisedShape
 }
 
-pub fn register_block_in_order(id: i32, collision_shape: VoxelShape){
+pub struct NoisedShape {
+    pub direction: NoiseDirection,
+    pub based_shape: VoxelShape
+}
+
+static EMPTY_SHAPE: VoxelShape = VoxelShape {
+    aabb_list: vec![]
+};
+
+impl NoisedShape {
+    pub fn get_shape(&self, block_x: i32, block_y: i32, block_z: i32) -> VoxelShape {
+        let direction: i32 = self.direction.clone() as i32;
+
+        return if direction == NoiseDirection::NONE as i32 {
+            self.based_shape.clone()
+        } else {
+            let noise: i64 = minecraft::math::create_plant_noise(block_x, block_y, block_z);
+
+            let x = (((noise & 15_i64) as f32 / 15.0_f32) as f64 - 0.5_f64) * 0.5_f64;
+            let mut y = 0.0_f64;
+            if direction == NoiseDirection::XYZ as i32 {
+                y = (((noise >> 4 & 15_i64) as f32 / 15.0_f32) as f64 - 1.0_f64) * 0.2_f64;
+            }
+            let z = (((noise >> 8 & 15_i64) as f32 / 15.0_f32) as f64 - 0.5_f64) * 0.5_f64;
+
+            let new_shape: VoxelShape = self.based_shape.shift(x, y, z);
+            new_shape
+        }
+    }
+}
+
+#[derive(Copy, Clone)]
+pub enum NoiseDirection {
+    NONE = 0,
+    XZ = 1,
+    XYZ = 2
+}
+
+impl BlockData{
+    pub fn get_id(&self) -> i32 {
+        return self.block_id;
+    }
+
+    pub fn get_collision_shape(&self) -> &NoisedShape {
+        return &self.collision_shape;
+    }
+
+    pub fn get_shape(&self) -> &NoisedShape {
+        return &self.shape;
+    }
+}
+
+pub fn register_block_in_order(id: i32, collision_shape: NoisedShape, shape: NoisedShape){
     let temp = id;
     let data = BlockData {
         block_id: temp,
-        collision_shape
+        collision_shape,
+        shape
     };
 
     unsafe {
