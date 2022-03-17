@@ -46,10 +46,11 @@ public class TestListener implements Listener {
             NMSEntity entityPlayer = nmsHandler.createNMSEntity(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
             entityPlayer.setPositionRaw(location.getX(), location.getY(), location.getZ());
 
-            CollideOption collideOption = new CollideOption(FluidCollisionMode.ALWAYS, false);
+            CollideOption collideOption = new CollideOption(FluidCollisionMode.NEVER, true);
+            /*
             collideOption.setCollideBlockFunction(engineBlock -> {
                 return engineBlock.getMaterial() != Material.GLASS;
-            });
+            });*/
     
             THPEngineAPI.getInstance().getTickRunnerPool().spawn(tickRunner -> {
                 EnginePlayerEntity npc = new EnginePlayerEntity(tickRunner.getThreadLocalCache().getWorld(location.getWorld().getName()), (NMSEntityPlayer) entityPlayer, tickRunner, true);
@@ -65,9 +66,10 @@ public class TestListener implements Listener {
         Player player = event.getPlayer();
         if(!player.isSneaking()) return;
         
+        /*
         Location loc = player.getLocation();
         NativeBridge.test2(player.getWorld().getName().toCharArray(), loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ());
-        player.sendMessage("click!");
+        player.sendMessage("click!");*/
     
         /*
         List<EngineBoundingBox> list = new ArrayList<>();
@@ -123,7 +125,8 @@ public class TestListener implements Listener {
         });*/
         
     
-        /*
+        Location location = player.getLocation();
+        INMSHandler nmsHandler = THPEngineAPI.getInstance().getNMSHandler();
         for (int index = 0; index < 100; index++) {
             GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
             NMSEntity entityPlayer = nmsHandler.createNMSEntity(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
@@ -138,7 +141,7 @@ public class TestListener implements Listener {
             count++;
             
             player.sendMessage("PlayerNPC -> " + count);
-        }*/
+        }
     }
     
 }

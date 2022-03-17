@@ -3,6 +3,7 @@ package thpmc.engine.natives;
 import thpmc.engine.THPEngine;
 import thpmc.engine.api.natives.NativeBridge;
 import thpmc.engine.api.setting.THPESettings;
+import thpmc.engine.nms.NMSManager;
 
 import java.nio.file.Paths;
 
@@ -51,6 +52,13 @@ public class NativeManager {
             throw new IllegalStateException("Incorrect library version."
                     + System.lineSeparator() + "Plugin version : " + NativeBridge.LIBRARY_BRIDGE_VERSION
                     + System.lineSeparator() + "Library version : " + libraryVersion);
+        }
+    }
+    
+    
+    public static void registerBlocksForNative(){
+        if(THPESettings.isUseJNI()){
+            NMSManager.getNMSHandler().registerBlocksForNative();
         }
     }
     

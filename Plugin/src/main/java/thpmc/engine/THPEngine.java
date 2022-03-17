@@ -45,8 +45,7 @@ public final class THPEngine extends JavaPlugin {
         //NMS setup
         NMSManager.setup();
         
-        NMSManager.getNMSHandler().registerBlocksForNative();
-        //NativeBridge.test2(7767);
+        NativeManager.registerBlocksForNative();
         
         //Create api instance
         api = new ImplTHPEngineAPI(this, NMSManager.getNMSHandler(), 24);

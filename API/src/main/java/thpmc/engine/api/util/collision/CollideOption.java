@@ -59,6 +59,8 @@ public class CollideOption {
     
     public double getBoundingBoxGrow() {return boundingBoxGrow;}
     
+    public boolean hasFunctions(){return collideBlockFunction != null || collideEntityFunction != null || collideBoundingBoxFunction != null;}
+    
     public @Nullable Function<EngineBlock, Boolean> getCollideBlockFunction() {return collideBlockFunction;}
     
     public @Nullable Function<EngineBoundingBox, Boolean> getCollideBoundingBoxFunction() {return collideBoundingBoxFunction;}

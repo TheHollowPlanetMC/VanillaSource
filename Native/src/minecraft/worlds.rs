@@ -2,26 +2,27 @@ use std::collections::HashMap;
 use std::sync::RwLock;
 use once_cell::sync::Lazy;
 use crate::{BlockData, minecraft};
+use crate::collision::collisions::CollideOption;
 
 //World caches
-static mut GLOBAL_WORLD_REGISTRY: Lazy<AsyncWorldRegistry> = Lazy::new(AsyncWorldRegistry::new);
+static mut GLOBAL_WORLD_REGISTRY: Lazy<WorldRegistry> = Lazy::new(WorldRegistry::new);
 
-pub struct AsyncWorldRegistry {
-    world_map: HashMap<Vec<u16>, AsyncWorld>
+pub struct WorldRegistry {
+    world_map: HashMap<Vec<u16>, World>
 }
 
-impl AsyncWorldRegistry {
+impl WorldRegistry {
     fn new() -> Self {
-        let mut world_map: HashMap<Vec<u16>, AsyncWorld> = HashMap::new();
+        let mut world_map: HashMap<Vec<u16>, World> = HashMap::new();
         Self {
             world_map
         }
     }
 
-    pub fn get_world(&mut self, world_name: Vec<u16>) -> &mut AsyncWorld {
+    pub fn get_world(&mut self, world_name: Vec<u16>) -> &mut World {
         let map = &mut self.world_map;
         if !map.contains_key(&world_name) {
-            let mut world: AsyncWorld = AsyncWorld::new(world_name.clone());
+            let mut world: World = World::new(world_name.clone());
 
             map.insert(world_name.clone(), world);
         }
@@ -30,19 +31,19 @@ impl AsyncWorldRegistry {
     }
 }
 
-pub fn get_world(world_name: Vec<u16>) -> &'static mut AsyncWorld {
+pub fn get_world(world_name: Vec<u16>) -> &'static mut World {
     unsafe {
         return GLOBAL_WORLD_REGISTRY.get_world(world_name);
     }
 }
 
 
-pub struct AsyncWorld {
+pub struct World {
     pub world_name: Vec<u16>,
     pub chunk_map: RwLock<HashMap<i64, Chunk>>
 }
 
-impl AsyncWorld {
+impl World {
 
     fn new(world_name: Vec<u16>) -> Self {
         let mut map: HashMap<i64, Chunk> = HashMap::new();
@@ -106,6 +107,30 @@ impl Chunk {
         }
     }
 
+
+    pub fn has_collision(&self, block_x: i32, block_y: i32, block_z: i32, collide_option: &CollideOption) -> bool {
+        let index = minecraft::chunk_util::get_section_index(block_y);
+        let option = &self.sections[index];
+        return if option.is_none() {
+            false
+        } else {
+            let option = option.as_ref().unwrap().get_block_data(block_x, block_y, block_z);
+            if option.is_none() {
+                return false;
+            }
+
+            let block_data = option.unwrap();
+
+            if collide_option.is_ignore_passable_block {
+                let collision = block_data.get_collision_shape().get_shape(0, 0, 0);
+                !collision.is_empty()
+            } else {
+                let collision = block_data.get_shape().get_shape(0, 0, 0);
+                !collision.is_empty()
+            }
+        }
+    }
+
 }
 
 
@@ -130,7 +155,7 @@ impl ChunkSection {
 
 
 pub fn test() {
-    let mut world: &mut AsyncWorld = &mut AsyncWorld {
+    let mut world: &mut World = &mut World {
         world_name: vec![0],
         chunk_map: Default::default()
     };

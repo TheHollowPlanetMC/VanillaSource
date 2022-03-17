@@ -3,6 +3,8 @@ package thpmc.engine.api.entity.ai.pathfinding;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import thpmc.engine.api.natives.NativeBridge;
+import thpmc.engine.api.setting.THPESettings;
 import thpmc.engine.api.util.collision.CollideOption;
 import thpmc.engine.api.world.cache.EngineWorld;
 
@@ -71,6 +73,43 @@ public class AsyncAStarMachine {
     }
     
     public List<BlockPosition> runPathFinding(){
+        
+        //Fast native pathfinding
+        if(THPESettings.isUseJNIPathfinding() && !collideOption.hasFunctions()){
+            int[] options = new int[11];
+            options[0] = start.x;
+            options[1] = start.y;
+            options[2] = start.z;
+            
+            options[3] = goal.x;
+            options[4] = goal.y;
+            options[5] = goal.z;
+            
+            options[6] = descendingHeight;
+            options[7] = jumpHeight;
+            options[8] = maxIteration;
+            
+            options[9] = collideOption.getFluidCollisionMode().ordinal();
+            options[10] = collideOption.isIgnorePassableBlocks() ? 1 : 0;
+            
+            int[] result = NativeBridge.runAStar(world.getName().toCharArray(), options);
+            int size = result.length / 3;
+            
+            List<BlockPosition> paths = new ArrayList<>(size);
+            for(int i = 0; i < size; i++){
+                int ix = i * 3;
+                int iy = i * 3 + 1;
+                int iz = i * 3 + 2;
+                paths.add(new BlockPosition(result[ix], result[iy], result[iz]));
+            }
+            /*
+            for(BlockPosition blockPosition : paths){
+                Bukkit.getOnlinePlayers().forEach(player -> player.sendBlockChange(new Location(player.getWorld(), blockPosition.x, blockPosition.y, blockPosition.z), Material.LIME_STAINED_GLASS.createBlockData()));
+            }*/
+            
+            return paths;
+        }
+        
         //Check the start and goal position.
         if(/*!canStandAt(start.x, start.y, start.z) || !canStandAt(goal.x, goal.y, goal.z) ||*/ start.equals(goal)){
             //I couldn't find a path...

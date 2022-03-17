@@ -1,14 +1,18 @@
 mod minecraft;
+mod pathfinding;
+mod collision;
 
 extern crate jni;
 
 use jni::sys::{jboolean, jchar, jcharArray, jclass, jdouble, jdoubleArray, jint, jintArray, jsize, jstring};
 use jni::JNIEnv;
 use jni::*;
+use crate::collision::collisions::{CollideOption, FluidCollisionMode};
 use crate::minecraft::blocks::{BlockData, NoiseDirection, NoisedShape, register_block_in_order};
 use crate::minecraft::bounding_box::{AABB, VoxelShape};
 use crate::minecraft::worlds::{Chunk, ChunkSection};
 use crate::NoiseDirection::{NONE, XYZ, XZ};
+use crate::pathfinding::astar::BlockPosition;
 
 //Library version
 const VERSION: jint = 0;
@@ -26,10 +30,10 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_getLibraryVers
 pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_registerBlockInOrder(env: JNIEnv, class: jclass, id: jint, collision: jdoubleArray, shape: jdoubleArray, noised_direction: jint){
     let length: jsize = env.get_array_length(collision).unwrap();
 
-    let mut arrayBuffer: Vec<jdouble> = vec![0.0; length as usize];
-    let arraySlice = &mut arrayBuffer;
+    let mut array_buffer: Vec<jdouble> = vec![0.0; length as usize];
+    let array_slice = &mut array_buffer;
 
-    env.get_double_array_region(collision, 0, arraySlice);
+    env.get_double_array_region(collision, 0, array_slice);
 
     static EMPTY_AABB: AABB = AABB{
         min_x: 0.0,
@@ -45,33 +49,33 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_registerBlockI
     for i in 0..aabbs {
         let min_index = (i * 6) as usize;
         collision_aabb_list[i as usize] = AABB{
-            min_x: arraySlice[min_index],
-            min_y: arraySlice[min_index + 1],
-            min_z: arraySlice[min_index + 2],
-            max_x: arraySlice[min_index + 3],
-            max_y: arraySlice[min_index + 4],
-            max_z: arraySlice[min_index + 5]
+            min_x: array_slice[min_index],
+            min_y: array_slice[min_index + 1],
+            min_z: array_slice[min_index + 2],
+            max_x: array_slice[min_index + 3],
+            max_y: array_slice[min_index + 4],
+            max_z: array_slice[min_index + 5]
         };
     }
 
     let length: jsize = env.get_array_length(collision).unwrap();
 
-    let mut arrayBuffer: Vec<jdouble> = vec![0.0; length as usize];
-    let arraySlice = &mut arrayBuffer;
+    let mut array_buffer: Vec<jdouble> = vec![0.0; length as usize];
+    let array_slice = &mut array_buffer;
 
-    env.get_double_array_region(collision, 0, arraySlice);
+    env.get_double_array_region(collision, 0, array_slice);
 
     let aabbs: jsize = length / 6;
     let mut shape_aabb_list: Vec<AABB> = vec![EMPTY_AABB.clone(); aabbs as usize];
     for i in 0..aabbs {
         let min_index = (i * 6) as usize;
         shape_aabb_list[i as usize] = AABB{
-            min_x: arraySlice[min_index],
-            min_y: arraySlice[min_index + 1],
-            min_z: arraySlice[min_index + 2],
-            max_x: arraySlice[min_index + 3],
-            max_y: arraySlice[min_index + 4],
-            max_z: arraySlice[min_index + 5]
+            min_x: array_slice[min_index],
+            min_y: array_slice[min_index + 1],
+            min_z: array_slice[min_index + 2],
+            max_x: array_slice[min_index + 3],
+            max_y: array_slice[min_index + 4],
+            max_z: array_slice[min_index + 5]
         };
     }
 
@@ -108,12 +112,12 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_registerBlockI
 pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_test2(env: JNIEnv, class: jclass, worldName: jcharArray, block_x: jint, block_y: jint, block_z: jint){
     let length: jsize = env.get_array_length(worldName).unwrap();
 
-    let mut worldNameBuffer: Vec<u16> = vec![0; length as usize];
-    let worldNameSlice = &mut worldNameBuffer;
+    let mut world_name_buffer: Vec<u16> = vec![0; length as usize];
+    let world_name_slice = &mut world_name_buffer;
 
-    env.get_char_array_region(worldName, 0, worldNameSlice);
+    env.get_char_array_region(worldName, 0, world_name_slice);
 
-    let world = minecraft::worlds::get_world(worldNameBuffer);
+    let world = minecraft::worlds::get_world(world_name_buffer);
     let option = world.get_block_data(block_x, block_y, block_z);
 
     if option.is_none() {
@@ -162,10 +166,10 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_getIsHigher(en
 pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_addChunkData(env: JNIEnv, class: jclass, chunk_x: jint, chunk_z: jint, worldName: jcharArray, filledSections: jint, chunkData: jintArray){
     let length: jsize = env.get_array_length(worldName).unwrap();
 
-    let mut worldNameBuffer: Vec<u16> = vec![0; length as usize];
-    let worldNameSlice = &mut worldNameBuffer;
+    let mut world_name_buffer: Vec<u16> = vec![0; length as usize];
+    let world_name_slice = &mut world_name_buffer;
 
-    env.get_char_array_region(worldName, 0, worldNameSlice);
+    env.get_char_array_region(worldName, 0, world_name_slice);
 
     let mut sections: Vec<Option<ChunkSection>> = Vec::new();
 
@@ -178,15 +182,15 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_addChunkData(e
             continue;
         }
 
-        let mut chunkDataBuffer: Vec<i32> = vec![0; 4096];
-        let chunkDataSlice = &mut chunkDataBuffer;
+        let mut chunk_data_buffer: Vec<i32> = vec![0; 4096];
+        let chunk_data_slice = &mut chunk_data_buffer;
 
-        env.get_int_array_region(chunkData, (index * 4096) as jsize, chunkDataSlice);
+        env.get_int_array_region(chunkData, (index * 4096) as jsize, chunk_data_slice);
 
         let mut block_pallet: Vec<Option<&'static BlockData>> = Vec::new();
 
         for c in 0..4096 {
-            let id = chunkDataBuffer[c];
+            let id = chunk_data_buffer[c];
 
             if id < 0 {
                 block_pallet.push(Option::None);
@@ -204,7 +208,60 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_addChunkData(e
 
     let chunk = Chunk::new(chunk_x, chunk_z, sections);
 
-    let world = minecraft::worlds::get_world(worldNameBuffer);
+    let world = minecraft::worlds::get_world(world_name_buffer);
 
     world.set_chunk_for_single_thread(chunk);
 }
+
+
+#[no_mangle]
+#[allow(unused_variables, non_snake_case)]
+pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_runAStar(env: JNIEnv, class: jclass, worldName: jcharArray, options: jintArray) -> jintArray{
+    //Get world
+    let length: jsize = env.get_array_length(worldName).unwrap();
+    let mut world_name_buffer: Vec<u16> = vec![0; length as usize];
+    let world_name_slice = &mut world_name_buffer;
+    env.get_char_array_region(worldName, 0, world_name_slice);
+    let world = minecraft::worlds::get_world(world_name_buffer);
+
+    //Decode a option
+    let length: jsize = env.get_array_length(options).unwrap();
+    let mut option_buffer: Vec<i32> = vec![0; length as usize];
+    let option_slice = &mut option_buffer;
+    env.get_int_array_region(options, 0, option_slice);
+
+    let start = BlockPosition::new(option_slice[0], option_slice[1], option_slice[2]);
+    let goal = BlockPosition::new(option_slice[3], option_slice[4], option_slice[5]);
+    let down_height = option_slice[6];
+    let jump_height = option_slice[7];
+    let max_iteration = option_slice[8];
+
+    let mode = option_slice[9];
+    let ignore = option_slice[10];
+    let collide_option = CollideOption{
+        fluid_collision_mode: if mode == 0 {
+            FluidCollisionMode::Never
+        } else if mode == 1 {
+            FluidCollisionMode::SourceOnly
+        } else {
+            FluidCollisionMode::Always
+        },
+        is_ignore_passable_block: ignore == 1
+    };
+
+    //Run pathfinding
+    let paths = pathfinding::astar::run_astar(world, start, goal, down_height, jump_height, max_iteration, collide_option);
+    let mut path_i32_list: Vec<i32> = Vec::new();
+    for position in paths.iter() {
+        path_i32_list.push(position.x);
+        path_i32_list.push(position.y);
+        path_i32_list.push(position.z);
+    }
+
+    //Convert to java array
+    let java_int_array = env.new_int_array(path_i32_list.len() as jsize);
+    env.set_int_array_region(*java_int_array.as_ref().unwrap(), 0, &path_i32_list);
+
+    return java_int_array.unwrap();
+}
+

@@ -16,4 +16,6 @@ public abstract class NativeBridge {
     
     public static native void addChunkData(int chunkX, int chunkZ, char[] worldName, int filledSections, int[] chunkData);
     
+    public static native int[] runAStar(char[] worldName, int[] options);
+    
 }

@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.Nullable;
 import thpmc.engine.api.THPEngineAPI;
+import thpmc.engine.api.setting.THPESettings;
 import thpmc.engine.api.world.ChunkUtil;
 
 import java.util.Map;
@@ -77,13 +78,17 @@ public class AsyncEngineWorld implements EngineWorld {
     
     public void setChunk(Chunk chunk){
         AsyncEngineChunk engineChunk = asyncChunkMap.computeIfAbsent(ChunkUtil.getChunkKey(chunk.getX(), chunk.getZ()), c -> new AsyncEngineChunk(chunk));
-        THPEngineAPI.getInstance().getNMSHandler().registerChunkForNative(worldName, engineChunk);
+        if(THPESettings.isUseJNI()) {
+            THPEngineAPI.getInstance().getNMSHandler().registerChunkForNative(worldName, engineChunk);
+        }
     }
     
     public void update(Chunk chunk){
         AsyncEngineChunk engineChunk = asyncChunkMap.computeIfAbsent(ChunkUtil.getChunkKey(chunk.getX(), chunk.getZ()), c -> new AsyncEngineChunk(chunk));
         engineChunk.update(chunk);
-        THPEngineAPI.getInstance().getNMSHandler().registerChunkForNative(worldName, engineChunk);
+        if(THPESettings.isUseJNI()) {
+            THPEngineAPI.getInstance().getNMSHandler().registerChunkForNative(worldName, engineChunk);
+        }
     }
     
 }
