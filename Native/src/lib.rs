@@ -4,13 +4,14 @@ mod collision;
 
 extern crate jni;
 
+use std::time::Instant;
 use jni::sys::{jboolean, jchar, jcharArray, jclass, jdouble, jdoubleArray, jint, jintArray, jsize, jstring};
 use jni::JNIEnv;
 use jni::*;
 use crate::collision::collisions::{CollideOption, FluidCollisionMode};
 use crate::minecraft::blocks::{BlockData, NoiseDirection, NoisedShape, register_block_in_order};
 use crate::minecraft::bounding_box::{AABB, VoxelShape};
-use crate::minecraft::worlds::{Chunk, ChunkSection};
+use crate::minecraft::worlds::{Chunk, ChunkSection, LocalWorld};
 use crate::NoiseDirection::{NONE, XYZ, XZ};
 use crate::pathfinding::astar::BlockPosition;
 
@@ -117,7 +118,7 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_test2(env: JNI
 
     env.get_char_array_region(worldName, 0, world_name_slice);
 
-    let world = minecraft::worlds::get_world(world_name_buffer);
+    let world = minecraft::worlds::get_global_world(world_name_buffer);
     let option = world.get_block_data(block_x, block_y, block_z);
 
     if option.is_none() {
@@ -208,7 +209,7 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_addChunkData(e
 
     let chunk = Chunk::new(chunk_x, chunk_z, sections);
 
-    let world = minecraft::worlds::get_world(world_name_buffer);
+    let world = minecraft::worlds::get_global_world(world_name_buffer);
 
     world.set_chunk_for_single_thread(chunk);
 }
@@ -217,12 +218,14 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_addChunkData(e
 #[no_mangle]
 #[allow(unused_variables, non_snake_case)]
 pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_runAStar(env: JNIEnv, class: jclass, worldName: jcharArray, options: jintArray) -> jintArray{
+    let s = Instant::now();
     //Get world
     let length: jsize = env.get_array_length(worldName).unwrap();
     let mut world_name_buffer: Vec<u16> = vec![0; length as usize];
     let world_name_slice = &mut world_name_buffer;
     env.get_char_array_region(worldName, 0, world_name_slice);
-    let world = minecraft::worlds::get_world(world_name_buffer);
+    let mut world_ref = minecraft::worlds::get_local_world(world_name_buffer);
+    let mut world = world_ref.borrow_mut();
 
     //Decode a option
     let length: jsize = env.get_array_length(options).unwrap();
@@ -250,7 +253,7 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_runAStar(env: 
     };
 
     //Run pathfinding
-    let paths = pathfinding::astar::run_astar(world, start, goal, down_height, jump_height, max_iteration, collide_option);
+    let paths = pathfinding::astar::run_astar(&mut world, start, goal, down_height, jump_height, max_iteration, collide_option);
     let mut path_i32_list: Vec<i32> = Vec::new();
     for position in paths.iter() {
         path_i32_list.push(position.x);
@@ -261,6 +264,9 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_runAStar(env: 
     //Convert to java array
     let java_int_array = env.new_int_array(path_i32_list.len() as jsize);
     env.set_int_array_region(*java_int_array.as_ref().unwrap(), 0, &path_i32_list);
+
+    let end = s.elapsed();
+    println!("rust astar : {:?}ns", end.as_nanos());
 
     return java_int_array.unwrap();
 }

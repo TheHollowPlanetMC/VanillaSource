@@ -1,12 +1,13 @@
 package thpmc.engine.listener;
 
+import org.bukkit.*;
+import thpmc.engine.api.entity.ai.pathfinding.AsyncAStarMachine;
+import thpmc.engine.api.entity.ai.pathfinding.BlockPosition;
 import thpmc.engine.api.natives.NativeBridge;
+import thpmc.engine.api.world.cache.local.ThreadLocalCache;
+import thpmc.engine.api.world.cache.local.ThreadLocalEngineWorld;
 import thpmc.engine.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
-import org.bukkit.FluidCollisionMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -124,7 +125,7 @@ public class TestListener implements Listener {
             }
         });*/
         
-    
+        /*
         Location location = player.getLocation();
         INMSHandler nmsHandler = THPEngineAPI.getInstance().getNMSHandler();
         for (int index = 0; index < 100; index++) {
@@ -141,7 +142,59 @@ public class TestListener implements Listener {
             count++;
             
             player.sendMessage("PlayerNPC -> " + count);
-        }
+        }*/
+    
+        World world = player.getWorld();
+        BlockPosition start = new BlockPosition(173, 80, -23);
+        BlockPosition goal = new BlockPosition(172, 80, 4);
+    
+        ThreadLocalCache cache = new ThreadLocalCache();
+        ThreadLocalEngineWorld engineWorld = cache.getWorld(world.getName());
+        
+        CollideOption collideOption = new CollideOption(FluidCollisionMode.NEVER, true);
+        
+        AsyncAStarMachine astar;
+        long s;
+        long e;
+        astar = new AsyncAStarMachine(engineWorld, start, goal, 1, 1, 50, false, collideOption);
+        s = System.nanoTime();
+        astar.runPathFinding();
+        e = System.nanoTime();
+        System.out.println("[Java] iteration = 50,  Time = " + (e - s) + "ns");
+        s = System.nanoTime();
+        astar.runPathfindingNative();
+        e = System.nanoTime();
+        System.out.println("[Rust] iteration = 50,  Time = " + (e - s) + "ns");
+    
+        astar = new AsyncAStarMachine(engineWorld, start, goal, 1, 1, 100, false, collideOption);
+        s = System.nanoTime();
+        astar.runPathFinding();
+        e = System.nanoTime();
+        System.out.println("[Java] iteration = 100,  Time = " + (e - s) + "ns");
+        s = System.nanoTime();
+        astar.runPathfindingNative();
+        e = System.nanoTime();
+        System.out.println("[Rust] iteration = 100,  Time = " + (e - s) + "ns");
+    
+        astar = new AsyncAStarMachine(engineWorld, start, goal, 1, 1, 500, false, collideOption);
+        s = System.nanoTime();
+        astar.runPathFinding();
+        e = System.nanoTime();
+        System.out.println("[Java] iteration = 500,  Time = " + (e - s) + "ns");
+        s = System.nanoTime();
+        astar.runPathfindingNative();
+        e = System.nanoTime();
+        System.out.println("[Rust] iteration = 500,  Time = " + (e - s) + "ns");
+    
+        astar = new AsyncAStarMachine(engineWorld, start, goal, 1, 1, 5000, false, collideOption);
+        s = System.nanoTime();
+        astar.runPathFinding();
+        e = System.nanoTime();
+        System.out.println("[Java] iteration = 5000,  Time = " + (e - s) + "ns");
+        s = System.nanoTime();
+        astar.runPathfindingNative();
+        e = System.nanoTime();
+        System.out.println("[Rust] iteration = 5000,  Time = " + (e - s) + "ns");
     }
     
 }

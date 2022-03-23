@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use crate::{BlockData, Chunk, minecraft};
 use crate::collision::collisions::CollideOption;
-use crate::minecraft::worlds::World;
+use crate::minecraft::worlds::{GlobalWorld, LocalWorld};
 
 #[derive(PartialEq, Eq, Hash, Clone)]
 pub struct BlockPosition {
@@ -49,7 +49,7 @@ impl NodeData {
         return BlockPosition::new(self.x, self.y, self.z);
     }
 
-    pub fn get_neighbours(&self, down: i32, up: i32, world: &mut World, collide_option: &CollideOption) -> Vec<BlockPosition> {
+    pub fn get_neighbours(&self, down: i32, up: i32, world: &mut LocalWorld, collide_option: &CollideOption) -> Vec<BlockPosition> {
         let mut neighbour: Vec<BlockPosition> = Vec::new();
 
         let p1 = self.add_if_can_stand(&mut neighbour, BlockPosition::new(self.x + 1, self.y, self.z), world, collide_option);
@@ -119,7 +119,7 @@ impl NodeData {
         return neighbour;
     }
 
-    pub fn add_if_can_stand(&self, positions: &mut Vec<BlockPosition>, position: BlockPosition, world: &mut World, collide_option: &CollideOption) -> bool {
+    pub fn add_if_can_stand(&self, positions: &mut Vec<BlockPosition>, position: BlockPosition, world: &mut LocalWorld, collide_option: &CollideOption) -> bool {
         return if can_stand(world, position.x, position.y, position.z, collide_option) {
             positions.push(position);
             true
@@ -131,7 +131,7 @@ impl NodeData {
 }
 
 
-pub fn can_stand(world: &mut World, x: i32, y: i32, z: i32, collide_option: &CollideOption) -> bool{
+pub fn can_stand(world: &mut LocalWorld, x: i32, y: i32, z: i32, collide_option: &CollideOption) -> bool{
     let mut option = world.get_chunk_at(x >> 4, z >> 4);
     if option.is_none() {
         return false;
@@ -165,7 +165,7 @@ pub fn can_stand(world: &mut World, x: i32, y: i32, z: i32, collide_option: &Col
 }
 
 
-pub fn is_traversable(world: &mut World, x: i32, y: i32, z: i32, collide_option: &CollideOption) -> bool{
+pub fn is_traversable(world: &mut LocalWorld, x: i32, y: i32, z: i32, collide_option: &CollideOption) -> bool{
     let mut option = world.get_chunk_at(x >> 4, z >> 4);
     if option.is_none() {
         return true;
@@ -188,7 +188,7 @@ pub fn is_traversable(world: &mut World, x: i32, y: i32, z: i32, collide_option:
 
 
 
-pub fn run_astar(world: &mut World, start: BlockPosition, goal: BlockPosition, down_height: i32, jump_height: i32, max_iteration: i32, collide_option: CollideOption) -> Vec<BlockPosition> {
+pub fn run_astar(world: &mut LocalWorld, start: BlockPosition, goal: BlockPosition, down_height: i32, jump_height: i32, max_iteration: i32, collide_option: CollideOption) -> Vec<BlockPosition> {
     if start.eq(&goal) {
         //I couldn't find a path...
         return Vec::new();

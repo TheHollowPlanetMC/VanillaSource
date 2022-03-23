@@ -158,8 +158,7 @@ public class TickRunner implements Runnable {
         tickExecutor.shutdown();
     }
 
-    public void start(){
-        MainThreadTimer.instance.addTickRunner(this);}
+    public void start(){MainThreadTimer.instance.addTickRunner(this);}
 
     public void tickAtAsync(){tickExecutor.submit(this);}
 
