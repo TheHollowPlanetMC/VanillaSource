@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use fxhash::{FxHashMap, FxHashSet};
 use crate::{BlockData, Chunk, minecraft};
 use crate::collision::collisions::CollideOption;
 use crate::minecraft::worlds::{GlobalWorld, LocalWorld};
@@ -194,9 +194,9 @@ pub fn run_astar(world: &mut LocalWorld, start: BlockPosition, goal: BlockPositi
         return Vec::new();
     }
 
-    let mut node_map: HashMap<BlockPosition, NodeData> = HashMap::new();
-    let mut opened_positions: HashSet<BlockPosition> = HashSet::new();
-    let mut node_list: HashSet<NodeData> = HashSet::new();
+    let mut node_map: FxHashMap<BlockPosition, NodeData> = FxHashMap::default();
+    let mut opened_positions: FxHashSet<BlockPosition> = FxHashSet::default();
+    let mut node_list: FxHashSet<NodeData> = FxHashSet::default();
 
     //Open first position node
     let mut start_node = open_node(Option::None, start, &goal, &mut node_map, &mut opened_positions);
@@ -296,7 +296,7 @@ fn get_paths(node_data: NodeData, paths: &mut Vec<BlockPosition>) {
     get_paths(origin.unwrap(), paths);
 }
 
-fn open_node(origin: Option<&NodeData>, block_position: BlockPosition, goal: &BlockPosition, node_map: &mut HashMap<BlockPosition, NodeData>, opened_positions: &mut HashSet<BlockPosition>) -> NodeData {
+fn open_node(origin: Option<&NodeData>, block_position: BlockPosition, goal: &BlockPosition, node_map: &mut FxHashMap<BlockPosition, NodeData>, opened_positions: &mut FxHashSet<BlockPosition>) -> NodeData {
     let node_data = node_map.get(&block_position);
     if node_data.is_some() {
         return (*node_data.unwrap()).clone();

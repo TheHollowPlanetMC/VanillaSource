@@ -1,6 +1,6 @@
-name: 'THP-Engine'
+name: 'VanillaSource'
 version: ${project.version}
-main: thpmc.engine.THPEngine
+main: thpmc.vanilla_source.VanillaSource
 api-version: 1.15
 softdepend: [WorldEdit, Multiverse-Core, Cinema4C]
 load: STARTUP

@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::sync::{Arc, RwLock};
+use fxhash::FxHashMap;
 use once_cell::sync::Lazy;
 use crate::{BlockData, minecraft};
 use crate::collision::collisions::CollideOption;
@@ -15,12 +15,12 @@ thread_local!(pub static THREAD_LOCAL_WORLD_REGISTRY: RefCell<LocalWorldRegistry
 });
 
 pub struct GlobalWorldRegistry {
-    world_map: HashMap<Vec<u16>, GlobalWorld>
+    world_map: FxHashMap<Vec<u16>, GlobalWorld>
 }
 
 impl GlobalWorldRegistry {
     fn new() -> Self {
-        let mut world_map: HashMap<Vec<u16>, GlobalWorld> = HashMap::new();
+        let mut world_map: FxHashMap<Vec<u16>, GlobalWorld> = FxHashMap::default();
         Self {
             world_map
         }
@@ -39,12 +39,12 @@ impl GlobalWorldRegistry {
 }
 
 pub struct LocalWorldRegistry {
-    world_map: HashMap<Vec<u16>, Rc<RefCell<LocalWorld>>>
+    world_map: FxHashMap<Vec<u16>, Rc<RefCell<LocalWorld>>>
 }
 
 impl LocalWorldRegistry {
     fn new() -> Self {
-        let mut world_map: HashMap<Vec<u16>, Rc<RefCell<LocalWorld>>> = HashMap::new();
+        let mut world_map: FxHashMap<Vec<u16>, Rc<RefCell<LocalWorld>>> = FxHashMap::default();
         Self {
             world_map
         }
@@ -78,13 +78,13 @@ pub fn get_local_world(world_name: Vec<u16>) -> Rc<RefCell<LocalWorld>> {
 
 pub struct GlobalWorld {
     pub world_name: Vec<u16>,
-    pub chunk_map: RwLock<HashMap<i64, Arc<Chunk>>>
+    pub chunk_map: RwLock<FxHashMap<i64, Arc<Chunk>>>
 }
 
 impl GlobalWorld {
 
     fn new(world_name: Vec<u16>) -> Self {
-        let mut map: HashMap<i64, Arc<Chunk>> = HashMap::new();
+        let mut map: FxHashMap<i64, Arc<Chunk>> = FxHashMap::default();
         let mut chunk_map = RwLock::new(map);
         Self {
             world_name,
@@ -117,14 +117,14 @@ impl GlobalWorld {
 
 pub struct LocalWorld {
     pub world_name: Vec<u16>,
-    pub chunk_map: HashMap<i64, Arc<Chunk>>,
+    pub chunk_map: FxHashMap<i64, Arc<Chunk>>,
     pub global_world: &'static GlobalWorld
 }
 
 impl LocalWorld {
 
     pub(crate) fn new(world_name: Vec<u16>) -> Self {
-        let chunk_map: HashMap<i64, Arc<Chunk>> = HashMap::new();
+        let chunk_map: FxHashMap<i64, Arc<Chunk>> = FxHashMap::default();
         let global_world = get_global_world(world_name.clone());
         Self {
             world_name,

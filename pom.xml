@@ -8,7 +8,7 @@
   </properties>
 
   <groupId>thpmc</groupId>
-  <artifactId>thp_engine_parent</artifactId>
+  <artifactId>vanilla_source_parent</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
 

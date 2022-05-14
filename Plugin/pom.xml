@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>thp_engine_plugin</artifactId>
+    <artifactId>vanilla_source_plugin</artifactId>
     <packaging>jar</packaging>
     <version>${revision}</version>
 
     <parent>
         <groupId>thpmc</groupId>
-        <artifactId>thp_engine_parent</artifactId>
+        <artifactId>vanilla_source_parent</artifactId>
         <version>${revision}</version>
     </parent>
 
@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <name>THP-Engine</name>
+    <name>VanillaSource</name>
 
     <build>
         <plugins>
@@ -137,7 +137,7 @@
         </dependency>
         <dependency>
             <groupId>thpmc</groupId>
-            <artifactId>thp_engine_api</artifactId>
+            <artifactId>vanilla_source_api</artifactId>
             <type>jar</type>
             <version>${revision}</version>
             <scope>compile</scope>
@@ -145,7 +145,7 @@
         </dependency>
         <dependency>
             <groupId>thpmc</groupId>
-            <artifactId>thp_engine_v1_15_R1</artifactId>
+            <artifactId>vanilla_source_v1_15_R1</artifactId>
             <type>jar</type>
             <version>${revision}</version>
             <scope>compile</scope>
@@ -153,7 +153,7 @@
         </dependency>
         <dependency>
             <groupId>thpmc</groupId>
-            <artifactId>thp_engine_v1_16_R3</artifactId>
+            <artifactId>vanilla_source_v1_16_R3</artifactId>
             <type>jar</type>
             <version>${revision}</version>
             <scope>compile</scope>

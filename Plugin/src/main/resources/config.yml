@@ -6,6 +6,5 @@ use-cached-chunk-packet: false
 rewrite-light-packet: true
 
 # Settings related to jni libraries.
-# Enabling the feature speeds up some processing only in some supported environments.
 jni-library:
-  use-jni-pathfinding: true
+  use-jni-pathfinding: false
