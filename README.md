@@ -1,4 +1,4 @@
-## THP-Engine
+## VanillaSource
 Game engine system for minecraft.
 
 ### Supported version
