@@ -1,5 +1,9 @@
 package thpmc.vanilla_source.api.entity.tick;
 
+import org.bukkit.Bukkit;
+import org.contan_lang.ContanEngine;
+import org.contan_lang.thread.ContanTickBasedThread;
+import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.TickBase;
 import thpmc.vanilla_source.api.player.EnginePlayer;
@@ -9,12 +13,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TickRunner implements Runnable {
+public class TickRunner implements Runnable, ContanTickBasedThread {
     
     private static final Set<TickRunner> tickRunners = ConcurrentHashMap.newKeySet();
     
@@ -161,6 +163,30 @@ public class TickRunner implements Runnable {
     public void start(){MainThreadTimer.instance.addTickRunner(this);}
 
     public void tickAtAsync(){tickExecutor.submit(this);}
-
+    
+    @Override
+    public <T> void scheduleTask(Callable<T> callable, long l) {
+        Bukkit.getScheduler().runTaskLater(VanillaSourceAPI.getInstance().getPlugin(), () -> tickExecutor.submit(callable), l);
+    }
+    
+    @Override
+    public <T> T runTaskImmediately(Callable<T> callable) throws ExecutionException, InterruptedException {
+        return tickExecutor.submit(callable).get();
+    }
+    
+    @Override
+    public <T> void scheduleTask(Callable<T> callable) {
+        tickExecutor.submit(callable);
+    }
+    
+    @Override
+    public boolean shutdownWithAwait(long l, TimeUnit timeUnit) throws InterruptedException {
+        return true;
+    }
+    
+    @Override
+    public ContanEngine getContanEngine() {
+        return VanillaSourceAPI.getInstance().getContanEngine();
+    }
 }
 

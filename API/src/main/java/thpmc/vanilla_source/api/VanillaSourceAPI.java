@@ -1,5 +1,7 @@
 package thpmc.vanilla_source.api;
 
+import org.contan_lang.ContanEngine;
+import thpmc.vanilla_source.api.contan.ContanMainThread;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.entity.tick.TickRunnerPool;
 import thpmc.vanilla_source.api.entity.tick.TickWatchDog;
@@ -10,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -37,6 +40,8 @@ public abstract class VanillaSourceAPI {
     
     protected final ScheduledExecutorService watchFogExecutor;
     
+    protected final ContanEngine contanEngine;
+    
     public VanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads){
         this.javaPlugin = plugin;
         this.nmsHandler = nmsHandler;
@@ -44,6 +49,8 @@ public abstract class VanillaSourceAPI {
     
         this.watchDog = new TickWatchDog(tickRunnerPool);
         this.watchFogExecutor = Executors.newSingleThreadScheduledExecutor();
+        
+        this.contanEngine = new ContanEngine(new ContanMainThread(), new ArrayList<>(tickRunnerPool.getAsyncTickRunnerList()));
     }
     
     /**
@@ -55,6 +62,12 @@ public abstract class VanillaSourceAPI {
     public INMSHandler getNMSHandler() {return nmsHandler;}
     
     public TickRunnerPool getTickRunnerPool() {return tickRunnerPool;}
+    
+    /**
+     * Get Contan script engine.
+     * @return Singleton {@link ContanEngine} instance.
+     */
+    public ContanEngine getContanEngine() {return contanEngine;}
     
     /**
      * Create universe if absent.
