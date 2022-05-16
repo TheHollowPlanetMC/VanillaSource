@@ -42,11 +42,9 @@ public class ContanManager {
 
         //Compile all source codes
         for (Path path : scriptFilePaths) {
-            System.out.println(path.toString());
             if (!path.toString().endsWith(".cntn")) {
                 continue;
             }
-            System.out.println(path.toString());
 
             StringBuilder script = new StringBuilder();
 
