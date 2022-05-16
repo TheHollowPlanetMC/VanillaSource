@@ -3,6 +3,7 @@ package thpmc.vanilla_source;
 import be4rjp.artgui.ArtGUI;
 import thpmc.vanilla_source.api.entity.tick.MainThreadTimer;
 import thpmc.vanilla_source.config.ImplVSSettings;
+import thpmc.vanilla_source.contan.ContanManager;
 import thpmc.vanilla_source.listener.PlayerJoinQuitListener;
 import thpmc.vanilla_source.command.parallelCommandExecutor;
 import thpmc.vanilla_source.natives.NativeManager;
@@ -73,6 +74,14 @@ public final class VanillaSource extends JavaPlugin {
         
         ImplStructureData.loadAllStructureData();
         ParallelStructure.loadAllParallelStructure();
+
+        //Load all Contan script
+        try {
+            ContanManager.loadAllModules();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Failed to load script files.");
+        }
     }
     
     @Override
