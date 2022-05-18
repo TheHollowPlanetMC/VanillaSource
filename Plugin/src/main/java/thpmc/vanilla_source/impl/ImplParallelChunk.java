@@ -72,7 +72,7 @@ public class ImplParallelChunk implements ParallelChunk {
     public int getChunkZ() {return chunkZ;}
     
     @Override
-    public Set<EngineEntity> getEntitiesInSection(int sectionIndex) {
+    public @NotNull Set<EngineEntity> getEntitiesInSection(int sectionIndex) {
         return entitySlices[sectionIndex];
     }
     
