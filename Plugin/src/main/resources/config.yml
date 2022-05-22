@@ -1,3 +1,6 @@
+# Setting of how many asynchronous entity threads to use.
+entity-threads: 4
+
 # Setting whether to use cache when rewriting chunk packets.
 # If there is a possibility that block changes will be made outside this plugin, false is recommended.
 use-cached-chunk-packet: false

@@ -145,12 +145,11 @@ public class TickRunner implements Runnable, ContanTickBasedThread {
             entityTracker.tick(entities);
         }
         if(i % 40 == 0){
+            //Remove offline player
             trackerMap.keySet().removeIf(enginePlayer -> !enginePlayer.getBukkitPlayer().isOnline());
         }
         
         entities.forEach(EngineEntity::setPreviousPosition);
-        
-        if(i % 100 == 0) System.out.printf("ID -> %d   TPS: %.1f%n", ID, tps);
         i++;
     }
     

@@ -97,7 +97,7 @@ public class ImplStructureData extends StructureData{
      * ymlファイルへ書き込み
      */
     public void saveData(){
-        File file = new File("plugins/Parallel/structure_data", name + ".yml");
+        File file = new File("plugins/VanillaSource/structure_data", name + ".yml");
         FileConfiguration yml = new YamlConfiguration();
         
         List<String> lines = new ArrayList<>();

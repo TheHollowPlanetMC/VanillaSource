@@ -38,12 +38,11 @@ public class TickWatchDog implements Runnable{
             log.log(Level.SEVERE, "PID: " + threadInfo.getThreadId() + " | Suspended: " + threadInfo.isSuspended()
                     + " | Native: " + threadInfo.isInNative() + " | State: " + threadInfo.getThreadState());
             if (threadInfo.getLockedMonitors().length != 0) {
-                log.log(Level.SEVERE, "Thread is waiting on monitor(s):");
                 for (MonitorInfo monitor : threadInfo.getLockedMonitors()) {
                     log.log(Level.SEVERE, "Locked on:" + monitor.getLockedStackFrame());
                 }
             }
-            log.log(Level.SEVERE, "Stack:");
+            log.log(Level.SEVERE, "Stack: ");
             
             for (StackTraceElement stack : threadInfo.getStackTrace()) {
                 log.log(Level.SEVERE, "\t" + stack);

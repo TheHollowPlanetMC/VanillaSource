@@ -46,7 +46,9 @@ public final class VanillaSource extends JavaPlugin {
         NativeManager.registerBlocksForNative();
         
         //Create api instance
-        api = new ImplVanillaSourceAPI(this, NMSManager.getNMSHandler(), 24);
+        api = new ImplVanillaSourceAPI(this, NMSManager.getNMSHandler(), ImplVSSettings.getEntityThreads());
+        
+        //Start async tick runners
         TaskHandler.runSync(() -> {
             MainThreadTimer.instance.runTaskTimer(this, 0, 1);
             api.startAsyncThreads();

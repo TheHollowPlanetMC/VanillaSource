@@ -43,7 +43,7 @@ public class ParallelStructure {
         initialize();
     
         VanillaSource.getPlugin().getLogger().info("Loading structures...");
-        File dir = new File("plugins/Parallel/structures");
+        File dir = new File("plugins/VanillaSource/structures");
     
         dir.getParentFile().mkdir();
         dir.mkdir();
@@ -180,7 +180,7 @@ public class ParallelStructure {
      * ymlファイルから読み込み
      */
     public void loadData() {
-        File file = new File("plugins/Parallel/structures", name + ".yml");
+        File file = new File("plugins/VanillaSource/structures", name + ".yml");
         createFile(file);
         
         FileConfiguration yml = YamlConfiguration.loadConfiguration(file);
@@ -192,7 +192,7 @@ public class ParallelStructure {
      * ymlファイルへ書き込み
      */
     public void saveData() {
-        File file = new File("plugins/Parallel/structures", name + ".yml");
+        File file = new File("plugins/VanillaSource/structures", name + ".yml");
         FileConfiguration yml = new YamlConfiguration();
         
         yml.set("base-location", baseLocation);
