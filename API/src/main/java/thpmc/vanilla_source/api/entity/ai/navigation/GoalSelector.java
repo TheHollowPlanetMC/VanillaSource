@@ -1,26 +1,26 @@
 package thpmc.vanilla_source.api.entity.ai.navigation;
 
-import thpmc.vanilla_source.api.entity.EngineLivingEntity;
 import thpmc.vanilla_source.api.entity.ai.navigation.goal.PathfindingGoal;
+import thpmc.vanilla_source.api.entity.controller.EntityAIController;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GoalSelector {
 
-    private final EngineLivingEntity entity;
+    private final EntityAIController controller;
     
     private final List<PathfindingGoal> goalList = new ArrayList<>();
     
     private boolean isFinished = false;
     
-    public GoalSelector(EngineLivingEntity entity) {this.entity = entity;}
+    public GoalSelector(EntityAIController controller) {this.controller = controller;}
     
     public void registerGoal(int index, PathfindingGoal goal){this.goalList.add(index, goal);}
     
     public void tick(){
         isFinished = false;
-        Navigator navigator = entity.getNavigator();
+        Navigator navigator = controller.navigator;
         
         for(PathfindingGoal goal : goalList){
             if(isFinished){

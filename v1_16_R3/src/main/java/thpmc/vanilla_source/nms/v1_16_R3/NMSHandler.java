@@ -14,7 +14,7 @@ import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import thpmc.vanilla_source.api.nms.entity.NMSEntity;
+import thpmc.vanilla_source.api.nms.entity.NMSEntityController;
 import thpmc.vanilla_source.api.nms.enums.WrappedPlayerInfoAction;
 import thpmc.vanilla_source.api.util.collision.CollideOption;
 import thpmc.vanilla_source.api.util.collision.EngineBlockBoundingBox;
@@ -94,8 +94,8 @@ public class NMSHandler implements INMSHandler {
     }
     
     @Override
-    public <T> NMSEntity createNMSEntity(World world, double x, double y, double z, EntityType type, @Nullable T data) {
-        return EntityManager.createNMSEntity(world, x, y, z, type, data);
+    public <T> NMSEntityController createNMSEntityController(World world, double x, double y, double z, EntityType type, @Nullable T data) {
+        return EntityManager.createNMSEntityController(world, x, y, z, type, data);
     }
     
     @Override

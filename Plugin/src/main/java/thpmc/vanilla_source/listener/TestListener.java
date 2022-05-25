@@ -1,6 +1,8 @@
 package thpmc.vanilla_source.listener;
 
 import org.bukkit.*;
+import thpmc.vanilla_source.api.entity.EngineEntity;
+import thpmc.vanilla_source.api.entity.ai.navigation.goal.EntityFollowGoal;
 import thpmc.vanilla_source.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.EntityType;
@@ -10,11 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
-import thpmc.vanilla_source.api.entity.EnginePlayerEntity;
-import thpmc.vanilla_source.api.entity.ai.navigation.goal.EntityFollowGoal;
 import thpmc.vanilla_source.api.nms.INMSHandler;
-import thpmc.vanilla_source.api.nms.entity.NMSEntity;
-import thpmc.vanilla_source.api.nms.entity.NMSEntityPlayer;
+import thpmc.vanilla_source.api.nms.entity.NMSEntityController;
 import thpmc.vanilla_source.api.util.collision.CollideOption;
 
 import java.util.UUID;
@@ -34,7 +33,7 @@ public class TestListener implements Listener {
             INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
     
             GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
-            NMSEntity entityPlayer = nmsHandler.createNMSEntity(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
+            NMSEntityController entityPlayer = nmsHandler.createNMSEntityController(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
             entityPlayer.setPositionRaw(location.getX(), location.getY(), location.getZ());
 
             CollideOption collideOption = new CollideOption(FluidCollisionMode.NEVER, true);
@@ -43,12 +42,13 @@ public class TestListener implements Listener {
                 return engineBlock.getMaterial() != Material.GLASS;
             });*/
     
+            /*
             VanillaSourceAPI.getInstance().getTickRunnerPool().spawn(tickRunner -> {
                 EnginePlayerEntity npc = new EnginePlayerEntity(tickRunner.getThreadLocalCache().getWorld(location.getWorld().getName()), (NMSEntityPlayer) entityPlayer, tickRunner, true);
                 npc.getGoalSelector().registerGoal(0, new EntityFollowGoal(player));
                 npc.setMovementCollideOption(collideOption);
                 tickRunner.addEntity(npc);
-            });
+            });*/
         });
     }
     
@@ -120,12 +120,14 @@ public class TestListener implements Listener {
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
         for (int index = 0; index < 100; index++) {
             GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
-            NMSEntity entityPlayer = nmsHandler.createNMSEntity(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
+            NMSEntityController entityPlayer = nmsHandler.createNMSEntityController(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
             entityPlayer.setPositionRaw(location.getX(), location.getY(), location.getZ());
     
+            
             VanillaSourceAPI.getInstance().getTickRunnerPool().spawn(tickRunner -> {
-                EnginePlayerEntity npc = new EnginePlayerEntity(tickRunner.getThreadLocalCache().getWorld(location.getWorld().getName()), (NMSEntityPlayer) entityPlayer, tickRunner, true);
-                npc.getGoalSelector().registerGoal(0, new EntityFollowGoal(player));
+                EngineEntity npc = new EngineEntity(tickRunner.getThreadLocalCache().getWorld(location.getWorld().getName()), entityPlayer, tickRunner);
+                npc.getAIController().goalSelector.registerGoal(0, new EntityFollowGoal(player));
+                npc.setAutoClimbHeight(1.0F);
                 tickRunner.addEntity(npc);
             });
     

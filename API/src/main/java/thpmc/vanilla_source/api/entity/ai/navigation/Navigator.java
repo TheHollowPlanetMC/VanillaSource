@@ -3,7 +3,7 @@ package thpmc.vanilla_source.api.entity.ai.navigation;
 import org.bukkit.Location;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
-import thpmc.vanilla_source.api.entity.EngineLivingEntity;
+import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.ai.pathfinding.AsyncAStarMachine;
 import thpmc.vanilla_source.api.entity.ai.pathfinding.BlockPosition;
 
@@ -18,7 +18,7 @@ public class Navigator {
     //Entity walk speed
     private float speed;
     //NPC instance
-    private final EngineLivingEntity entity;
+    private final EngineEntity entity;
     
     private float jumpHeight;
     
@@ -49,7 +49,7 @@ public class Navigator {
      * Create Navigator instance.
      * @param speed Entity walk speed.
      */
-    public Navigator(EngineLivingEntity entity, float speed, float jumpHeight, int descendingHeight){
+    public Navigator(EngineEntity entity, float speed, float jumpHeight, int descendingHeight){
         this.entity = entity;
         this.speed = speed;
         this.jumpHeight = jumpHeight;
@@ -266,7 +266,7 @@ public class Navigator {
     
     public int getDescendingHeight() {return descendingHeight;}
     
-    public EngineLivingEntity getEntity() {return entity;}
+    public EngineEntity getEntity() {return entity;}
     
     public void setDescendingHeight(int descendingHeight) {this.descendingHeight = descendingHeight;}
     

@@ -3,13 +3,15 @@ package thpmc.vanilla_source.api.entity;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import org.contan_lang.variables.primitive.ContanClassInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
+import thpmc.vanilla_source.api.entity.controller.EntityAIController;
+import thpmc.vanilla_source.api.entity.controller.EntityController;
 import thpmc.vanilla_source.api.entity.tick.TickRunner;
 import thpmc.vanilla_source.api.entity.tick.EntityTracker;
 import thpmc.vanilla_source.api.nms.INMSHandler;
-import thpmc.vanilla_source.api.nms.entity.NMSEntity;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.util.collision.*;
 import thpmc.vanilla_source.api.util.math.Vec2f;
@@ -24,9 +26,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class EngineEntity implements TickBase {
+public class EngineEntity implements TickBase {
     
-    protected final NMSEntity nmsEntity;
+    protected final EntityController entityController;
     
     protected TickRunner tickRunner;
     
@@ -41,6 +43,8 @@ public abstract class EngineEntity implements TickBase {
     protected double previousX;
     protected double previousY;
     protected double previousZ;
+    
+    protected EntityAIController aiController;
     
     protected Vector velocity = new Vector(0.0, 0.0, 0.0);
     
@@ -59,49 +63,39 @@ public abstract class EngineEntity implements TickBase {
     /**
      * Create entity instance.
      * @param world      World in which this entity exists
-     * @param nmsEntity  NMS handle
+     * @param entityController  NMS handle
      * @param tickRunner {@link TickRunner} that executes the processing of this entity
      */
-    public EngineEntity(@NotNull EngineWorld world, @Nullable NMSEntity nmsEntity, @NotNull TickRunner tickRunner){
+    public EngineEntity(@NotNull EngineWorld world, @NotNull EntityController entityController, @NotNull TickRunner tickRunner){
         this.world = world;
-        this.nmsEntity = nmsEntity;
+        this.entityController = entityController;
         this.tickRunner = tickRunner;
         
         //Initialize position and rotation
-        if(nmsEntity != null){
-            Vector position = nmsEntity.getPosition();
-            this.x = position.getX();
-            this.y = position.getY();
-            this.z = position.getZ();
-            
-            this.previousX = x;
-            this.previousY = y;
-            this.previousZ = z;
-    
-            Vec2f yawPitch = nmsEntity.getYawPitch();
-            this.yaw = yawPitch.x;
-            this.pitch = yawPitch.y;
-            
-            this.chunk = world.getChunkAt(NumberConversions.floor(x) >> 4, NumberConversions.floor(z) >> 4);
-        }else{
-            this.x = 0.0;
-            this.y = 0.0;
-            this.z = 0.0;
-            this.yaw = 0.0F;
-            this.pitch = 0.0F;
-    
-            this.previousX = x;
-            this.previousY = y;
-            this.previousZ = z;
-        }
+        Vector position = entityController.getPosition();
+        this.x = position.getX();
+        this.y = position.getY();
+        this.z = position.getZ();
         
+        this.previousX = x;
+        this.previousY = y;
+        this.previousZ = z;
+
+        Vec2f yawPitch = entityController.getYawPitch();
+        this.yaw = yawPitch.x;
+        this.pitch = yawPitch.y;
+        
+        this.chunk = world.getChunkAt(NumberConversions.floor(x) >> 4, NumberConversions.floor(z) >> 4);
+        this.aiController = new EntityAIController(this);
     }
     
     /**
-     * Gets a nms handle.
-     * @return {@link NMSEntity}
+     * Gets entity handle.
+     * @return {@link EntityController}
      */
-    public @Nullable NMSEntity getHandle() {return nmsEntity;}
+    public EntityController getController() {
+        return entityController;
+    }
     
     /**
      * Gets the world in which this entity exists.
@@ -131,7 +125,10 @@ public abstract class EngineEntity implements TickBase {
      * Sets the height of the block that the entity will automatically climb.
      * @param autoClimbHeight The height of the block that the entity will automatically climb.
      */
-    public void setAutoClimbHeight(float autoClimbHeight) {this.autoClimbHeight = autoClimbHeight;}
+    public void setAutoClimbHeight(float autoClimbHeight) {
+        this.autoClimbHeight = autoClimbHeight;
+        aiController.navigator.setJumpHeight(autoClimbHeight);
+    }
     
     @Override
     public boolean shouldRemove() {return dead;}
@@ -181,15 +178,15 @@ public abstract class EngineEntity implements TickBase {
      * Gets whether this entity has a BoundingBox.
      * @return Whether this entity has a BoundingBox.
      */
-    public boolean hasBoundingBox(){return nmsEntity != null;}
+    public boolean hasBoundingBox(){return entityController != null;}
     
     /**
      * Gets entity bounding box.
      * @return {@link EngineEntityBoundingBox}
      */
     public @Nullable EngineEntityBoundingBox getBoundingBox(){
-        if(nmsEntity == null) return null;
-        return nmsEntity.getEngineBoundingBox(this);
+        if(entityController == null) return null;
+        return entityController.getEngineBoundingBox(this);
     }
     
     /**
@@ -239,7 +236,13 @@ public abstract class EngineEntity implements TickBase {
      * @param movementCollideOption {@link CollideOption}
      */
     public void setMovementCollideOption(CollideOption movementCollideOption) {this.movementCollideOption = movementCollideOption;}
-
+    
+    /**
+     * Get entity AI and navigation controller.
+     * @return {@link EntityAIController}
+     */
+    public EntityAIController getAIController() {return aiController;}
+    
     /**
      * Moves this entity by the specified amount.
      * @param movement Vector to move an entity
@@ -248,7 +251,7 @@ public abstract class EngineEntity implements TickBase {
     public @NotNull MovementResult move(Vector movement){
         if(!hasBoundingBox()) return MovementResult.EMPTY_MOVEMENT_RESULT;
         
-        if(nmsEntity == null) return MovementResult.EMPTY_MOVEMENT_RESULT;
+        if(entityController == null) return MovementResult.EMPTY_MOVEMENT_RESULT;
         
         EngineBoundingBox originalBoundingBox = getBoundingBox();
         if(originalBoundingBox == null) return MovementResult.EMPTY_MOVEMENT_RESULT;
@@ -371,7 +374,7 @@ public abstract class EngineEntity implements TickBase {
     
         //reset position by using bounding box
         if(limitedMovement.lengthSquared() > 1.0E-7D){
-            nmsEntity.resetBoundingBoxForMovement((EngineBoundingBox) this.getBoundingBox().shift(limitedMovement));
+            entityController.resetBoundingBoxForMovement((EngineBoundingBox) this.getBoundingBox().shift(limitedMovement));
         
             EngineBoundingBox boundingBox = getBoundingBox();
             setPosition((boundingBox.getMinX() + boundingBox.getMaxX()) / 2.0D, boundingBox.getMinY(), (boundingBox.getMinZ() + boundingBox.getMaxZ()) / 2.0D);
@@ -430,12 +433,13 @@ public abstract class EngineEntity implements TickBase {
         this.x = x;
         this.y = y;
         this.z = z;
-        nmsEntity.setPositionRaw(x, y, z);
+        entityController.setPositionRaw(x, y, z);
     }
     
     public void setRotation(float yaw, float pitch){
         this.yaw = yaw;
         this.pitch = pitch;
+        this.entityController.setRotation(yaw, pitch);
     }
     
     @Override
@@ -446,6 +450,8 @@ public abstract class EngineEntity implements TickBase {
         move(velocity);
     
         if(onGround) velocity.setY(0);
+        
+        aiController.tick(x, y, z);
     }
     
     /**
@@ -463,18 +469,32 @@ public abstract class EngineEntity implements TickBase {
      * @param absolute Whether absolute coordinates should be sent to the player.
      *                 True at defined intervals.
      */
-    public abstract void playTickResult(EnginePlayer player, boolean absolute);
+    public void playTickResult(EnginePlayer player, boolean absolute) {
+        entityController.playTickResult(this, player, absolute);
+    }
     
     /**
      * Used for display in {@link EntityTracker}.
      * @param player {@link EnginePlayer}
      */
-    public abstract void show(EnginePlayer player);
+    public void show(EnginePlayer player) {
+        entityController.show(this, player);
+    }
     
     /**
      * Used for display in {@link EntityTracker}.
      * @param player {@link EnginePlayer}
      */
-    public abstract void hide(EnginePlayer player);
+    public void hide(EnginePlayer player) {
+        entityController.hide(this, player);
+    }
+    
+    /**
+     * Gets the amount of movement of an entity.
+     * @return Movement delta of {@link Vector}
+     */
+    public Vector getMoveDelta() {
+        return new Vector(x - previousX, y - previousY, z - previousZ);
+    }
     
 }

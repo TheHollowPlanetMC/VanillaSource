@@ -8,16 +8,16 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.Nullable;
-import thpmc.vanilla_source.api.nms.entity.NMSEntity;
+import thpmc.vanilla_source.api.nms.entity.NMSEntityController;
 
 public class EntityManager {
     
-    public static <T> NMSEntity createNMSEntity(World world, double x, double y, double z, EntityType type, @Nullable T data) {
+    public static <T> NMSEntityController createNMSEntityController(World world, double x, double y, double z, EntityType type, @Nullable T data) {
         WorldServer worldServer = ((CraftWorld) world).getHandle();
         
         switch (type){
             case PLAYER:{
-                return new ImplEntityPlayer(MinecraftServer.getServer(), worldServer, (GameProfile) data, new PlayerInteractManager(worldServer));
+                return new ImplEntityControllerPlayer(MinecraftServer.getServer(), worldServer, (GameProfile) data, new PlayerInteractManager(worldServer));
             }
         }
         

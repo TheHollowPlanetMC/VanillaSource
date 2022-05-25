@@ -1,25 +1,16 @@
-package thpmc.vanilla_source.api.nms.entity;
+package thpmc.vanilla_source.api.entity.controller;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import thpmc.vanilla_source.api.entity.EngineEntity;
+import thpmc.vanilla_source.api.entity.tick.EntityTracker;
+import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.util.collision.EngineBoundingBox;
 import thpmc.vanilla_source.api.util.collision.EngineEntityBoundingBox;
 import thpmc.vanilla_source.api.util.math.Vec2f;
+import thpmc.vanilla_source.api.world.EngineLocation;
 
-/**
- * NMS entity controller.
- * It is used as an interface for NMS entities.
- * Implementing classes always extend NMS entities.
- */
-public interface NMSEntity {
-    
-    /**
-     * Get bukkit entity instance.
-     * Note that most of Bukkit's methods are not thread-safe.
-     * @return Bukkit entity
-     */
-    Entity getBukkitEntity();
+public interface EntityController {
     
     /**
      * Set entity position.
@@ -61,4 +52,24 @@ public interface NMSEntity {
      */
     void resetBoundingBoxForMovement(EngineBoundingBox boundingBox);
     
+    /**
+     * Sends the results to the player after the tick is executed.
+     * @param player {@link EnginePlayer}
+     * @param absolute Whether absolute coordinates should be sent to the player.
+     *                 True at defined intervals.
+     */
+    void playTickResult(EngineEntity engineEntity, EnginePlayer player, boolean absolute);
+    
+    /**
+     * Used for display in {@link EntityTracker}.
+     * @param player {@link EnginePlayer}
+     */
+    void show(EngineEntity engineEntity, EnginePlayer player);
+    
+    /**
+     * Used for display in {@link EntityTracker}.
+     * @param player {@link EnginePlayer}
+     */
+    void hide(EngineEntity engineEntity, EnginePlayer player);
+
 }

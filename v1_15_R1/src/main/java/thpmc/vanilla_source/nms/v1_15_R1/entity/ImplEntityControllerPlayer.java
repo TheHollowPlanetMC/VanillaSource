@@ -5,7 +5,8 @@ import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.util.Vector;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.dummy.network.EmptySocket;
-import thpmc.vanilla_source.api.nms.entity.NMSEntityPlayer;
+import thpmc.vanilla_source.api.nms.entity.NMSEntityControllerPlayer;
+import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.util.collision.EngineBoundingBox;
 import thpmc.vanilla_source.api.util.collision.EngineEntityBoundingBox;
 import thpmc.vanilla_source.api.util.math.Vec2f;
@@ -15,9 +16,9 @@ import thpmc.vanilla_source.nms.v1_15_R1.entity.dummy.EmptyPlayerConnection;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ImplEntityPlayer extends EntityPlayer implements NMSEntityPlayer {
+public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntityControllerPlayer {
     
-    public ImplEntityPlayer(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile, PlayerInteractManager playerinteractmanager) {
+    public ImplEntityControllerPlayer(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile, PlayerInteractManager playerinteractmanager) {
         super(minecraftserver, worldserver, gameprofile, playerinteractmanager);
     
         Socket socket = new EmptySocket();
@@ -29,7 +30,7 @@ public class ImplEntityPlayer extends EntityPlayer implements NMSEntityPlayer {
         } catch (IOException e) {
             //Ignore
         }
-    
+     
         super.valid = false;
     }
     
@@ -59,4 +60,33 @@ public class ImplEntityPlayer extends EntityPlayer implements NMSEntityPlayer {
     public void resetBoundingBoxForMovement(EngineBoundingBox boundingBox) {
         super.a(new AxisAlignedBB(boundingBox.getMinX(), boundingBox.getMinY(), boundingBox.getMinZ(), boundingBox.getMaxX(), boundingBox.getMaxY(), boundingBox.getMaxZ()));
     }
+    
+    @Override
+    public void playTickResult(EngineEntity engineEntity, EnginePlayer player, boolean absolute) {
+        
+        player.sendPacket(new PacketPlayOutEntityHeadRotation(this, (byte) ((yaw * 256.0F) / 360.0F)));
+        
+        if (absolute) {
+            player.sendPacket(new PacketPlayOutEntityTeleport(this));
+        } else {
+            Vector delta = engineEntity.getMoveDelta();
+            player.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook(super.getId(),
+                    (short) (delta.getX() * 4096), (short) (delta.getY() * 4096), (short) (delta.getZ() * 4096),
+                    (byte) ((yaw * 256.0F) / 360.0F), (byte) ((pitch * 256.0F) / 360.0F), engineEntity.isOnGround()));
+        }
+    }
+    
+    @Override
+    public void show(EngineEntity engineEntity, EnginePlayer player) {
+        player.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this));
+        player.sendPacket(new PacketPlayOutNamedEntitySpawn(this));
+        player.sendPacket(new PacketPlayOutEntityTeleport(this));
+    }
+    
+    @Override
+    public void hide(EngineEntity engineEntity, EnginePlayer player) {
+        player.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, this));
+        player.sendPacket(new PacketPlayOutEntityDestroy(this.getId()));
+    }
+    
 }

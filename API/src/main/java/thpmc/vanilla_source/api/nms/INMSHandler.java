@@ -10,7 +10,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import thpmc.vanilla_source.api.nms.entity.NMSEntity;
+import thpmc.vanilla_source.api.nms.entity.NMSEntityController;
 import thpmc.vanilla_source.api.nms.enums.WrappedPlayerInfoAction;
 import thpmc.vanilla_source.api.util.collision.CollideOption;
 import thpmc.vanilla_source.api.util.collision.EngineBoundingBox;
@@ -55,7 +55,7 @@ public interface INMSHandler {
 
     void sendClearChunkMultiBlockChangePacketAtPrimaryThread(Player player, ParallelChunk parallelChunk);
     
-    <T> NMSEntity createNMSEntity(World world, double x, double y, double z, EntityType type, @Nullable T data);
+    <T> NMSEntityController createNMSEntityController(World world, double x, double y, double z, EntityType type, @Nullable T data);
     
     Object createSpawnEntityPacket(Object entity);
     
