@@ -86,7 +86,7 @@ public class ParallelStructure {
      * @param implStructureData 構造物データ
      */
     public void setStructureData(Player player, ImplStructureData implStructureData){
-        EnginePlayer enginePlayer = EnginePlayer.getParallelPlayer(player);
+        EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer(player);
         if(enginePlayer == null) return;
         
         this.setStructureData(enginePlayer, implStructureData);
@@ -144,7 +144,7 @@ public class ParallelStructure {
      * @param chunkUpdate チャンクアップデートのパケットを送信するかどうか
      */
     public void clearStructureData(Player player, boolean chunkUpdate){
-        EnginePlayer enginePlayer = EnginePlayer.getParallelPlayer(player);
+        EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer(player);
         if(enginePlayer == null) return;
     
         this.clearStructureData(enginePlayer, chunkUpdate);

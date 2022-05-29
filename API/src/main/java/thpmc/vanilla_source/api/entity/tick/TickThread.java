@@ -16,13 +16,13 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TickRunner implements Runnable, ContanTickBasedThread {
+public class TickThread implements Runnable, ContanTickBasedThread {
     
-    private static final Set<TickRunner> tickRunners = ConcurrentHashMap.newKeySet();
+    private static final Set<TickThread> TICK_THREADS = ConcurrentHashMap.newKeySet();
     
     public static void removeTrackers(EnginePlayer enginePlayer){
-        for(TickRunner tickRunner : tickRunners){
-            tickRunner.removeTracker(enginePlayer);
+        for(TickThread tickThread : TICK_THREADS){
+            tickThread.removeTracker(enginePlayer);
         }
     }
     
@@ -41,13 +41,13 @@ public class TickRunner implements Runnable, ContanTickBasedThread {
     
     private final ReentrantLock ADD_LOCK = new ReentrantLock();
     
-    private final ThreadLocalCache threadLocalCache = new ThreadLocalCache();
+    private final ThreadLocalCache threadLocalCache = new ThreadLocalCache(this);
     
     private boolean isStopped = false;
     
     private final int ID;
     
-    public TickRunner(int ID){this.ID = ID;}
+    public TickThread(int ID){this.ID = ID;}
     
     public int getRunnerID() {return ID;}
     

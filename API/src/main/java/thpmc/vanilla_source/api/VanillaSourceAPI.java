@@ -1,9 +1,10 @@
 package thpmc.vanilla_source.api;
 
 import org.contan_lang.ContanEngine;
-import thpmc.vanilla_source.api.contan.ContanMainThread;
+import thpmc.vanilla_source.api.contan.MainTickThread;
+import thpmc.vanilla_source.api.contan.ContanUtil;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
-import thpmc.vanilla_source.api.entity.tick.TickRunnerPool;
+import thpmc.vanilla_source.api.entity.tick.TickThreadPool;
 import thpmc.vanilla_source.api.entity.tick.TickWatchDog;
 import thpmc.vanilla_source.api.nms.INMSHandler;
 import thpmc.vanilla_source.api.player.EnginePlayer;
@@ -34,7 +35,7 @@ public abstract class VanillaSourceAPI {
     
     protected final INMSHandler nmsHandler;
     
-    protected final TickRunnerPool tickRunnerPool;
+    protected final TickThreadPool tickThreadPool;
     
     protected final TickWatchDog watchDog;
     
@@ -42,15 +43,19 @@ public abstract class VanillaSourceAPI {
     
     protected final ContanEngine contanEngine;
     
+    protected final MainTickThread mainThread;
+    
     public VanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads){
         this.javaPlugin = plugin;
         this.nmsHandler = nmsHandler;
-        this.tickRunnerPool = new TickRunnerPool(tickRunnerThreads);
+        this.tickThreadPool = new TickThreadPool(tickRunnerThreads);
     
-        this.watchDog = new TickWatchDog(tickRunnerPool);
+        this.watchDog = new TickWatchDog(tickThreadPool);
         this.watchFogExecutor = Executors.newSingleThreadScheduledExecutor();
         
-        this.contanEngine = new ContanEngine(new ContanMainThread(), new ArrayList<>(tickRunnerPool.getAsyncTickRunnerList()));
+        this.mainThread = new MainTickThread(0);
+        this.contanEngine = new ContanEngine(mainThread, new ArrayList<>(tickThreadPool.getAsyncTickRunnerList()));
+        ContanUtil.setUpContan();
     }
     
     /**
@@ -61,7 +66,9 @@ public abstract class VanillaSourceAPI {
     
     public INMSHandler getNMSHandler() {return nmsHandler;}
     
-    public TickRunnerPool getTickRunnerPool() {return tickRunnerPool;}
+    public TickThreadPool getTickThreadPool() {return tickThreadPool;}
+    
+    public MainTickThread getMainThread() {return mainThread;}
     
     /**
      * Get Contan script engine.
@@ -105,7 +112,7 @@ public abstract class VanillaSourceAPI {
      * Get ParallelPlayer
      * @return ParallelPlayer
      */
-    public @Nullable EnginePlayer getParallelPlayer(Player player){return EnginePlayer.getParallelPlayer(player);}
+    public @Nullable EnginePlayer getEnginePlayer(Player player){return EnginePlayer.getEnginePlayer(player);}
     
     public abstract boolean isHigher_v1_18_R1();
 }

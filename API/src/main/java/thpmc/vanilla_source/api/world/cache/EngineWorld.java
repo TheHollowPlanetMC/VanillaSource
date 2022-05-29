@@ -4,6 +4,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.contan_lang.variables.primitive.ContanClassInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
@@ -33,6 +34,41 @@ public interface EngineWorld extends IWorld {
      * @return ChunkCache
      */
     @Nullable EngineChunk getChunkAt(int chunkX, int chunkZ);
+    
+    @NotNull ContanClassInstance getScriptHandle();
+    
+    /**
+     * Gets entities that are within the specified radius.
+     * @param center Center point to look for entities
+     * @param radius Radius to look for entities
+     * @return Search radius
+     */
+    default @NotNull Collection<EngineEntity> getNearbyEntities(Vector center, double radius){
+        Set<EngineEntity> entities = new HashSet<>();
+        
+        int startChunkX = (center.getBlockX() - NumberConversions.floor(radius)) >> 4;
+        int startChunkY = (center.getBlockY() - NumberConversions.floor(radius)) >> 4;
+        int startChunkZ = (center.getBlockZ() - NumberConversions.floor(radius)) >> 4;
+        int endChunkX = (center.getBlockX() + NumberConversions.floor(radius)) >> 4;
+        int endChunkY = (center.getBlockY() + NumberConversions.floor(radius)) >> 4;
+        int endChunkZ = (center.getBlockZ() + NumberConversions.floor(radius)) >> 4;
+        
+        for (int chunkX = startChunkX; chunkX <= endChunkX; chunkX++) {
+            for (int chunkY = startChunkY; chunkY <= endChunkY; chunkY++) {
+                for (int chunkZ = startChunkZ; chunkZ <= endChunkZ; chunkZ++) {
+                    EngineChunk chunk = getChunkAt(chunkX, chunkZ);
+                    if (chunk != null) {
+                        entities.addAll(chunk.getEntitiesInSection(ChunkUtil.getSectionIndex(chunkY << 4)));
+                    }
+                }
+            }
+        }
+        
+        double radSq = radius * radius;
+        entities.removeIf(engineEntity -> engineEntity.getLocation().toVector().distanceSquared(center) > radSq);
+        
+        return entities;
+    }
 
 
     default @Nullable EngineRayTraceResult rayTrace(@NotNull Vector startPosition, @NotNull Vector direction, double distance, @NotNull CollideOption collideOption){

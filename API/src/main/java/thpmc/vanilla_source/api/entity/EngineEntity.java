@@ -3,13 +3,15 @@ package thpmc.vanilla_source.api.entity;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import org.contan_lang.variables.ContanObject;
 import org.contan_lang.variables.primitive.ContanClassInstance;
+import org.contan_lang.variables.primitive.ContanVoidObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.controller.EntityAIController;
 import thpmc.vanilla_source.api.entity.controller.EntityController;
-import thpmc.vanilla_source.api.entity.tick.TickRunner;
+import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.entity.tick.EntityTracker;
 import thpmc.vanilla_source.api.nms.INMSHandler;
 import thpmc.vanilla_source.api.player.EnginePlayer;
@@ -30,7 +32,9 @@ public class EngineEntity implements TickBase {
     
     protected final EntityController entityController;
     
-    protected TickRunner tickRunner;
+    protected TickThread tickThread;
+    
+    protected ContanClassInstance scriptHandle;
     
     protected EngineWorld world;
     protected EngineChunk chunk;
@@ -60,16 +64,19 @@ public class EngineEntity implements TickBase {
     
     protected CollideOption movementCollideOption = new CollideOption(FluidCollisionMode.NEVER, true);
     
+    public boolean teleported = false;
+    
     /**
      * Create entity instance.
      * @param world      World in which this entity exists
      * @param entityController  NMS handle
-     * @param tickRunner {@link TickRunner} that executes the processing of this entity
+     * @param tickThread {@link TickThread} that executes the processing of this entity
      */
-    public EngineEntity(@NotNull EngineWorld world, @NotNull EntityController entityController, @NotNull TickRunner tickRunner){
+    public EngineEntity(@NotNull EngineWorld world, @NotNull EntityController entityController, @NotNull TickThread tickThread, @Nullable ContanClassInstance scriptHandle){
         this.world = world;
         this.entityController = entityController;
-        this.tickRunner = tickRunner;
+        this.tickThread = tickThread;
+        this.scriptHandle = scriptHandle;
         
         //Initialize position and rotation
         Vector position = entityController.getPosition();
@@ -87,6 +94,8 @@ public class EngineEntity implements TickBase {
         
         this.chunk = world.getChunkAt(NumberConversions.floor(x) >> 4, NumberConversions.floor(z) >> 4);
         this.aiController = new EntityAIController(this);
+        
+        this.setAutoClimbHeight(1.0F);
     }
     
     /**
@@ -202,16 +211,16 @@ public class EngineEntity implements TickBase {
     public void setGravity(boolean hasGravity) {this.hasGravity = hasGravity;}
     
     /**
-     * Gets an instance of {@link TickRunner} executing a tick.
-     * @return {@link TickRunner}
+     * Gets an instance of {@link TickThread} executing a tick.
+     * @return {@link TickThread}
      */
-    public @NotNull TickRunner getTickRunner(){return tickRunner;}
+    public @NotNull TickThread getTickThread(){return tickThread;}
     
     /**
-     * Sets an instance of {@link TickRunner} executing a tick.
-     * @param tickRunner  {@link TickRunner}
+     * Sets an instance of {@link TickThread} executing a tick.
+     * @param tickThread  {@link TickThread}
      */
-    public void setTickRunner(TickRunner tickRunner){this.tickRunner = tickRunner;}
+    public void setTickRunner(TickThread tickThread){this.tickThread = tickThread;}
     
     /**
      * Gets velocity of the entity.
@@ -238,10 +247,28 @@ public class EngineEntity implements TickBase {
     public void setMovementCollideOption(CollideOption movementCollideOption) {this.movementCollideOption = movementCollideOption;}
     
     /**
-     * Get entity AI and navigation controller.
+     * Gets entity AI and navigation controller.
      * @return {@link EntityAIController}
      */
     public EntityAIController getAIController() {return aiController;}
+    
+    /**
+     * Gets Contan script handle
+     * @return {@link ContanClassInstance}
+     */
+    public ContanClassInstance getScriptHandle() {return scriptHandle;}
+    
+    /**
+     * Gets entity's position.
+     * @return Position vector.
+     */
+    public Vector getPosition() {return new Vector(x, y, z);}
+    
+    /**
+     * Gets entity's rotation.
+     * @return Rotation vec2f.
+     */
+    public Vec2f getRotation() {return new Vec2f(yaw, pitch);}
     
     /**
      * Moves this entity by the specified amount.
@@ -389,6 +416,12 @@ public class EngineEntity implements TickBase {
         return new MovementResult(hitCollisions);
     }
     
+    /**
+     * Set position for movement (not for teleport).
+     * @param x position x.
+     * @param y position y.
+     * @param z position z.
+     */
     public void setPosition(double x, double y, double z){
         int previousBlockX = NumberConversions.floor(this.x);
         int previousBlockY = NumberConversions.floor(this.y);
@@ -436,6 +469,20 @@ public class EngineEntity implements TickBase {
         entityController.setPositionRaw(x, y, z);
     }
     
+    
+    public void teleport(EngineLocation location) {
+        this.world = location.getWorld() == null ? world : location.getWorld();
+        this.setPosition(location.getX(), location.getY(), location.getZ());
+        this.setRotation(location.getYaw(), location.getPitch());
+        
+        this.previousX = x;
+        this.previousY = y;
+        this.previousZ = z;
+        
+        this.teleported = true;
+    }
+    
+    
     public void setRotation(float yaw, float pitch){
         this.yaw = yaw;
         this.pitch = pitch;
@@ -444,6 +491,8 @@ public class EngineEntity implements TickBase {
     
     @Override
     public void tick() {
+        invokeScriptFunction("onTick");
+        
         //gravity
         if(hasGravity) velocity.add(new Vector(0.0D, -0.04D, 0.0D));
         
@@ -452,6 +501,20 @@ public class EngineEntity implements TickBase {
         if(onGround) velocity.setY(0);
         
         aiController.tick(x, y, z);
+    
+        invokeScriptFunction("update");
+    }
+    
+    protected ContanObject<?> invokeScriptFunction(String functionName, ContanObject<?>... arguments) {
+        if (scriptHandle != null) {
+            return scriptHandle.invokeFunctionIgnoreNotFound(tickThread, functionName);
+        }
+        
+        return ContanVoidObject.INSTANCE;
+    }
+    
+    public void spawn() {
+        tickThread.addEntity(this);
     }
     
     /**
@@ -470,7 +533,8 @@ public class EngineEntity implements TickBase {
      *                 True at defined intervals.
      */
     public void playTickResult(EnginePlayer player, boolean absolute) {
-        entityController.playTickResult(this, player, absolute);
+        entityController.playTickResult(this, player, absolute || teleported);
+        teleported = false;
     }
     
     /**

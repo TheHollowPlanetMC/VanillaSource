@@ -55,7 +55,7 @@ public class ImplVanillaSourceAPI extends VanillaSourceAPI {
         if(isStarted) return;
         isStarted = true;
         
-        super.tickRunnerPool.startAll();
+        super.tickThreadPool.startAll();
         super.watchFogExecutor.scheduleAtFixedRate(watchDog, 0, 30, TimeUnit.SECONDS);
     }
     
@@ -63,7 +63,7 @@ public class ImplVanillaSourceAPI extends VanillaSourceAPI {
         if(!isStarted) return;
         isStarted = false;
         
-        super.tickRunnerPool.cancelAll();
+        super.tickThreadPool.cancelAll();
         super.watchDog.cancel();
         super.watchFogExecutor.shutdown();
     }

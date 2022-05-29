@@ -1,23 +1,22 @@
 package thpmc.vanilla_source.api.entity.tick;
 
 import org.bukkit.Location;
+import org.bukkit.util.NumberConversions;
+import org.bukkit.util.Vector;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.world.EngineLocation;
 import thpmc.vanilla_source.api.world.cache.local.ThreadLocalEngineWorld;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class EntityTracker {
     
     private static final int TRACK_INTERVAL = 20;
     private static final int ABSOLUTE_PACKET_INTERVAL = 60;
     
-    private final TickRunner tickRunner;
+    private final TickThread tickThread;
     
     private final EnginePlayer enginePlayer;
     
@@ -25,8 +24,8 @@ public class EntityTracker {
     
     private int tick = new Random().nextInt(TRACK_INTERVAL);
     
-    public EntityTracker(TickRunner tickRunner, EnginePlayer enginePlayer) {
-        this.tickRunner = tickRunner;
+    public EntityTracker(TickThread tickThread, EnginePlayer enginePlayer) {
+        this.tickThread = tickThread;
         this.enginePlayer = enginePlayer;
     }
     
@@ -41,11 +40,11 @@ public class EntityTracker {
     
             int drawDistance = enginePlayer.getEntityDrawDistance();
     
-            ThreadLocalEngineWorld world = tickRunner.getThreadLocalCache().getWorld(Objects.requireNonNull(pl.getWorld()).getName());
+            ThreadLocalEngineWorld world = tickThread.getThreadLocalCache().getWorld(Objects.requireNonNull(pl.getWorld()).getName());
     
             for (EngineEntity entity : entities) {
                 EngineLocation location = entity.getLocation();
-                if (location.getWorld() != world){
+                if (location.getWorld() != world) {
                     continue;
                 }
         
@@ -54,7 +53,7 @@ public class EntityTracker {
                 
                 if (Math.abs(entityChunkX - playerChunkX) + Math.abs(entityChunkZ - playerChunkZ) <= drawDistance) {
                     //in range
-                    if (!trackedEntities.contains(entity) && trackedEntities.size() <= (enginePlayer.getEntityTrackLimit() / VanillaSourceAPI.getInstance().getTickRunnerPool().getPoolSize())) {
+                    if (!trackedEntities.contains(entity) && trackedEntities.size() <= (enginePlayer.getEntityTrackLimit() / VanillaSourceAPI.getInstance().getTickThreadPool().getPoolSize())) {
                         entity.show(enginePlayer);
                         trackedEntities.add(entity);
                     }
@@ -72,4 +71,29 @@ public class EntityTracker {
         boolean absolute = tick % ABSOLUTE_PACKET_INTERVAL == 0;
         trackedEntities.forEach(engineEntity -> engineEntity.playTickResult(enginePlayer, absolute));
     }
+    
+    
+    public static Collection<EnginePlayer> getPlayersInTrackingRange(double centerX, double centerY, double centerZ) {
+        Set<EnginePlayer> players = new HashSet<>();
+        
+        int entityChunkX = NumberConversions.floor(centerX) >> 4;
+        int entityChunkY = NumberConversions.floor(centerY) >> 4;
+        int entityChunkZ = NumberConversions.floor(centerZ) >> 4;
+        
+        for (EnginePlayer enginePlayer : EnginePlayer.getAllPlayers()) {
+            Location playerLoc = enginePlayer.getCurrentLocation();
+            int playerChunkX = playerLoc.getBlockX() >> 4;
+            int playerChunkY = playerLoc.getBlockY() >> 4;
+            int playerChunkZ = playerLoc.getBlockZ() >> 4;
+    
+            if (Math.abs(entityChunkX - playerChunkX) + Math.abs(entityChunkY - playerChunkY)
+                    + Math.abs(entityChunkZ - playerChunkZ) <= enginePlayer.getEntityDrawDistance()) {
+                
+                players.add(enginePlayer);
+            }
+        }
+        
+        return players;
+    }
+    
 }

@@ -1,5 +1,12 @@
 package thpmc.vanilla_source.impl;
 
+import org.contan_lang.ContanEngine;
+import org.contan_lang.ContanModule;
+import org.contan_lang.evaluators.ClassBlock;
+import org.contan_lang.variables.primitive.ContanClassInstance;
+import org.contan_lang.variables.primitive.JavaClassInstance;
+import thpmc.vanilla_source.api.VanillaSourceAPI;
+import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
@@ -24,9 +31,24 @@ public class ImplParallelWorld implements ParallelWorld {
 
     private final String worldName;
     
+    private final ContanClassInstance scriptHandle;
+    
     public ImplParallelWorld(ParallelUniverse parallelUniverse, String worldName){
         this.parallelUniverse = parallelUniverse;
         this.worldName = worldName;
+        
+        TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
+        ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
+    
+        ContanClassInstance scriptHandle = null;
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/world/World.cntn");
+        if (contanModule != null) {
+            ClassBlock classBlock = contanModule.getClassByName("World");
+            if (classBlock != null) {
+                scriptHandle = classBlock.createInstance(contanEngine, tickThread, new JavaClassInstance(contanEngine, this));
+            }
+        }
+        this.scriptHandle = scriptHandle;
     }
     
     public String getWorldName() {return worldName;}
@@ -262,5 +284,10 @@ public class ImplParallelWorld implements ParallelWorld {
     @Override
     public @Nullable EngineChunk getChunkAt(int chunkX, int chunkZ) {
         return null;
+    }
+    
+    @Override
+    public @NotNull ContanClassInstance getScriptHandle() {
+        return scriptHandle;
     }
 }

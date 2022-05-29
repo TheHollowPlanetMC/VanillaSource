@@ -3,7 +3,15 @@ package thpmc.vanilla_source.api.world.cache.local;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.contan_lang.ContanEngine;
+import org.contan_lang.ContanModule;
+import org.contan_lang.evaluators.ClassBlock;
+import org.contan_lang.variables.primitive.ContanClassInstance;
+import org.contan_lang.variables.primitive.JavaClassInstance;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import thpmc.vanilla_source.api.VanillaSourceAPI;
+import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.world.ChunkUtil;
 import thpmc.vanilla_source.api.world.cache.AsyncEngineChunk;
 import thpmc.vanilla_source.api.world.cache.AsyncEngineWorld;
@@ -20,9 +28,23 @@ public class ThreadLocalEngineWorld implements EngineWorld {
     
     private final Long2ObjectOpenHashMap<AsyncEngineChunk> chunkMap = new Long2ObjectOpenHashMap<>();
     
-    public ThreadLocalEngineWorld(String worldName, AsyncEngineWorld asyncWorld) {
+    private final ContanClassInstance scriptHandle;
+    
+    public ThreadLocalEngineWorld(String worldName, AsyncEngineWorld asyncWorld, TickThread tickThread) {
         this.worldName = worldName;
         this.asyncWorld = asyncWorld;
+        
+        ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
+    
+        ContanClassInstance scriptHandle = null;
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/world/World.cntn");
+        if (contanModule != null) {
+            ClassBlock classBlock = contanModule.getClassByName("World");
+            if (classBlock != null) {
+                scriptHandle = classBlock.createInstance(contanEngine, tickThread, new JavaClassInstance(contanEngine, this));
+            }
+        }
+        this.scriptHandle = scriptHandle;
     }
     
     @Override
@@ -88,5 +110,10 @@ public class ThreadLocalEngineWorld implements EngineWorld {
             }
         }
         return asyncChunk;
+    }
+    
+    @Override
+    public @NotNull ContanClassInstance getScriptHandle() {
+        return scriptHandle;
     }
 }

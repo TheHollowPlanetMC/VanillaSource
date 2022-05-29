@@ -1,5 +1,15 @@
 package thpmc.vanilla_source.impl;
 
+import org.bukkit.Location;
+import org.contan_lang.ContanEngine;
+import org.contan_lang.ContanModule;
+import org.contan_lang.evaluators.ClassBlock;
+import org.contan_lang.variables.primitive.ContanClassInstance;
+import org.contan_lang.variables.primitive.JavaClassInstance;
+import thpmc.vanilla_source.api.VanillaSourceAPI;
+import thpmc.vanilla_source.api.entity.tick.TickThread;
+import thpmc.vanilla_source.api.world.EngineLocation;
+import thpmc.vanilla_source.api.world.cache.AsyncWorldCache;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
@@ -7,6 +17,7 @@ import thpmc.vanilla_source.api.player.EnginePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+import thpmc.vanilla_source.util.BukkitAdapter;
 
 public class ImplEnginePlayer extends EnginePlayer {
 
@@ -23,7 +34,20 @@ public class ImplEnginePlayer extends EnginePlayer {
 
 
     private ImplEnginePlayer(Player player) {
-        super(player);
+        super(player, AsyncWorldCache.getAsyncWorld(player.getWorld().getName()), new PlayerEntityController(player), VanillaSourceAPI.getInstance().getMainThread(), null);
+        TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
+        ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
+    
+        ContanClassInstance scriptHandle = null;
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/entity/Player.cntn");
+        if (contanModule != null) {
+            ClassBlock classBlock = contanModule.getClassByName("Player");
+            if (classBlock != null) {
+                scriptHandle = classBlock.createInstance(contanEngine, tickThread, new JavaClassInstance(contanEngine, this));
+            }
+        }
+        
+        super.scriptHandle = scriptHandle;
     }
 
     @Override
@@ -78,5 +102,24 @@ public class ImplEnginePlayer extends EnginePlayer {
     }
     
     public void setUniverseRaw(ParallelUniverse universe){this.currentUniverse = universe;}
-
+    
+    @Override
+    public void teleport(EngineLocation location) {
+        if (location.getWorld() != null) {
+            Location bukkitLocation = BukkitAdapter.toBukkitLocation(location);
+            player.teleport(bukkitLocation);
+        }
+        
+        super.teleport(location);
+    }
+    
+    @Override
+    public void tick() {
+        super.currentLocation = player.getLocation();
+    }
+    
+    @Override
+    public void spawn() {
+        invokeScriptFunction("update");
+    }
 }

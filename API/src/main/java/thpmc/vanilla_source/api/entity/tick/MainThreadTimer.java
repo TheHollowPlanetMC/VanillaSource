@@ -17,14 +17,14 @@ public class MainThreadTimer extends BukkitRunnable {
     }
 
 
-    private final Set<TickRunner> tickRunners = ConcurrentHashMap.newKeySet();
+    private final Set<TickThread> tickThreads = ConcurrentHashMap.newKeySet();
 
-    public void addTickRunner(TickRunner tickRunner){this.tickRunners.add(tickRunner);}
+    public void addTickRunner(TickThread tickThread){this.tickThreads.add(tickThread);}
 
-    public void removeTickRunner(TickRunner tickRunner){this.tickRunners.remove(tickRunner);}
+    public void removeTickRunner(TickThread tickThread){this.tickThreads.remove(tickThread);}
 
     @Override
     public void run() {
-        tickRunners.forEach(TickRunner::tickAtAsync);
+        tickThreads.forEach(TickThread::tickAtAsync);
     }
 }

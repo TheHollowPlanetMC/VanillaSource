@@ -14,7 +14,7 @@ public class UniverseGUI {
 
     public static void openUniverseGUI(Player player){
 
-        EnginePlayer enginePlayer = EnginePlayer.getParallelPlayer(player);
+        EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer(player);
         if(enginePlayer == null) return;
 
         Artist artist = new Artist(() -> {

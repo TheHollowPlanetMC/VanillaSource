@@ -1,8 +1,14 @@
 package thpmc.vanilla_source.listener;
 
 import org.bukkit.*;
+import org.contan_lang.ContanEngine;
+import org.contan_lang.ContanModule;
+import org.contan_lang.evaluators.ClassBlock;
+import org.contan_lang.variables.primitive.ContanClassInstance;
+import org.contan_lang.variables.primitive.JavaClassInstance;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.ai.navigation.goal.EntityFollowGoal;
+import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.EntityType;
@@ -17,6 +23,7 @@ import thpmc.vanilla_source.api.nms.entity.NMSEntityController;
 import thpmc.vanilla_source.api.util.collision.CollideOption;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class TestListener implements Listener {
     
@@ -118,23 +125,30 @@ public class TestListener implements Listener {
         
         Location location = player.getLocation();
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
-        for (int index = 0; index < 100; index++) {
-            GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
-            NMSEntityController entityPlayer = nmsHandler.createNMSEntityController(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
-            entityPlayer.setPositionRaw(location.getX(), location.getY(), location.getZ());
     
-            
-            VanillaSourceAPI.getInstance().getTickRunnerPool().spawn(tickRunner -> {
-                EngineEntity npc = new EngineEntity(tickRunner.getThreadLocalCache().getWorld(location.getWorld().getName()), entityPlayer, tickRunner);
-                npc.getAIController().goalSelector.registerGoal(0, new EntityFollowGoal(player));
-                npc.setAutoClimbHeight(1.0F);
-                tickRunner.addEntity(npc);
-            });
-    
-            count++;
-            
-            player.sendMessage("PlayerNPC -> " + count);
+        TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/event/EventHandler.cntn");
+        if (contanModule != null) {
+            try {
+                contanModule.invokeFunction(tickThread, "firePlayerClick", event);
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+        
+    
+        /*
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
+        NMSEntityController entityPlayer = nmsHandler.createNMSEntityController(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
+        entityPlayer.setPositionRaw(location.getX(), location.getY(), location.getZ());
+    
+    
+        TickThread tickThread = VanillaSourceAPI.getInstance().getTickThreadPool().getNextTickThread();
+        
+        EngineEntity npc = new EngineEntity(tickThread.getThreadLocalCache().getWorld(location.getWorld().getName()), entityPlayer, tickThread);
+        npc.getAIController().goalSelector.registerGoal(0, new EntityFollowGoal(player));
+        npc.setAutoClimbHeight(1.0F);
+        tickThread.addEntity(npc);*/
     
         /*
         World world = player.getWorld();

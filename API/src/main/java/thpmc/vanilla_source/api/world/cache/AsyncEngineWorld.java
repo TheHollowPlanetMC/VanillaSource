@@ -3,8 +3,15 @@ package thpmc.vanilla_source.api.world.cache;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
+import org.contan_lang.ContanEngine;
+import org.contan_lang.ContanModule;
+import org.contan_lang.evaluators.ClassBlock;
+import org.contan_lang.variables.primitive.ContanClassInstance;
+import org.contan_lang.variables.primitive.JavaClassInstance;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
+import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.setting.VSSettings;
 import thpmc.vanilla_source.api.world.ChunkUtil;
 
@@ -17,7 +24,24 @@ public class AsyncEngineWorld implements EngineWorld {
     
     private final Map<Long, AsyncEngineChunk> asyncChunkMap = new ConcurrentHashMap<>();
     
-    public AsyncEngineWorld(String worldName) {this.worldName = worldName;}
+    private final ContanClassInstance scriptHandle;
+    
+    public AsyncEngineWorld(String worldName) {
+        this.worldName = worldName;
+        
+        TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
+        ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
+        
+        ContanClassInstance scriptHandle = null;
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/world/World.cntn");
+        if (contanModule != null) {
+            ClassBlock classBlock = contanModule.getClassByName("World");
+            if (classBlock != null) {
+                scriptHandle = classBlock.createInstance(contanEngine, tickThread, new JavaClassInstance(contanEngine, this));
+            }
+        }
+        this.scriptHandle = scriptHandle;
+    }
     
     @Override
     public String getName() {return worldName;}
@@ -74,6 +98,11 @@ public class AsyncEngineWorld implements EngineWorld {
     @Override
     public @Nullable AsyncEngineChunk getChunkAt(int chunkX, int chunkZ) {
         return asyncChunkMap.get(ChunkUtil.getChunkKey(chunkX, chunkZ));
+    }
+    
+    @Override
+    public @NotNull ContanClassInstance getScriptHandle() {
+        return scriptHandle;
     }
     
     public void setChunk(Chunk chunk){

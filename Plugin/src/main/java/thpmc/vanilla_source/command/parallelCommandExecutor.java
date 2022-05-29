@@ -116,7 +116,7 @@ public class parallelCommandExecutor implements CommandExecutor, TabExecutor {
                 return true;
             }
     
-            EnginePlayer enginePlayer = EnginePlayer.getParallelPlayer((Player) sender);
+            EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer((Player) sender);
             if(enginePlayer == null) return false;
             
             enginePlayer.setUniverse(universe);
@@ -124,7 +124,7 @@ public class parallelCommandExecutor implements CommandExecutor, TabExecutor {
         }
     
         if(args[0].equals("leave-universe")){
-            EnginePlayer enginePlayer = EnginePlayer.getParallelPlayer((Player) sender);
+            EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer((Player) sender);
             if(enginePlayer == null) return false;
         
             enginePlayer.setUniverse(null);

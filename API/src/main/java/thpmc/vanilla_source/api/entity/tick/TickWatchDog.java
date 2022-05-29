@@ -10,12 +10,12 @@ import java.util.logging.Logger;
 
 public class TickWatchDog implements Runnable{
     
-    private final TickRunnerPool tickRunnerPool;
+    private final TickThreadPool tickThreadPool;
     
     private boolean isStopped = false;
     
-    public TickWatchDog(TickRunnerPool tickRunnerPool){
-        this.tickRunnerPool = tickRunnerPool;
+    public TickWatchDog(TickThreadPool tickThreadPool){
+        this.tickThreadPool = tickThreadPool;
     }
     
     @Override
@@ -23,16 +23,16 @@ public class TickWatchDog implements Runnable{
         if(isStopped) return;
         
         long currentTime = System.currentTimeMillis();
-        for (TickRunner tickRunner : tickRunnerPool.getAsyncTickRunnerList()) {
-            if (tickRunner.getLastTickMS() + 30000 > currentTime) continue;
+        for (TickThread tickThread : tickThreadPool.getAsyncTickRunnerList()) {
+            if (tickThread.getLastTickMS() + 30000 > currentTime) continue;
             
             Logger log = VanillaSourceAPI.getInstance().getPlugin().getLogger();
-            log.log(Level.SEVERE, "--- THREAD " + tickRunner.getRunnerID() + " HAD NO RESPONSE FOR 30 SECONDS! ---");
+            log.log(Level.SEVERE, "--- THREAD " + tickThread.getRunnerID() + " HAD NO RESPONSE FOR 30 SECONDS! ---");
             log.log(Level.SEVERE, "It will output a thread dump, but if you are still unable to identify the cause after reading it, please contact support.");
             log.log(Level.SEVERE, "");
-            log.log(Level.SEVERE, "----- THREAD DUMP FOR " + tickRunner.getRunnerID() + " -----");
+            log.log(Level.SEVERE, "----- THREAD DUMP FOR " + tickThread.getRunnerID() + " -----");
             
-            ThreadInfo threadInfo = ManagementFactory.getThreadMXBean().getThreadInfo(tickRunner.getCurrentThread().getId(), Integer.MAX_VALUE);
+            ThreadInfo threadInfo = ManagementFactory.getThreadMXBean().getThreadInfo(tickThread.getCurrentThread().getId(), Integer.MAX_VALUE);
             
             log.log(Level.SEVERE, "Thread: " + threadInfo.getThreadName());
             log.log(Level.SEVERE, "PID: " + threadInfo.getThreadId() + " | Suspended: " + threadInfo.isSuspended()

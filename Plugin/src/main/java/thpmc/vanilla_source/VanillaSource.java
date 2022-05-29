@@ -1,7 +1,9 @@
 package thpmc.vanilla_source;
 
 import be4rjp.artgui.ArtGUI;
+import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.tick.MainThreadTimer;
+import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.config.ImplVSSettings;
 import thpmc.vanilla_source.contan.ContanManager;
 import thpmc.vanilla_source.listener.PlayerJoinQuitListener;
@@ -84,6 +86,11 @@ public final class VanillaSource extends JavaPlugin {
             e.printStackTrace();
             throw new IllegalStateException("Failed to load script files.");
         }
+        
+        //Start player tick timer
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            EnginePlayer.getAllPlayers().forEach(EngineEntity::tick);
+        }, 0, 1);
     }
     
     @Override

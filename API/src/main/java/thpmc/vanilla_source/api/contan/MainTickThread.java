@@ -3,11 +3,16 @@ package thpmc.vanilla_source.api.contan;
 import org.contan_lang.ContanEngine;
 import org.contan_lang.thread.ContanTickBasedThread;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
+import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.util.ThreadUtil;
 
 import java.util.concurrent.*;
 
-public class ContanMainThread implements ContanTickBasedThread {
+public class MainTickThread extends TickThread implements ContanTickBasedThread {
+    
+    public MainTickThread(int ID) {
+        super(ID);
+    }
     
     @Override
     public <T> void scheduleTask(Callable<T> callable, long l) {
