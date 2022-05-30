@@ -144,7 +144,7 @@
     <dependency>
       <groupId>com.github.Be4rJP</groupId>
       <artifactId>Contan</artifactId>
-      <version>10292fefc8</version>
+      <version>cbd32d23b1</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
