@@ -26,7 +26,7 @@ public class PlayerJoinQuitListener implements Listener {
         EnginePlayer enginePlayer = ImplEnginePlayer.onPlayerJoin(player);
 
         ParallelUniverse universe = VanillaSourceAPI.getInstance().createUniverse(player.getUniqueId().toString());
-        universe.addPlayer(enginePlayer);
+        //universe.addPlayer(enginePlayer);
         
         Object wrappedParallelPlayer = ChiyogamiManager.getWrappedParallelPlayer(player);
         if(wrappedParallelPlayer != null) ChiyogamiManager.setCheckFunction(enginePlayer, wrappedParallelPlayer);

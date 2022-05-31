@@ -174,6 +174,7 @@ public class NativeBlockRegister {
     public static void registerChunk(String worldName, AsyncEngineChunk chunk){
         try{
             ChunkSnapshot chunkSnapshot = chunk.getChunkSnapShot();
+            if (chunkSnapshot == null) return;
             
             Field blockids = CraftChunkSnapshot.class.getDeclaredField("blockids");
             blockids.setAccessible(true);

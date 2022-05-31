@@ -31,7 +31,7 @@ public class UniverseGUI {
 
             ArtButton L = new ArtButton(new ItemBuilder(Material.BARRIER).name("&b&nLeave from current universe").build())
                     .listener((inventoryClickEvent, menu) -> {
-                        enginePlayer.setUniverse(null);
+                        enginePlayer.setUniverse(VanillaSourceAPI.getInstance().getDefaultUniverse());
                         player.closeInventory();
                     });
 

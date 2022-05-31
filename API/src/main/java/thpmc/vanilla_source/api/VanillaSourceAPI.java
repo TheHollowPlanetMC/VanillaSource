@@ -44,11 +44,14 @@ public abstract class VanillaSourceAPI {
     protected final ContanEngine contanEngine;
     
     protected final MainTickThread mainThread;
+
+    protected final ParallelUniverse defaultUniverse;
     
-    public VanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads){
+    public VanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads, ParallelUniverse defaultUniverse){
         this.javaPlugin = plugin;
         this.nmsHandler = nmsHandler;
         this.tickThreadPool = new TickThreadPool(tickRunnerThreads);
+        this.defaultUniverse = defaultUniverse;
     
         this.watchDog = new TickWatchDog(tickThreadPool);
         this.watchFogExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -69,7 +72,9 @@ public abstract class VanillaSourceAPI {
     public TickThreadPool getTickThreadPool() {return tickThreadPool;}
     
     public MainTickThread getMainThread() {return mainThread;}
-    
+
+    public ParallelUniverse getDefaultUniverse() {return defaultUniverse;}
+
     /**
      * Get Contan script engine.
      * @return Singleton {@link ContanEngine} instance.

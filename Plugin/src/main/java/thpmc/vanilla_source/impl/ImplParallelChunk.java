@@ -1,8 +1,9 @@
 package thpmc.vanilla_source.impl;
 
+import thpmc.vanilla_source.api.world.cache.AsyncEngineChunk;
+import thpmc.vanilla_source.api.world.cache.AsyncWorldCache;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
-import org.bukkit.ChunkSnapshot;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.nms.INMSHandler;
@@ -10,6 +11,7 @@ import thpmc.vanilla_source.util.SectionLevelArray;
 import thpmc.vanilla_source.util.SectionTypeArray;
 import thpmc.vanilla_source.util.TaskHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -19,12 +21,15 @@ import org.jetbrains.annotations.Nullable;
 import thpmc.vanilla_source.nms.NMSManager;
 import thpmc.vanilla_source.api.world.ChunkUtil;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ImplParallelChunk implements ParallelChunk {
 
     private final ParallelWorld parallelWorld;
+
+    private final @NotNull AsyncEngineChunk engineChunk;
     
     private final int chunkX;
     
@@ -42,10 +47,17 @@ public class ImplParallelChunk implements ParallelChunk {
     private Object mapChunkPacketCache;
     
     private Object lightUpdatePacketCache;
+
+    private boolean hasBlockDifferenceData;
+
+    private boolean hasBlockLightDifferenceData;
+
+    private boolean hasSkyLightDifferenceData;
     
     
     public ImplParallelChunk(ParallelWorld parallelWorld, int chunkX, int chunkZ){
         this.parallelWorld = parallelWorld;
+        this.engineChunk = Objects.requireNonNull(AsyncWorldCache.getAsyncWorld(parallelWorld.getName()).getChunkAt(chunkX, chunkZ));
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
     
@@ -124,6 +136,7 @@ public class ImplParallelChunk implements ParallelChunk {
         Object iBlockData = NMSManager.getNMSHandler().getIBlockData(material.createBlockData());
         sectionTypeArray.setType(blockX & 0xF, blockY & 0xF, blockZ & 0xF, iBlockData);
         mapChunkPacketCache = null;
+        hasBlockDifferenceData = true;
     }
 
     @Override
@@ -131,10 +144,10 @@ public class ImplParallelChunk implements ParallelChunk {
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
 
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
-        if(sectionTypeArray == null) return null;
+        if(sectionTypeArray == null) return engineChunk.getType(blockX, blockY, blockZ);
 
         Object iBlockData = sectionTypeArray.getType(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
-        if(iBlockData == null) return null;
+        if(iBlockData == null) return engineChunk.getType(blockX, blockY, blockZ);
 
         return NMSManager.getNMSHandler().getBukkitBlockData(iBlockData).getMaterial();
     }
@@ -152,6 +165,7 @@ public class ImplParallelChunk implements ParallelChunk {
         Object iBlockData = NMSManager.getNMSHandler().getIBlockData(blockData);
         sectionTypeArray.setType(blockX & 0xF, blockY & 0xF, blockZ & 0xF, iBlockData);
         mapChunkPacketCache = null;
+        hasBlockDifferenceData = true;
     }
     
     @Override
@@ -166,6 +180,7 @@ public class ImplParallelChunk implements ParallelChunk {
         
         sectionTypeArray.setType(blockX & 0xF, blockY & 0xF, blockZ & 0xF, blockData);
         mapChunkPacketCache = null;
+        hasBlockDifferenceData = true;
     }
     
     @Override
@@ -173,10 +188,10 @@ public class ImplParallelChunk implements ParallelChunk {
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
 
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
-        if(sectionTypeArray == null) return null;
+        if(sectionTypeArray == null) return engineChunk.getBlockData(blockX, blockY, blockZ);
 
         Object iBlockData = sectionTypeArray.getType(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
-        if(iBlockData == null) return null;
+        if(iBlockData == null) return engineChunk.getBlockData(blockX, blockY, blockZ);
 
         return NMSManager.getNMSHandler().getBukkitBlockData(iBlockData);
     }
@@ -186,9 +201,13 @@ public class ImplParallelChunk implements ParallelChunk {
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
     
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
-        if(sectionTypeArray == null) return null;
+        if(sectionTypeArray == null) return engineChunk.getNMSBlockData(blockX, blockY, blockZ);
     
-        return sectionTypeArray.getType(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+        Object type = sectionTypeArray.getType(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+        if (type == null) {
+            return engineChunk.getNMSBlockData(blockX, blockY, blockZ);
+        }
+        return type;
     }
     
     @Override
@@ -214,6 +233,7 @@ public class ImplParallelChunk implements ParallelChunk {
 
         sectionLevelArray.setLevel(blockX & 0xF, blockY & 0xF, blockZ & 0xF, (byte) level);
         lightUpdatePacketCache = null;
+        hasBlockLightDifferenceData = true;
     }
 
     @Override
@@ -221,9 +241,13 @@ public class ImplParallelChunk implements ParallelChunk {
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
 
         SectionLevelArray sectionLevelArray = blockLightArrays[sectionIndex];
-        if(sectionLevelArray == null) return 0;
+        if(sectionLevelArray == null) return engineChunk.getBlockLightLevel(blockX, blockY, blockZ);
 
-        return sectionLevelArray.getLevel(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+        int level = sectionLevelArray.getLevel(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+        if (level == 0) {
+            return engineChunk.getBlockLightLevel(blockX, blockY, blockZ);
+        }
+        return level;
     }
     
     @Override
@@ -249,6 +273,7 @@ public class ImplParallelChunk implements ParallelChunk {
     
         sectionLevelArray.setLevel(blockX & 0xF, blockY & 0xF, blockZ & 0xF, (byte) level);
         lightUpdatePacketCache = null;
+        hasSkyLightDifferenceData = true;
     }
 
     @Override
@@ -256,9 +281,13 @@ public class ImplParallelChunk implements ParallelChunk {
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
     
         SectionLevelArray sectionLevelArray = skyLightArrays[sectionIndex];
-        if(sectionLevelArray == null) return 0;
+        if(sectionLevelArray == null) return engineChunk.getSkyLightLevel(blockX, blockY, blockZ);
     
-        return sectionLevelArray.getLevel(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+        int level = sectionLevelArray.getLevel(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+        if (level == 0) {
+            return engineChunk.getSkyLightLevel(blockX, blockY, blockZ);
+        }
+        return level;
     }
     
     @Override
@@ -295,9 +324,13 @@ public class ImplParallelChunk implements ParallelChunk {
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
     
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
-        if(sectionTypeArray == null) return false;
+        if(sectionTypeArray == null) return engineChunk.hasBlockData(blockX, blockY, blockZ);
     
-        return sectionTypeArray.contains(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+        boolean has = sectionTypeArray.contains(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+        if (!has) {
+            return engineChunk.hasBlockData(blockX, blockY, blockZ);
+        }
+        return true;
     }
     
     @Override
@@ -337,6 +370,17 @@ public class ImplParallelChunk implements ParallelChunk {
         });
     }
 
+    @Override
+    public boolean hasBlockDifferenceData() {return hasBlockDifferenceData;}
+
+    @Override
+    public boolean hasBlockLightLevelDifferenceData() {return hasBlockLightDifferenceData;}
+
+    @Override
+    public boolean hasSkyLightLevelDifferenceData() {return hasSkyLightDifferenceData;}
+
+
+
     public void sendClearPacket(Player player){
         INMSHandler nmsHandler = NMSManager.getNMSHandler();
 
@@ -371,7 +415,12 @@ public class ImplParallelChunk implements ParallelChunk {
     }
     
     @Override
-    public @NotNull ChunkSnapshot getChunkSnapShot() {
-        return null;
+    public @Nullable ChunkSnapshot getChunkSnapShot() {
+        return engineChunk.getChunkSnapShot();
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return engineChunk.isLoaded();
     }
 }

@@ -22,11 +22,10 @@ import thpmc.vanilla_source.api.world.EngineLocation;
 import thpmc.vanilla_source.api.world.block.EngineBlock;
 import thpmc.vanilla_source.api.world.cache.EngineChunk;
 import thpmc.vanilla_source.api.world.cache.EngineWorld;
+import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
+import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class EngineEntity implements TickBase {
     
@@ -269,6 +268,53 @@ public class EngineEntity implements TickBase {
      * @return Rotation vec2f.
      */
     public Vec2f getRotation() {return new Vec2f(yaw, pitch);}
+
+    /**
+     * Switch entity's universe.
+     * @param universe To universe.
+     */
+    public void switchUniverse(ParallelUniverse universe) {
+        ParallelUniverse previousUniverse = this.getUniverse();
+        if (previousUniverse != null) {
+            getTrackedPlayers().forEach(this::hide);
+        }
+
+        int chunkX = NumberConversions.floor(x) >> 4;
+        int chunkZ = NumberConversions.floor(z) >> 4;
+        int sectionIndex = ChunkUtil.getSectionIndex(NumberConversions.floor(y));
+        EngineChunk chunk = world.getChunkAt(chunkX, chunkZ);
+        chunk.getEntitiesInSection(sectionIndex).remove(this);
+
+        if (universe != null) {
+            this.world = tickThread.getThreadLocalCache().getParallelWorld(universe, world.getName());
+            getTrackedPlayers().forEach(this::show);
+
+            chunk = world.getChunkAt(chunkX, chunkZ);
+            chunk.getEntitiesInSection(sectionIndex).add(this);
+        }
+    }
+
+    /**
+     * Gets all player who can see this entity.
+     * @return Collection of players who can see this entity.
+     */
+    public Collection<EnginePlayer> getTrackedPlayers() {
+        ParallelUniverse universe = this.getUniverse();
+        if (universe == null) {
+            return EntityTracker.getPlayersInTrackingRange(x, y, z);
+        } else {
+            Collection<EnginePlayer> players = EntityTracker.getPlayersInTrackingRange(x, y, z);
+            players.removeIf(enginePlayer -> enginePlayer.getUniverse() != universe);
+            return players;
+        }
+    }
+
+    public @Nullable ParallelUniverse getUniverse() {
+        if (world instanceof ParallelWorld) {
+            return ((ParallelWorld) world).getUniverse();
+        }
+        return null;
+    }
     
     /**
      * Moves this entity by the specified amount.
@@ -317,7 +363,7 @@ public class EngineEntity implements TickBase {
                     }else if(chunk.getChunkX() != chunkX || chunk.getChunkZ() != chunkZ){
                         chunk = world.getChunkAt(chunkX, chunkZ);
                     }
-                    if(chunk == null){
+                    if(!chunk.isLoaded()){
                         boxList.add(EngineBoundingBox.getBoundingBoxForUnloadChunk(chunkX, chunkZ));
                         continue;
                     }
@@ -445,7 +491,7 @@ public class EngineEntity implements TickBase {
             
             if(chunk == null){
                 chunk = world.getChunkAt(previousChunkX, previousChunkZ);
-                if(chunk == null) return; //unload chunk teleport cancel
+                if(!chunk.isLoaded()) return; //unload chunk teleport cancel
             }
             Set<EngineEntity> previousEntityList = chunk.getEntitiesInSection(previousSectionIndex);
     
@@ -491,6 +537,7 @@ public class EngineEntity implements TickBase {
     
     @Override
     public void tick() {
+        invokeScriptFunction("update1");
         invokeScriptFunction("onTick");
         
         //gravity
@@ -502,7 +549,7 @@ public class EngineEntity implements TickBase {
         
         aiController.tick(x, y, z);
     
-        invokeScriptFunction("update");
+        invokeScriptFunction("update2");
     }
     
     protected ContanObject<?> invokeScriptFunction(String functionName, ContanObject<?>... arguments) {

@@ -19,7 +19,7 @@ public class AsyncEngineChunk implements EngineChunk {
     private static final Set<EngineEntity> EMPTY_ENTITY_LIST = Collections.emptySet();
 
     
-    private ChunkSnapshot chunkSnapshot;
+    private @Nullable ChunkSnapshot chunkSnapshot;
     
     private final int chunkX;
     
@@ -32,6 +32,18 @@ public class AsyncEngineChunk implements EngineChunk {
         this.chunkX = chunkSnapshot.getX();
         this.chunkZ = chunkSnapshot.getZ();
         
+        int index = VanillaSourceAPI.getInstance().isHigher_v1_18_R1() ? 24 : 16;
+        this.entitySlices = new Set[index];
+        for(int i = 0; i < index; i++){
+            entitySlices[i] = ConcurrentHashMap.newKeySet();
+        }
+    }
+
+    public AsyncEngineChunk(int chunkX, int chunkZ) {
+        this.chunkSnapshot = null;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
+
         int index = VanillaSourceAPI.getInstance().isHigher_v1_18_R1() ? 24 : 16;
         this.entitySlices = new Set[index];
         for(int i = 0; i < index; i++){
@@ -53,6 +65,8 @@ public class AsyncEngineChunk implements EngineChunk {
     
     @Override
     public @Nullable Material getType(int blockX, int blockY, int blockZ) {
+        if (chunkSnapshot == null) return null;
+
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
         if(isOutOfSectionIndex(sectionIndex)) return null;
         if(chunkSnapshot.isSectionEmpty(sectionIndex)) return null;
@@ -61,6 +75,8 @@ public class AsyncEngineChunk implements EngineChunk {
     
     @Override
     public @Nullable BlockData getBlockData(int blockX, int blockY, int blockZ) {
+        if (chunkSnapshot == null) return null;
+
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
         if(isOutOfSectionIndex(sectionIndex)) return null;
         if(chunkSnapshot.isSectionEmpty(sectionIndex)) return null;
@@ -69,6 +85,8 @@ public class AsyncEngineChunk implements EngineChunk {
     
     @Override
     public @Nullable Object getNMSBlockData(int blockX, int blockY, int blockZ) {
+        if (chunkSnapshot == null) return null;
+
         BlockData blockData = getBlockData(blockX, blockY, blockZ);
         if(blockData == null) return null;
         
@@ -77,11 +95,15 @@ public class AsyncEngineChunk implements EngineChunk {
     
     @Override
     public boolean hasBlockData(int blockX, int blockY, int blockZ) {
+        if (chunkSnapshot == null) return false;
+
         return getBlockData(blockX, blockY, blockZ) != null;
     }
     
     @Override
     public int getBlockLightLevel(int blockX, int blockY, int blockZ) {
+        if (chunkSnapshot == null) return 0;
+
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
         if(isOutOfSectionIndex(sectionIndex)) return 0;
         if(chunkSnapshot.isSectionEmpty(sectionIndex)) return 0;
@@ -90,6 +112,8 @@ public class AsyncEngineChunk implements EngineChunk {
     
     @Override
     public int getSkyLightLevel(int blockX, int blockY, int blockZ) {
+        if (chunkSnapshot == null) return 0;
+
         int sectionIndex = ChunkUtil.getSectionIndex(blockY);
         if(isOutOfSectionIndex(sectionIndex)) return 0;
         if(chunkSnapshot.isSectionEmpty(sectionIndex)) return 0;
@@ -97,8 +121,13 @@ public class AsyncEngineChunk implements EngineChunk {
     }
     
     @Override
-    public @NotNull ChunkSnapshot getChunkSnapShot() {return chunkSnapshot;}
-    
+    public @Nullable ChunkSnapshot getChunkSnapShot() {return chunkSnapshot;}
+
+    @Override
+    public boolean isLoaded() {
+        return chunkSnapshot != null;
+    }
+
     public void update(Chunk chunk){this.chunkSnapshot = chunk.getChunkSnapshot();}
 
     private boolean isOutOfSectionIndex(int sectionIndex){

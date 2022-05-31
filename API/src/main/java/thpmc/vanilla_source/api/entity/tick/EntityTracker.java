@@ -2,12 +2,13 @@ package thpmc.vanilla_source.api.entity.tick;
 
 import org.bukkit.Location;
 import org.bukkit.util.NumberConversions;
-import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.world.EngineLocation;
 import thpmc.vanilla_source.api.world.cache.local.ThreadLocalEngineWorld;
+import thpmc.vanilla_source.api.world.cache.local.ThreadLocalParallelWorld;
 
 import java.util.*;
 
@@ -34,19 +35,24 @@ public class EntityTracker {
     
         //Collect tracking entities
         if(tick % TRACK_INTERVAL == 0) {
-            Location pl = enginePlayer.getBukkitPlayer().getLocation();
+            Location pl = enginePlayer.getCurrentLocation();
             int playerChunkX = pl.getBlockX() >> 4;
             int playerChunkZ = pl.getBlockZ() >> 4;
     
             int drawDistance = enginePlayer.getEntityDrawDistance();
     
-            ThreadLocalEngineWorld world = tickThread.getThreadLocalCache().getWorld(Objects.requireNonNull(pl.getWorld()).getName());
-    
             for (EngineEntity entity : entities) {
                 EngineLocation location = entity.getLocation();
-                if (location.getWorld() != world) {
+                if (location.getWorld() == null) {
                     continue;
                 }
+                if (!location.getWorld().getName().equals(enginePlayer.getWorld().getName())) {
+                    continue;
+                }
+                if (enginePlayer.getUniverse() != entity.getUniverse()) {
+                    continue;
+                }
+
         
                 int entityChunkX = location.getBlockX() >> 4;
                 int entityChunkZ = location.getBlockZ() >> 4;

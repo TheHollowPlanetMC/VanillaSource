@@ -2,6 +2,7 @@ package thpmc.vanilla_source.api.world.cache;
 
 import org.bukkit.ChunkSnapshot;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import thpmc.vanilla_source.api.world.IChunk;
 
 /**
@@ -13,6 +14,8 @@ public interface EngineChunk extends IChunk {
      * Get bukkit chunk snapshot.
      * @return ChunkSnapshot
      */
-    @NotNull ChunkSnapshot getChunkSnapShot();
+    @Nullable ChunkSnapshot getChunkSnapShot();
+
+    boolean isLoaded();
 
 }

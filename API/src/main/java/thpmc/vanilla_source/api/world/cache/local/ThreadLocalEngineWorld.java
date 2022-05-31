@@ -53,32 +53,24 @@ public class ThreadLocalEngineWorld implements EngineWorld {
     @Override
     public Material getType(int x, int y, int z) {
         AsyncEngineChunk asyncChunk = getChunkAt(x >> 4, z >> 4);
-        if(asyncChunk == null) return null;
-        
         return asyncChunk.getType(x, y, z);
     }
     
     @Override
     public BlockData getBlockData(int x, int y, int z) {
         AsyncEngineChunk asyncChunk = getChunkAt(x >> 4, z >> 4);
-        if(asyncChunk == null) return null;
-        
         return asyncChunk.getBlockData(x, y, z);
     }
     
     @Override
     public @Nullable Object getNMSBlockData(int x, int y, int z) {
         AsyncEngineChunk asyncChunk = getChunkAt(x >> 4, z >> 4);
-        if(asyncChunk == null) return null;
-        
         return asyncChunk.getNMSBlockData(x, y, z);
     }
     
     @Override
     public boolean hasBlockData(int blockX, int blockY, int blockZ) {
         AsyncEngineChunk asyncChunk = getChunkAt(blockX >> 4, blockZ >> 4);
-        if(asyncChunk == null) return false;
-        
         return asyncChunk.hasBlockData(blockX, blockY, blockZ);
     }
     
@@ -86,28 +78,22 @@ public class ThreadLocalEngineWorld implements EngineWorld {
     @Override
     public int getBlockLightLevel(int x, int y, int z) {
         AsyncEngineChunk asyncChunk = getChunkAt(x >> 4, z >> 4);
-        if(asyncChunk == null) return 0;
-        
         return asyncChunk.getBlockLightLevel(x, y, z);
     }
     
     @Override
     public int getSkyLightLevel(int x, int y, int z) {
         AsyncEngineChunk asyncChunk = getChunkAt(x >> 4, z >> 4);
-        if(asyncChunk == null) return 0;
-        
         return asyncChunk.getSkyLightLevel(x, y, z);
     }
     
     @Override
-    public @Nullable AsyncEngineChunk getChunkAt(int chunkX, int chunkZ) {
+    public @NotNull AsyncEngineChunk getChunkAt(int chunkX, int chunkZ) {
         long coord = ChunkUtil.getChunkKey(chunkX, chunkZ);
         AsyncEngineChunk asyncChunk = chunkMap.get(coord);
-        if(asyncChunk == null){
+        if (asyncChunk == null) {
             asyncChunk = asyncWorld.getChunkAt(chunkX, chunkZ);
-            if(asyncChunk != null){
-                chunkMap.put(coord, asyncChunk);
-            }
+            chunkMap.put(coord, asyncChunk);
         }
         return asyncChunk;
     }

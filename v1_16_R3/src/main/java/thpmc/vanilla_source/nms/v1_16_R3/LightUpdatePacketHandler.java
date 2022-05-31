@@ -67,10 +67,13 @@ public class LightUpdatePacketHandler implements IPacketHandler {
             boolean iFlag = i.getBoolean(packet);
     
             ParallelChunk parallelChunk = parallelWorld.getChunk(chunkX, chunkZ);
-            if(parallelChunk == null) return packet;
+            if (parallelChunk == null) return packet;
+            if (!parallelChunk.hasBlockLightLevelDifferenceData() && !parallelChunk.hasSkyLightLevelDifferenceData()) {
+                return packet;
+            }
             
             Object cachedPacket = parallelChunk.getCachedLightUpdatePacket();
-            if(cachedPacket != null) return cachedPacket;
+            if (cachedPacket != null) return cachedPacket;
             
             int cValue = c.getInt(packet);
             int dValue = d.getInt(packet);

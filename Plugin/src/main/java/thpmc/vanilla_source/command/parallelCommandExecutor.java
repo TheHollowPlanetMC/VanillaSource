@@ -127,7 +127,7 @@ public class parallelCommandExecutor implements CommandExecutor, TabExecutor {
             EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer((Player) sender);
             if(enginePlayer == null) return false;
         
-            enginePlayer.setUniverse(null);
+            enginePlayer.setUniverse(VanillaSourceAPI.getInstance().getDefaultUniverse());
         }
         
         //parallel structure-data create [name]

@@ -131,6 +131,12 @@ public interface ParallelChunk extends EngineChunk {
      */
     void sendUpdate(Player player);
 
+    boolean hasBlockDifferenceData();
+
+    boolean hasBlockLightLevelDifferenceData();
+
+    boolean hasSkyLightLevelDifferenceData();
+
     @Nullable Object getCachedMapChunkPacket();
     
     @Nullable Object getCachedLightUpdatePacket();

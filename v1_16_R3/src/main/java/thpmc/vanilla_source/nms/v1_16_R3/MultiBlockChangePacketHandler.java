@@ -51,15 +51,16 @@ public class MultiBlockChangePacketHandler implements IPacketHandler {
             int chunkZ = aValue.getZ();
             
             ParallelChunk parallelChunk = parallelWorld.getChunk(chunkX, chunkZ);
-            if(parallelChunk == null) return packet;
+            if (parallelChunk == null) return packet;
+            if (!parallelChunk.hasBlockDifferenceData()) return packet;
     
             SectionTypeArray sectionTypeArray = parallelChunk.getSectionTypeArray(aValue.getY());
-            if(sectionTypeArray == null) return packet;
+            if (sectionTypeArray == null) return packet;
             
             short[] bValue = (short[]) b.get(packet);
             IBlockData[] cValueClone = ((IBlockData[]) c.get(packet)).clone();
             
-            for(int i = 0; i < bValue.length; i++){
+            for (int i = 0; i < bValue.length; i++){
                 short coord = bValue[i];
                 
                 int x = coord >> 8;

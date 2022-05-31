@@ -20,8 +20,9 @@ public class ImplVanillaSourceAPI extends VanillaSourceAPI {
     private static final Map<String, ParallelUniverse> universeMap = new ConcurrentHashMap<>();
     
     public ImplVanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads) {
-        super(plugin, nmsHandler, tickRunnerThreads);
+        super(plugin, nmsHandler, tickRunnerThreads, new ImplParallelUniverse("default"));
         instance = this;
+        universeMap.put("default", getDefaultUniverse());
     }
     
     @Override
@@ -35,7 +36,7 @@ public class ImplVanillaSourceAPI extends VanillaSourceAPI {
     @Override
     public void removeUniverse(String universeName) {
         ParallelUniverse universe = getUniverse(universeName);
-        if(universe != null) ((ImplParallelUniverse) universe).getPlayers().forEach(player -> player.setUniverse(null));
+        if(universe != null) ((ImplParallelUniverse) universe).getPlayers().forEach(player -> player.setUniverse(VanillaSourceAPI.getInstance().getDefaultUniverse()));
     
         universeMap.remove(universeName);
     }

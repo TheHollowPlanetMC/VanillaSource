@@ -46,7 +46,8 @@ public class MultiBlockChangePacketHandler implements IPacketHandler {
             int chunkZ = aValue.z;
 
             ParallelChunk parallelChunk = parallelWorld.getChunk(chunkX, chunkZ);
-            if(parallelChunk == null) return packet;
+            if (parallelChunk == null) return packet;
+            if (!parallelChunk.hasBlockDifferenceData()) return packet;
 
             PacketPlayOutMultiBlockChange newPacket = new PacketPlayOutMultiBlockChange();
             a.set(newPacket, aValue);
@@ -54,7 +55,7 @@ public class MultiBlockChangePacketHandler implements IPacketHandler {
             int length = bValue.length;
             PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[] newInfo = new PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[length];
 
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++){
                 PacketPlayOutMultiBlockChange.MultiBlockChangeInfo info = bValue[index];
                 BlockPosition bp = info.a();
                 BlockData blockData = parallelChunk.getBlockData(bp.getX(), bp.getY(), bp.getZ());

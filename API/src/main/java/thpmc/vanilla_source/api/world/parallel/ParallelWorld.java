@@ -22,7 +22,7 @@ public interface ParallelWorld extends EngineWorld {
      * Get the ParallelUniverse in which this world is stored.
      * @return ParallelUniverse
      */
-    @NotNull ParallelUniverse getParallelUniverse();
+    @NotNull ParallelUniverse getUniverse();
     
     /**
      * Set the material for a block in this world.

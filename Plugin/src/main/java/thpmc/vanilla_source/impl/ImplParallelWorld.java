@@ -41,9 +41,9 @@ public class ImplParallelWorld implements ParallelWorld {
         ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
     
         ContanClassInstance scriptHandle = null;
-        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/world/World.cntn");
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/world/ParallelWorld.cntn");
         if (contanModule != null) {
-            ClassBlock classBlock = contanModule.getClassByName("World");
+            ClassBlock classBlock = contanModule.getClassByName("ParallelWorld");
             if (classBlock != null) {
                 scriptHandle = classBlock.createInstance(contanEngine, tickThread, new JavaClassInstance(contanEngine, this));
             }
@@ -67,7 +67,7 @@ public class ImplParallelWorld implements ParallelWorld {
     }
     
     @Override
-    public @NotNull ParallelUniverse getParallelUniverse() {
+    public @NotNull ParallelUniverse getUniverse() {
         return parallelUniverse;
     }
 
@@ -75,9 +75,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public void setType(int blockX, int blockY, int blockZ, Material material) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-
-        ParallelChunk parallelChunk = chunkMap.computeIfAbsent(coord, c -> new ImplParallelChunk(this, chunkX, chunkZ));
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         parallelChunk.setType(blockX, blockY, blockZ, material);
     }
 
@@ -86,10 +84,7 @@ public class ImplParallelWorld implements ParallelWorld {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
         long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return null;
-
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.getType(blockX, blockY, blockZ);
     }
 
@@ -97,9 +92,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public void setBlockData(int blockX, int blockY, int blockZ, BlockData blockData) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-
-        ParallelChunk parallelChunk = chunkMap.computeIfAbsent(coord, c -> new ImplParallelChunk(this, chunkX, chunkZ));
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         parallelChunk.setBlockData(blockX, blockY, blockZ, blockData);
     }
     
@@ -107,9 +100,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public void setNMSBlockData(int blockX, int blockY, int blockZ, Object blockData) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-    
-        ParallelChunk parallelChunk = chunkMap.computeIfAbsent(coord, c -> new ImplParallelChunk(this, chunkX, chunkZ));
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         parallelChunk.setNMSBlockData(blockX, blockY, blockZ, blockData);
     }
     
@@ -117,11 +108,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public @Nullable BlockData getBlockData(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return null;
-
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.getBlockData(blockX, blockY, blockZ);
     }
     
@@ -129,11 +116,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public @Nullable Object getNMSBlockData(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-    
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return null;
-    
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.getNMSBlockData(blockX, blockY, blockZ);
     }
     
@@ -141,11 +124,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public void removeBlockData(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-    
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return;
-        
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         parallelChunk.removeBlockData(blockX, blockY, blockZ);
     }
     
@@ -153,9 +132,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public void setBlockLightLevel(int blockX, int blockY, int blockZ, int level) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-
-        ParallelChunk parallelChunk = chunkMap.computeIfAbsent(coord, c -> new ImplParallelChunk(this, chunkX, chunkZ));
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         parallelChunk.setBlockLightLevel(blockX, blockY, blockZ, level);
     }
 
@@ -163,11 +140,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public int getBlockLightLevel(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return 0;
-
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.getBlockLightLevel(blockX, blockY, blockZ);
     }
     
@@ -175,11 +148,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public void removeBlockLight(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-    
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return;
-        
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         parallelChunk.removeBlockLight(blockX, blockY, blockZ);
     }
     
@@ -187,9 +156,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public void setSkyLightLevel(int blockX, int blockY, int blockZ, int level) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-
-        ParallelChunk parallelChunk = chunkMap.computeIfAbsent(coord, c -> new ImplParallelChunk(this, chunkX, chunkZ));
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         parallelChunk.setSkyLightLevel(blockX, blockY, blockZ, level);
     }
 
@@ -197,11 +164,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public int getSkyLightLevel(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return 0;
-
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.getSkyLightLevel(blockX, blockY, blockZ);
     }
     
@@ -209,11 +172,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public void removeSkyLight(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-    
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return;
-        
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         parallelChunk.removeSkyLight(blockX, blockY, blockZ);
     }
     
@@ -221,11 +180,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public boolean hasBlockData(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-    
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return false;
-        
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.hasBlockData(blockX, blockY, blockZ);
     }
     
@@ -233,11 +188,7 @@ public class ImplParallelWorld implements ParallelWorld {
     public boolean hasBlockLight(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-    
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return false;
-    
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.hasBlockLight(blockX, blockY, blockZ);
     }
     
@@ -245,16 +196,14 @@ public class ImplParallelWorld implements ParallelWorld {
     public boolean hasSkyLight(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
-    
-        ParallelChunk parallelChunk = chunkMap.get(coord);
-        if(parallelChunk == null) return false;
-    
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.hasSkyLight(blockX, blockY, blockZ);
     }
     
     @Override
-    public ParallelChunk getChunk(int chunkX, int chunkZ){return chunkMap.get(ChunkUtil.getCoordinateKey(chunkX, chunkZ));}
+    public @NotNull ParallelChunk getChunk(int chunkX, int chunkZ){
+        return chunkMap.computeIfAbsent(ChunkUtil.getCoordinateKey(chunkX, chunkZ), key -> new ImplParallelChunk(this, chunkX, chunkZ));
+    }
     
     @Override
     public void sendBlockUpdate(int blockX, int blockY, int blockZ) {
@@ -282,8 +231,8 @@ public class ImplParallelWorld implements ParallelWorld {
     public Collection<ParallelChunk> getAllChunk() {return chunkMap.values();}
     
     @Override
-    public @Nullable EngineChunk getChunkAt(int chunkX, int chunkZ) {
-        return null;
+    public @NotNull EngineChunk getChunkAt(int chunkX, int chunkZ) {
+        return getChunk(chunkX, chunkZ);
     }
     
     @Override

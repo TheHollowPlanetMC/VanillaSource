@@ -1,5 +1,11 @@
 package thpmc.vanilla_source.impl;
 
+import org.contan_lang.ContanEngine;
+import org.contan_lang.ContanModule;
+import org.contan_lang.evaluators.ClassBlock;
+import org.contan_lang.variables.primitive.ContanClassInstance;
+import org.contan_lang.variables.primitive.JavaClassInstance;
+import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
@@ -21,8 +27,21 @@ public class ImplParallelUniverse implements ParallelUniverse {
 
     private final Set<EnginePlayer> players = ConcurrentHashMap.newKeySet();
 
+    private final ContanClassInstance scriptHandle;
+
     public ImplParallelUniverse(String universeName){
         this.universeName = universeName;
+
+        ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
+        ContanClassInstance scriptHandle = null;
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/world/Universe.cntn");
+        if (contanModule != null) {
+            ClassBlock classBlock = contanModule.getClassByName("Universe");
+            if (classBlock != null) {
+                scriptHandle = classBlock.createInstance(contanEngine, contanEngine.getMainThread(), new JavaClassInstance(contanEngine, this));
+            }
+        }
+        this.scriptHandle = scriptHandle;
     }
 
     @Override
@@ -40,7 +59,7 @@ public class ImplParallelUniverse implements ParallelUniverse {
     public void addPlayer(@NotNull EnginePlayer player) {player.setUniverse(this);}
 
     @Override
-    public void removePlayer(@NotNull EnginePlayer player) {player.setUniverse(null);}
+    public void removePlayer(@NotNull EnginePlayer player) {player.setUniverse(VanillaSourceAPI.getInstance().getDefaultUniverse());}
 
     @Override
     public Set<EnginePlayer> getResidents() {return new HashSet<>(players);}
@@ -95,6 +114,11 @@ public class ImplParallelUniverse implements ParallelUniverse {
             EnginePlayer.setUniverse(this);
         }
     }
-    
+
+    @Override
+    public ContanClassInstance getScriptHandle() {
+        return scriptHandle;
+    }
+
     public Set<EnginePlayer> getPlayers() {return players;}
 }

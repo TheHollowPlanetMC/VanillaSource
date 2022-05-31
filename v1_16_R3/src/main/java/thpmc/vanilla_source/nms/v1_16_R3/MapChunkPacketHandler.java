@@ -71,13 +71,14 @@ public class MapChunkPacketHandler implements IPacketHandler {
             int chunkZ = b.getInt(packet);
 
             ParallelChunk parallelChunk = parallelWorld.getChunk(chunkX, chunkZ);
-            if(parallelChunk == null) return packet;
+            if (parallelChunk == null) return packet;
+            if (!parallelChunk.hasBlockDifferenceData()) return packet;
     
             Object cachedPacket = parallelChunk.getCachedMapChunkPacket();
-            if(cachedPacket != null) return cachedPacket;
+            if (cachedPacket != null) return cachedPacket;
 
             ChunkSnapshot chunkSnapshot = AsyncWorldCache.getChunkCache(worldName, chunkX, chunkZ);
-            if(chunkSnapshot == null) return packet;
+            if (chunkSnapshot == null) return packet;
 
 
             DataPaletteBlock<IBlockData>[] cachedDataBlocks = (DataPaletteBlock<IBlockData>[]) blockids.get(chunkSnapshot);

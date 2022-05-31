@@ -51,9 +51,9 @@ public abstract class EnginePlayer extends EngineEntity {
 
     public Player getBukkitPlayer() {return player;}
 
-    public abstract @Nullable ParallelUniverse getUniverse();
+    public abstract @NotNull ParallelUniverse getUniverse();
 
-    public abstract void setUniverse(@Nullable ParallelUniverse parallelUniverse);
+    public abstract void setUniverse(@NotNull ParallelUniverse parallelUniverse);
     
     public int getEntityDrawDistance() {return entityDrawDistance;}
     

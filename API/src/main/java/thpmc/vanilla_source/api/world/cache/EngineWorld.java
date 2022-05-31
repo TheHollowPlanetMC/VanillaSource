@@ -33,39 +33,39 @@ public interface EngineWorld extends IWorld {
      * @param chunkZ Chunk coordinate Z
      * @return ChunkCache
      */
-    @Nullable EngineChunk getChunkAt(int chunkX, int chunkZ);
+    @NotNull EngineChunk getChunkAt(int chunkX, int chunkZ);
     
     @NotNull ContanClassInstance getScriptHandle();
     
     /**
      * Gets entities that are within the specified radius.
-     * @param center Center point to look for entities
+     * @param centerX Center position X to look for entities
+     * @param centerY Center position Y to look for entities
+     * @param centerZ Center position Z to look for entities
      * @param radius Radius to look for entities
      * @return Search radius
      */
-    default @NotNull Collection<EngineEntity> getNearbyEntities(Vector center, double radius){
+    default @NotNull Collection<EngineEntity> getNearbyEntities(double centerX, double centerY, double centerZ, double radius){
         Set<EngineEntity> entities = new HashSet<>();
         
-        int startChunkX = (center.getBlockX() - NumberConversions.floor(radius)) >> 4;
-        int startChunkY = (center.getBlockY() - NumberConversions.floor(radius)) >> 4;
-        int startChunkZ = (center.getBlockZ() - NumberConversions.floor(radius)) >> 4;
-        int endChunkX = (center.getBlockX() + NumberConversions.floor(radius)) >> 4;
-        int endChunkY = (center.getBlockY() + NumberConversions.floor(radius)) >> 4;
-        int endChunkZ = (center.getBlockZ() + NumberConversions.floor(radius)) >> 4;
+        int startChunkX = NumberConversions.floor(centerX - radius) >> 4;
+        int startChunkY = NumberConversions.floor(centerY - radius) >> 4;
+        int startChunkZ = NumberConversions.floor(centerZ - radius) >> 4;
+        int endChunkX = NumberConversions.floor(centerX + radius) >> 4;
+        int endChunkY = NumberConversions.floor(centerY + radius) >> 4;
+        int endChunkZ = NumberConversions.floor(centerZ + radius) >> 4;
         
         for (int chunkX = startChunkX; chunkX <= endChunkX; chunkX++) {
             for (int chunkY = startChunkY; chunkY <= endChunkY; chunkY++) {
                 for (int chunkZ = startChunkZ; chunkZ <= endChunkZ; chunkZ++) {
                     EngineChunk chunk = getChunkAt(chunkX, chunkZ);
-                    if (chunk != null) {
-                        entities.addAll(chunk.getEntitiesInSection(ChunkUtil.getSectionIndex(chunkY << 4)));
-                    }
+                    entities.addAll(chunk.getEntitiesInSection(ChunkUtil.getSectionIndex(chunkY << 4)));
                 }
             }
         }
         
         double radSq = radius * radius;
-        entities.removeIf(engineEntity -> engineEntity.getLocation().toVector().distanceSquared(center) > radSq);
+        entities.removeIf(engineEntity -> engineEntity.getLocation().toVector().distanceSquared(new Vector(centerX, centerY, centerZ)) > radSq);
         
         return entities;
     }
@@ -183,8 +183,6 @@ public interface EngineWorld extends IWorld {
             for(int chunkY = minY; chunkY <= maxY; chunkY++){
                 for(int chunkZ = minZ; chunkZ <= maxZ; chunkZ++){
                     EngineChunk chunk = this.getChunkAt(chunkX, chunkZ);
-                    if(chunk == null) continue;
-
                     entities.addAll(chunk.getEntitiesInSection(ChunkUtil.getSectionIndex(chunkY << 4)));
                 }
             }
@@ -233,7 +231,7 @@ public interface EngineWorld extends IWorld {
                     }else if(chunk.getChunkX() != chunkX || chunk.getChunkZ() != chunkZ){
                         chunk = this.getChunkAt(chunkX, chunkZ);
                     }
-                    if(chunk == null){
+                    if(!chunk.isLoaded()){
                         boxList.add(EngineBoundingBox.getBoundingBoxForUnloadChunk(chunkX, chunkZ));
                         continue;
                     }

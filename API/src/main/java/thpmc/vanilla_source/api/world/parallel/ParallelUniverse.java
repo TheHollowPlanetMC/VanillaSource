@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.api.world.parallel;
 
+import org.contan_lang.variables.primitive.ContanClassInstance;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,4 +54,11 @@ public interface ParallelUniverse {
      * @param universe Universe
      */
     void addDiffs(ParallelUniverse universe);
+
+    /**
+     * Gets Contan script handle
+     * @return Handle instance of {@link ContanClassInstance}
+     */
+    ContanClassInstance getScriptHandle();
+
 }
