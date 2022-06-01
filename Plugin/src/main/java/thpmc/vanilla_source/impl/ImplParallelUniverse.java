@@ -110,7 +110,7 @@ public class ImplParallelUniverse implements ParallelUniverse {
         
         
         for(EnginePlayer EnginePlayer : this.getResidents()){
-            ((ImplEnginePlayer) EnginePlayer).setUniverseRaw(null);
+            ((ImplEnginePlayer) EnginePlayer).setUniverseRaw(VanillaSourceAPI.getInstance().getDefaultUniverse());
             EnginePlayer.setUniverse(this);
         }
     }

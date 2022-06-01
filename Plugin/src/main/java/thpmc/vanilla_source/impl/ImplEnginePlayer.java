@@ -48,6 +48,8 @@ public class ImplEnginePlayer extends EnginePlayer {
         }
         
         super.scriptHandle = scriptHandle;
+        super.invokeScriptFunction("setup");
+        
         super.currentUniverse = VanillaSourceAPI.getInstance().getDefaultUniverse();
     }
 
@@ -102,7 +104,7 @@ public class ImplEnginePlayer extends EnginePlayer {
         this.currentUniverse = parallelUniverse;
     }
     
-    public void setUniverseRaw(ParallelUniverse universe){this.currentUniverse = universe;}
+    public void setUniverseRaw(@NotNull ParallelUniverse universe){this.currentUniverse = universe;}
     
     @Override
     public void teleport(EngineLocation location) {
@@ -123,6 +125,7 @@ public class ImplEnginePlayer extends EnginePlayer {
         invokeScriptFunction("onTick");
 
         super.currentLocation = player.getLocation();
+        super.setPosition(currentLocation.getX(), currentLocation.getY(), currentLocation.getZ());
 
         invokeScriptFunction("update2");
     }
@@ -131,5 +134,14 @@ public class ImplEnginePlayer extends EnginePlayer {
     public void spawn() {
         //invokeScriptFunction("update");
     }
-
+    
+    @Override
+    public void switchUniverse(ParallelUniverse universe) {
+        if (universe == null) {
+            throw new IllegalArgumentException("null cannot be specified.");
+        }
+        
+        super.switchUniverse(universe);
+        this.setUniverse(universe);
+    }
 }

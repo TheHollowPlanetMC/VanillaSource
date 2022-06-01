@@ -45,13 +45,12 @@ public abstract class VanillaSourceAPI {
     
     protected final MainTickThread mainThread;
 
-    protected final ParallelUniverse defaultUniverse;
+    protected ParallelUniverse defaultUniverse;
     
-    public VanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads, ParallelUniverse defaultUniverse){
+    public VanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads){
         this.javaPlugin = plugin;
         this.nmsHandler = nmsHandler;
         this.tickThreadPool = new TickThreadPool(tickRunnerThreads);
-        this.defaultUniverse = defaultUniverse;
     
         this.watchDog = new TickWatchDog(tickThreadPool);
         this.watchFogExecutor = Executors.newSingleThreadScheduledExecutor();

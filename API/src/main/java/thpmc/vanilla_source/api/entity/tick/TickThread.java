@@ -161,7 +161,15 @@ public class TickThread implements Runnable, ContanTickBasedThread {
 
     public void start(){MainThreadTimer.instance.addTickRunner(this);}
 
-    public void tickAtAsync(){tickExecutor.submit(this);}
+    public void tickAtAsync(){
+        tickExecutor.submit(() -> {
+            try {
+                this.run();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+    }
     
     @Override
     public <T> void scheduleTask(Callable<T> callable, long l) {

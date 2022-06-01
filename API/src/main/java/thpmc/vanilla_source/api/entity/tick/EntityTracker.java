@@ -46,10 +46,13 @@ public class EntityTracker {
                 if (location.getWorld() == null) {
                     continue;
                 }
-                if (!location.getWorld().getName().equals(enginePlayer.getWorld().getName())) {
-                    continue;
-                }
-                if (enginePlayer.getUniverse() != entity.getUniverse()) {
+                if (!location.getWorld().getName().equals(enginePlayer.getWorld().getName())
+                        || enginePlayer.getUniverse() != entity.getUniverse()) {
+                    //Stop tracking
+                    if (trackedEntities.contains(entity)) {
+                        entity.hide(enginePlayer);
+                        trackedEntities.remove(entity);
+                    }
                     continue;
                 }
 

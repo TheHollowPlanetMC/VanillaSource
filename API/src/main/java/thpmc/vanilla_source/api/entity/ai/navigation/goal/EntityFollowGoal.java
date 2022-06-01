@@ -45,7 +45,7 @@ public class EntityFollowGoal implements PathfindingGoal{
         
         Location location = target.getLocation();
         EngineChunk chunk = world.getChunkAt(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        if(chunk == null) return;
+        if(!chunk.isLoaded()) return;
 
         for (int dy = 0; dy < 5; dy++) {
             Location l = location.clone().add(new Vector(0, -dy, 0));

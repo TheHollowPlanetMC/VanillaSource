@@ -87,6 +87,9 @@ public final class VanillaSource extends JavaPlugin {
             throw new IllegalStateException("Failed to load script files.");
         }
         
+        //Create default universe
+        api.createDefaultUniverse();
+        
         //Start player tick timer
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             EnginePlayer.getAllPlayers().forEach(EngineEntity::tick);
