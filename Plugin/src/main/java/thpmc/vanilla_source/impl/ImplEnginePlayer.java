@@ -9,15 +9,12 @@ import org.contan_lang.variables.primitive.JavaClassInstance;
 import org.jetbrains.annotations.NotNull;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
-import thpmc.vanilla_source.api.world.EngineLocation;
-import thpmc.vanilla_source.api.world.cache.AsyncWorldCache;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import thpmc.vanilla_source.util.BukkitAdapter;
 
 public class ImplEnginePlayer extends EnginePlayer {
 
@@ -34,7 +31,10 @@ public class ImplEnginePlayer extends EnginePlayer {
 
 
     private ImplEnginePlayer(Player player) {
-        super(player, AsyncWorldCache.getAsyncWorld(player.getWorld().getName()), new PlayerEntityController(player), VanillaSourceAPI.getInstance().getMainThread(), null);
+        super(player, VanillaSourceAPI.getInstance().getMainThread().getThreadLocalCache().getParallelWorld(
+                VanillaSourceAPI.getInstance().getDefaultUniverse(), player.getWorld().getName()),
+                new PlayerEntityController(player), VanillaSourceAPI.getInstance().getMainThread(), null);
+        
         TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
         ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
     
@@ -107,13 +107,9 @@ public class ImplEnginePlayer extends EnginePlayer {
     public void setUniverseRaw(@NotNull ParallelUniverse universe){this.currentUniverse = universe;}
     
     @Override
-    public void teleport(EngineLocation location) {
-        if (location.getWorld() != null) {
-            Location bukkitLocation = BukkitAdapter.toBukkitLocation(location);
-            player.teleport(bukkitLocation);
-        }
-        
-        super.teleport(location);
+    public void teleport(@NotNull String worldName, double x, double y, double z, float yaw, float pitch) {
+        player.teleport(new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch));
+        super.teleport(worldName, x, y, z, yaw, pitch);
     }
 
     /**
@@ -126,6 +122,7 @@ public class ImplEnginePlayer extends EnginePlayer {
 
         super.currentLocation = player.getLocation();
         super.setPosition(currentLocation.getX(), currentLocation.getY(), currentLocation.getZ());
+        super.setRotation(currentLocation.getYaw(), currentLocation.getPitch());
 
         invokeScriptFunction("update2");
     }

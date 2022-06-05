@@ -28,9 +28,10 @@ public class PlayerJoinQuitListener implements Listener {
         ParallelUniverse universe = VanillaSourceAPI.getInstance().createUniverse(player.getUniqueId().toString());
         //universe.addPlayer(enginePlayer);
         
+        /*
         Object wrappedParallelPlayer = ChiyogamiManager.getWrappedParallelPlayer(player);
         if(wrappedParallelPlayer != null) ChiyogamiManager.setCheckFunction(enginePlayer, wrappedParallelPlayer);
-        
+        */
         PacketHandler packetHandler = new PacketHandler(enginePlayer);
         
         try {
@@ -92,7 +93,7 @@ public class PlayerJoinQuitListener implements Listener {
         Player player = event.getPlayer();
         ImplEnginePlayer.onPlayerQuit(player);
         
-        ChiyogamiManager.removeWrappedParallelPlayer(player);
+        //ChiyogamiManager.removeWrappedParallelPlayer(player);
 
         try {
             Channel channel = NMSManager.getNMSHandler().getChannel(player);

@@ -22,6 +22,7 @@ import thpmc.vanilla_source.api.world.EngineLocation;
 import thpmc.vanilla_source.api.world.block.EngineBlock;
 import thpmc.vanilla_source.api.world.cache.EngineChunk;
 import thpmc.vanilla_source.api.world.cache.EngineWorld;
+import thpmc.vanilla_source.api.world.cache.local.ThreadLocalCache;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 
@@ -516,16 +517,21 @@ public class EngineEntity implements TickBase {
     }
     
     
-    public void teleport(EngineLocation location) {
-        this.world = location.getWorld() == null ? world : location.getWorld();
-        this.setPosition(location.getX(), location.getY(), location.getZ());
-        this.setRotation(location.getYaw(), location.getPitch());
+    public void teleport(String worldName, double x, double y, double z, float yaw, float pitch) {
+        ThreadLocalCache cache = tickThread.getThreadLocalCache();
+        this.world = getUniverse() == null ? cache.getGlobalWorld(worldName) : cache.getParallelWorld(getUniverse(), worldName);
+        this.setPosition(x, y, z);
+        this.setRotation(yaw, pitch);
         
         this.previousX = x;
         this.previousY = y;
         this.previousZ = z;
         
         this.teleported = true;
+    }
+    
+    public void teleport(String worldName, double x, double y, double z) {
+        this.teleport(worldName, x, y, z, yaw, pitch);
     }
     
     
