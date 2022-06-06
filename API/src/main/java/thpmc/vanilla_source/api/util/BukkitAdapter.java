@@ -1,4 +1,4 @@
-package thpmc.vanilla_source.util;
+package thpmc.vanilla_source.api.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

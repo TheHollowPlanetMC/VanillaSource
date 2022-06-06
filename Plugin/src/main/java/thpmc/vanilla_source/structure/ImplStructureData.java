@@ -2,7 +2,7 @@ package thpmc.vanilla_source.structure;
 
 import thpmc.vanilla_source.VanillaSource;
 import thpmc.vanilla_source.nms.NMSManager;
-import thpmc.vanilla_source.util.BlockPosition3i;
+import thpmc.vanilla_source.api.util.BlockPosition3i;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

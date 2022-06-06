@@ -3,7 +3,7 @@ package thpmc.vanilla_source.api.nms;
 import thpmc.vanilla_source.api.world.cache.AsyncEngineChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
-import thpmc.vanilla_source.util.BlockPosition3i;
+import thpmc.vanilla_source.api.util.BlockPosition3i;
 import io.netty.channel.Channel;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;

@@ -17,7 +17,7 @@ import thpmc.vanilla_source.api.world.cache.EngineChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
-import thpmc.vanilla_source.util.BlockPosition3i;
+import thpmc.vanilla_source.api.util.BlockPosition3i;
 
 import java.util.Collection;
 import java.util.Set;

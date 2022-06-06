@@ -2,9 +2,9 @@ package thpmc.vanilla_source.nms.v1_16_R3.packet;
 
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
-import thpmc.vanilla_source.util.BlockPosition3i;
-import thpmc.vanilla_source.util.SectionLevelArray;
-import thpmc.vanilla_source.util.SectionTypeArray;
+import thpmc.vanilla_source.api.util.BlockPosition3i;
+import thpmc.vanilla_source.api.util.SectionLevelArray;
+import thpmc.vanilla_source.api.util.SectionTypeArray;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;

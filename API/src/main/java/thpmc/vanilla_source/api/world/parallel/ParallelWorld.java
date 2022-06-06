@@ -1,6 +1,6 @@
 package thpmc.vanilla_source.api.world.parallel;
 
-import thpmc.vanilla_source.util.BlockPosition3i;
+import thpmc.vanilla_source.api.util.BlockPosition3i;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;

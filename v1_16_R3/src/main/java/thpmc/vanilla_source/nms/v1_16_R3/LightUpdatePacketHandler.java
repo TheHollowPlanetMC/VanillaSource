@@ -5,7 +5,7 @@ import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.api.nms.IPacketHandler;
 import thpmc.vanilla_source.api.player.EnginePlayer;
-import thpmc.vanilla_source.util.SectionLevelArray;
+import thpmc.vanilla_source.api.util.SectionLevelArray;
 import net.minecraft.server.v1_16_R3.NibbleArray;
 import net.minecraft.server.v1_16_R3.PacketPlayOutLightUpdate;
 import org.bukkit.World;

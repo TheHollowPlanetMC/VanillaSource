@@ -1,4 +1,4 @@
-package thpmc.vanilla_source.util;
+package thpmc.vanilla_source.api.util;
 
 @FunctionalInterface
 public interface ThreadsafeIteration<V> {

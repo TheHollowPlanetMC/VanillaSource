@@ -11,8 +11,8 @@ import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.nms.NMSManager;
 import thpmc.vanilla_source.api.player.EnginePlayer;
-import thpmc.vanilla_source.util.SectionLevelArray;
-import thpmc.vanilla_source.util.SectionTypeArray;
+import thpmc.vanilla_source.api.util.SectionLevelArray;
+import thpmc.vanilla_source.api.util.SectionTypeArray;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

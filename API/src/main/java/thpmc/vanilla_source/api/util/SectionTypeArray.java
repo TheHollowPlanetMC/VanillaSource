@@ -1,4 +1,4 @@
-package thpmc.vanilla_source.util;
+package thpmc.vanilla_source.api.util;
 
 import it.unimi.dsi.fastutil.shorts.Short2ObjectArrayMap;
 import org.jetbrains.annotations.Nullable;

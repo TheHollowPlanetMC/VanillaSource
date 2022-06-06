@@ -1,7 +1,7 @@
 package thpmc.vanilla_source.api.world.parallel;
 
-import thpmc.vanilla_source.util.SectionLevelArray;
-import thpmc.vanilla_source.util.SectionTypeArray;
+import thpmc.vanilla_source.api.util.SectionLevelArray;
+import thpmc.vanilla_source.api.util.SectionTypeArray;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;

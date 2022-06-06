@@ -12,7 +12,7 @@ import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.api.nms.INMSHandler;
 import thpmc.vanilla_source.nms.NMSManager;
-import thpmc.vanilla_source.util.BlockPosition3i;
+import thpmc.vanilla_source.api.util.BlockPosition3i;
 import thpmc.vanilla_source.util.ChunkUtil;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;

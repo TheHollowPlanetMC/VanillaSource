@@ -5,7 +5,7 @@ import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import org.bukkit.entity.EntityType;
 import thpmc.vanilla_source.api.nms.INMSHandler;
-import thpmc.vanilla_source.util.BlockPosition3i;
+import thpmc.vanilla_source.api.util.BlockPosition3i;
 import io.netty.channel.Channel;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.World;

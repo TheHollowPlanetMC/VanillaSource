@@ -5,7 +5,7 @@ import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.VanillaSource;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.enums.UpdatePacketType;
-import thpmc.vanilla_source.util.BlockPosition3i;
+import thpmc.vanilla_source.api.util.BlockPosition3i;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
