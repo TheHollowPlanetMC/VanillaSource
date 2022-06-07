@@ -11,6 +11,8 @@ public class BezierCurve3D {
     private Vector endControl;
     
     private BezierCurve3D previous = null;
+
+    public double length = 0;
     
     public BezierCurve3D(Vector startAnchor, Vector endAnchor){
         this.startAnchor = startAnchor;
@@ -19,6 +21,7 @@ public class BezierCurve3D {
         Vector direction = new Vector(endAnchor.getX() - startAnchor.getX(), endAnchor.getY() - startAnchor.getY(), endAnchor.getZ() - startAnchor.getZ());
         this.startControl = startAnchor.clone().add(direction.clone().multiply(0.25));
         this.endControl = endAnchor.clone();
+        updateLength();
     }
     
     public BezierCurve3D(Vector startAnchor, Vector endAnchor, Vector startControl, Vector endControl){
@@ -26,6 +29,7 @@ public class BezierCurve3D {
         this.endAnchor = endAnchor;
         this.startControl = startControl;
         this.endControl = endControl;
+        updateLength();
     }
     
     
@@ -41,12 +45,30 @@ public class BezierCurve3D {
     
     public Vector getStartControl() {return startControl;}
     
-    public void setEndControl(Vector endControl) {this.endControl = endControl;}
+    public void setEndControl(Vector endControl) {
+        this.endControl = endControl;
+        updateLength();
+    }
     
-    public void setStartControl(Vector startControl) {this.startControl = startControl;}
+    public void setStartControl(Vector startControl) {
+        this.startControl = startControl;
+        updateLength();
+    }
+
+    private void updateLength() {
+        double lengthSum = 0.0;
+
+        Vector previousPosition = getPosition(0.0);
+        for (double t = 0.0; t <= 1.0; t += 0.001) {
+            Vector currentPosition = getPosition(t);
+            lengthSum += currentPosition.distance(previousPosition);
+            previousPosition = currentPosition;
+        }
+        this.length = lengthSum;
+    }
     
     
-    public void moveEndAnchorToExperiment(double x, double y, double z){
+    public void moveEndAnchorForExperiment(double x, double y, double z){
         endAnchor.setX(x).setY(y).setZ(z);
         
         if(previous == null) return;
@@ -59,11 +81,13 @@ public class BezierCurve3D {
         direction = new Vector(startAnchor.getX() - x, startAnchor.getY() - y, startAnchor.getZ() - z);
         direction.multiply(0.25);
         endControl = endAnchor.clone().add(direction);
+        updateLength();
     }
     
     public BezierCurve3D createNextBezierCurve(Vector nextPosition){
         BezierCurve3D bezierCurve3D = new BezierCurve3D(endAnchor, nextPosition);
         bezierCurve3D.setPrevious(this);
+        updateLength();
         
         return bezierCurve3D;
     }

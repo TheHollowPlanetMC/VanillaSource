@@ -57,7 +57,7 @@ public abstract class VanillaSourceAPI {
         
         this.mainThread = new MainTickThread(0);
         this.contanEngine = new ContanEngine(mainThread, new ArrayList<>(tickThreadPool.getAsyncTickRunnerList()));
-        ContanUtil.setUpContan();
+        ContanUtil.setUpContan(contanEngine);
     }
     
     /**

@@ -53,6 +53,8 @@ public class EngineEntity implements TickBase {
     protected Vector velocity = new Vector(0.0, 0.0, 0.0);
     
     protected boolean collideEntities = false;
+
+    protected boolean marker = false;
     
     protected boolean onGround = false;
     
@@ -68,9 +70,10 @@ public class EngineEntity implements TickBase {
     
     /**
      * Create entity instance.
-     * @param world      World in which this entity exists
+     * @param world             World in which this entity exists
      * @param entityController  NMS handle
-     * @param tickThread {@link TickThread} that executes the processing of this entity
+     * @param tickThread        {@link TickThread} that executes the processing of this entity
+     * @param scriptHandle      Contan script handle
      */
     public EngineEntity(@NotNull EngineWorld world, @NotNull EntityController entityController, @NotNull TickThread tickThread, @Nullable ContanClassInstance scriptHandle){
         this.world = world;
