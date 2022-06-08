@@ -7,7 +7,7 @@ import thpmc.vanilla_source.api.util.math.EasingBezier2D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bezier3DCameraPositions implements CameraPositions {
+public class Bezier3DPositions implements CameraPositions {
 
     private final List<BezierCurve3D> bezierCurve3DList;
 
@@ -17,7 +17,7 @@ public class Bezier3DCameraPositions implements CameraPositions {
 
     private final double bezier3DLengthSum;
 
-    public Bezier3DCameraPositions(List<BezierCurve3D> bezierCurve3DList, EasingBezier2D easingBezier2D, int endTick) {
+    public Bezier3DPositions(List<BezierCurve3D> bezierCurve3DList, EasingBezier2D easingBezier2D, int endTick) {
         if (bezierCurve3DList.size() == 0) {
             throw new IllegalArgumentException("");
         }
@@ -41,21 +41,22 @@ public class Bezier3DCameraPositions implements CameraPositions {
     public Vector getTickPosition(int tick) {
         double t = (double) tick / (double) endTick;
         t = easingBezier2D.getProgressByTime(t);
+        double length = bezier3DLengthSum * t;
 
         BezierCurve3D currentBezier3D = bezierCurve3DList.get(0);
         double currentT = 0.0;
-        double length = 0.0;
+        double currentLengthSum = 0.0;
         for (int i = 0; i < bezierCurve3DList.size(); i++) {
-            BezierCurve3D bezierCurve3D = bezierCurve3DList.get(0);
+            BezierCurve3D bezierCurve3D = bezierCurve3DList.get(i);
 
-            double temp = bezier3DLengthSum * t - length;
+            double temp = length - currentLengthSum;
             if (temp <= bezierCurve3D.length) {
                 currentBezier3D = bezierCurve3D;
                 currentT = temp;
                 break;
             }
 
-            length += bezierCurve3D.length;
+            currentLengthSum += bezierCurve3D.length;
 
             if (i == bezierCurve3DList.size() - 1) {
                 currentBezier3D = bezierCurve3D;

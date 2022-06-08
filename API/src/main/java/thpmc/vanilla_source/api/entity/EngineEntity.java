@@ -563,7 +563,7 @@ public class EngineEntity implements TickBase {
     
     protected ContanObject<?> invokeScriptFunction(String functionName, ContanObject<?>... arguments) {
         if (scriptHandle != null) {
-            return scriptHandle.invokeFunctionIgnoreNotFound(tickThread, functionName);
+            return scriptHandle.invokeFunctionIgnoreNotFound(tickThread, functionName, arguments);
         }
         
         return ContanVoidObject.INSTANCE;

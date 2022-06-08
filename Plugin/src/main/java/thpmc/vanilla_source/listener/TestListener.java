@@ -1,14 +1,16 @@
 package thpmc.vanilla_source.listener;
 
 import org.bukkit.*;
-import org.contan_lang.ContanEngine;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.contan_lang.ContanModule;
-import org.contan_lang.evaluators.ClassBlock;
-import org.contan_lang.variables.primitive.ContanClassInstance;
-import org.contan_lang.variables.primitive.JavaClassInstance;
-import thpmc.vanilla_source.api.entity.EngineEntity;
-import thpmc.vanilla_source.api.entity.ai.navigation.goal.EntityFollowGoal;
+import thpmc.vanilla_source.VanillaSource;
+import thpmc.vanilla_source.api.camera.Bezier3DPositions;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
+import thpmc.vanilla_source.api.util.math.BezierCurve3D;
+import thpmc.vanilla_source.api.util.math.EasingBezier2D;
 import thpmc.vanilla_source.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.EntityType;
@@ -22,6 +24,9 @@ import thpmc.vanilla_source.api.nms.INMSHandler;
 import thpmc.vanilla_source.api.nms.entity.NMSEntityController;
 import thpmc.vanilla_source.api.util.collision.CollideOption;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -29,6 +34,7 @@ public class TestListener implements Listener {
     
     private int count = 0;
     
+    private BezierCurve3D endCurve = null;
     
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event){
@@ -57,6 +63,107 @@ public class TestListener implements Listener {
                 tickRunner.addEntity(npc);
             });*/
         });
+    }
+    
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+    
+        ItemStack itemStack = event.getItem();
+        if (itemStack == null) {
+            return;
+        }
+    
+        if(itemStack.getType() == Material.LAPIS_LAZULI){
+            Location loc = player.getLocation();
+        
+            if(endCurve == null){
+                endCurve = new BezierCurve3D(loc.toVector(), loc.toVector().add(new Vector(0.1, 0.1, 0.1)));
+            
+                new BukkitRunnable(){
+                    @Override
+                    public void run() {
+                    
+                        if(player.getInventory().getItemInMainHand().getType() != Material.LAPIS_LAZULI) return;
+                    
+                        Location location = player.getLocation();
+                        endCurve.moveEndAnchorForExperiment(location.getX(), location.getY(), location.getZ());
+                    
+                        BezierCurve3D current = endCurve;
+                        while (true){
+                        
+                            for(double t = 0.0; t < 1.0; t += 0.025){
+                                Vector pos = current.getPosition(t);
+                            
+                                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
+                                player.spawnParticle(Particle.REDSTONE, pos.getX(), pos.getY(), pos.getZ(), 0, 0, 0, 0, dustOptions);
+                            }
+                        
+                            Particle.DustOptions dustOptions = new Particle.DustOptions(Color.BLUE, 1);
+                            Vector start = current.getStartAnchor();
+                            Vector end = current.getEndAnchor();
+                            Vector startC = current.getStartControl();
+                            Vector endC = current.getEndControl();
+                            player.spawnParticle(Particle.REDSTONE, start.getX(), start.getY(), start.getZ(), 0, 0, 0, 0, dustOptions);
+                            player.spawnParticle(Particle.REDSTONE, end.getX(), end.getY(), end.getZ(), 0, 0, 0, 0, dustOptions);
+                            player.spawnParticle(Particle.REDSTONE, startC.getX(), startC.getY(), startC.getZ(), 0, 0, 0, 0, dustOptions);
+                            player.spawnParticle(Particle.REDSTONE, endC.getX(), endC.getY(), endC.getZ(), 0, 0, 0, 0, dustOptions);
+                        
+                            BezierCurve3D previous = current.getPrevious();
+                            if(previous == null){
+                                break;
+                            }
+                        
+                            current = previous;
+                        
+                        }
+                    
+                    
+                    }
+                }.runTaskTimerAsynchronously(VanillaSource.getPlugin(), 0, 1);
+            }else{
+                endCurve = endCurve.createNextBezierCurve(player.getLocation().toVector());
+            }
+        }
+    
+        if(itemStack.getType() == Material.PAPER){
+            if (endCurve == null) {
+                return;
+            }
+    
+            List<BezierCurve3D> bezierCurve3DList = new ArrayList<>();
+            BezierCurve3D current = endCurve;
+            while (true) {
+                bezierCurve3DList.add(current);
+                
+                BezierCurve3D previous = current.getPrevious();
+                if (previous == null) {
+                    break;
+                }
+                current = previous;
+            }
+            Collections.reverse(bezierCurve3DList);
+    
+            EasingBezier2D easingBezier2D = new EasingBezier2D(0.5, 0, 0, 0.5);
+            Bezier3DPositions positions = new Bezier3DPositions(bezierCurve3DList, easingBezier2D, 300);
+            
+            new BukkitRunnable() {
+                int i = 0;
+                
+                @Override
+                public void run() {
+                    
+                    Vector pos = positions.getTickPosition(i);
+                    Particle.DustOptions dustOptions = new Particle.DustOptions(Color.LIME, 1);
+                    player.spawnParticle(Particle.REDSTONE, pos.getX(), pos.getY(), pos.getZ(), 0, 0, 0, 0, dustOptions);
+                    
+                    i++;
+                    if (i > positions.endTick) {
+                        cancel();
+                    }
+                }
+            }.runTaskTimer(VanillaSource.getPlugin(), 0, 1);
+        }
     }
     
     @EventHandler
