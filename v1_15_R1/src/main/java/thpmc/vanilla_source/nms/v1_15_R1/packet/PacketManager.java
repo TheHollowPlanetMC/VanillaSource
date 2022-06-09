@@ -175,4 +175,9 @@ public class PacketManager {
         PacketPlayOutMultiBlockChange packet = new PacketPlayOutMultiBlockChange(coordList.size(), array, nmsChunk);
         nmsHandler.sendPacket(player, packet);
     }
+    
+    public static Packet<?> createCameraPacket(Entity target) {
+        return new PacketPlayOutCamera(target);
+    }
+    
 }

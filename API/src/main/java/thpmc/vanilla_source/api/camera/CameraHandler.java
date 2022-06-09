@@ -1,7 +1,9 @@
 package thpmc.vanilla_source.api.camera;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.contan_lang.ContanEngine;
 import org.contan_lang.runtime.JavaContanFuture;
@@ -29,12 +31,12 @@ public class CameraHandler implements TickBase {
 
     private final ContanClassInstance scriptHandle;
     
-    private final Map<Bezier3DPositions, NMSEntityController> advanceInitializedEntityMap = new HashMap<>();
+    private final Map<CameraPositions, NMSEntityController> advanceInitializedEntityMap = new HashMap<>();
     
     
     private int cameraTick = 0;
     
-    private Bezier3DPositions cameraPositions = null;
+    private CameraPositions cameraPositions = null;
     
     private JavaContanFuture cameraFuture = null;
     
@@ -43,7 +45,7 @@ public class CameraHandler implements TickBase {
     
     private int lookAtTick = 0;
     
-    private Bezier3DPositions lookAtPositions = null;
+    private CameraPositions lookAtPositions = null;
     
     private JavaContanFuture lookAtFuture = null;
     
@@ -66,50 +68,120 @@ public class CameraHandler implements TickBase {
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
         ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
         
+        
+        //Get camera position.
+        Vector previousPosition = lastCameraPosition;
         Vector cameraPosition;
         if (cameraPositions == null) {
             cameraPosition = lastCameraPosition;
-        } else {
-            cameraTick++;
-            
+        } else if (cameraTick < cameraPositions.getEndTick()) {
             cameraPosition = cameraPositions.getTickPosition(cameraTick);
             lastCameraPosition = cameraPosition;
-            
-            if (cameraPositions.endTick == cameraTick) {
-                cameraPositions = null;
+
+            if (cameraTick == cameraPositions.getEndTick()) {
                 cameraFuture.complete(new JavaClassInstance(contanEngine, cameraPosition));
             }
+    
+            cameraTick++;
+        } else {
+            cameraPosition = lastCameraPosition;
         }
         
+        //Get camera look at.
         Vec2f lookAt;
         if (lookAtPositions == null) {
-        
-        }
+            lookAt = lastLookAt;
+        } else {
+            Vector lookAtPosition = lookAtPositions.getTickPosition(lookAtTick);
+            
+            if (!cameraPosition.equals(lookAtPosition)) {
+                Location temp = new Location(null, cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ());
+                temp.setDirection(lookAtPosition);
+                lookAt = new Vec2f(temp.getYaw(), temp.getPitch());
+            } else {
+                lookAt = lastLookAt;
+            }
+            
+            lastLookAt = lookAt;
+            
+            if (lookAtTick == lookAtPositions.getEndTick()) {
+                lookAtPositions = null;
+                lookAtFuture.complete(new JavaClassInstance(contanEngine, lookAt));
+            }
     
-        NMSEntityController entityController = advanceInitializedEntityMap.computeIfAbsent(cameraPositions, key ->
-                nmsHandler.createNMSEntityController(target.getBukkitPlayer().getWorld(),
-                        cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(), EntityType.ARMOR_STAND, null));
+            lookAtTick++;
+        }
         
+        //Spawn entity if absent.
+        World world = target.getBukkitPlayer().getWorld();
+        double positionX = cameraPosition.getX();
+        double positionY = cameraPosition.getY();
+        double positionZ = cameraPosition.getZ();
+        NMSEntityController entityController = createAndSpawnEntity(world, positionX, positionY, positionZ);
+    
+        Player player = target.getBukkitPlayer();
         
+        //Send teleport and rotation packet.
+        entityController.setPositionRaw(positionX, positionY, positionZ);
+        entityController.setRotation(lookAt.x, lookAt.y);
+        Object movePacket;
+        if (cameraTick - 1 % 60 == 0 || previousPosition.distanceSquared(cameraPosition) > 64.0) {
+            movePacket = nmsHandler.createTeleportPacket(entityController);
+        } else {
+            double deltaX = cameraPosition.getX() - previousPosition.getX();
+            double deltaY = cameraPosition.getY() - previousPosition.getY();
+            double deltaZ = cameraPosition.getZ() - previousPosition.getZ();
+            movePacket = nmsHandler.createRelEntityMoveLookPacket(entityController, deltaX, deltaY, deltaZ, lookAt.x, lookAt.y);
+        }
+        Object rotationPacket = nmsHandler.createHeadRotationPacket(entityController, lookAt.x);
+        nmsHandler.sendPacket(player, movePacket);
+        nmsHandler.sendPacket(player, rotationPacket);
+        
+        if (cameraTick - 1 % 20 == 0) {
+            nmsHandler.sendPacket(player, nmsHandler.createCameraPacket(entityController));
+        }
     }
+    
     
     private ContanObject<?> invokeScriptFunction(String functionName, ContanObject<?>... arguments) {
         return scriptHandle.invokeFunctionIgnoreNotFound(tickThread, functionName, arguments);
     }
+    
+    
+    private NMSEntityController createAndSpawnEntity(World world, double x, double y, double z) {
+        INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
+        
+        return advanceInitializedEntityMap.computeIfAbsent(cameraPositions, key -> {
+                NMSEntityController controller = nmsHandler.createNMSEntityController(world, x, y, z, EntityType.ARMOR_STAND, null);
+                Object spawnPacket = nmsHandler.createSpawnEntityLivingPacket(controller);
+                nmsHandler.sendPacket(target.getBukkitPlayer(), spawnPacket);
+                
+                return controller;
+        });
+    }
 
+    
     @Override
     public boolean shouldRemove() {
         return false;
     }
     
-    public ContanClassInstance setCameraPositions(Bezier3DPositions cameraPositions) {
+    public ContanClassInstance setCameraPositions(CameraPositions cameraPositions) {
+        //Remove entity.
+        NMSEntityController entityController = advanceInitializedEntityMap.get(cameraPositions);
+        if (entityController != null) {
+            INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
+            Object removePacket = nmsHandler.createEntityDestroyPacket(entityController);
+            nmsHandler.sendPacket(target.getBukkitPlayer(), removePacket);
+        }
+        
         this.cameraTick = 0;
         this.cameraPositions = cameraPositions;
         this.cameraFuture = ContanUtil.createFutureInstance();
         return cameraFuture.getContanInstance();
     }
     
-    public ContanClassInstance setLookAtPositions(Bezier3DPositions lookAtPositions) {
+    public ContanClassInstance setLookAtPositions(CameraPositions lookAtPositions) {
         this.lookAtTick = 0;
         this.lookAtPositions = lookAtPositions;
         this.lookAtFuture = ContanUtil.createFutureInstance();

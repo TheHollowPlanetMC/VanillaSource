@@ -33,11 +33,8 @@ public class Bezier3DPositions implements CameraPositions {
         this.bezier3DLengthSum = bezier3DLengthSum;
     }
 
+    
     @Override
-    public Vector getFirstCameraPosition() {
-        return bezierCurve3DList.get(0).getStartAnchor();
-    }
-
     public Vector getTickPosition(int tick) {
         double t = (double) tick / (double) endTick;
         t = easingBezier2D.getProgressByTime(t);
@@ -66,5 +63,10 @@ public class Bezier3DPositions implements CameraPositions {
 
         return currentBezier3D.getPosition(currentT / currentBezier3D.length);
     }
-
+    
+    @Override
+    public int getEndTick() {
+        return endTick;
+    }
+    
 }

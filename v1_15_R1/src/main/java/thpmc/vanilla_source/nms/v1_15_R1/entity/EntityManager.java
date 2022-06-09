@@ -16,8 +16,12 @@ public class EntityManager {
         WorldServer worldServer = ((CraftWorld) world).getHandle();
     
         switch (type){
-            case PLAYER:{
+            case PLAYER: {
                 return new ImplEntityControllerPlayer(MinecraftServer.getServer(), worldServer, (GameProfile) data, new PlayerInteractManager(worldServer));
+            }
+            
+            case ARMOR_STAND: {
+                return new ImplEntityControllerArmorStand(worldServer, x, y, z);
             }
         }
     

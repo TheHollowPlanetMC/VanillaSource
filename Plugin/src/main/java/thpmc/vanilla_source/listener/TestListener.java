@@ -8,7 +8,11 @@ import org.bukkit.util.Vector;
 import org.contan_lang.ContanModule;
 import thpmc.vanilla_source.VanillaSource;
 import thpmc.vanilla_source.api.camera.Bezier3DPositions;
+import thpmc.vanilla_source.api.camera.CameraHandler;
+import thpmc.vanilla_source.api.camera.CameraPositionAt;
+import thpmc.vanilla_source.api.contan.ContanUtil;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
+import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.util.math.BezierCurve3D;
 import thpmc.vanilla_source.api.util.math.EasingBezier2D;
 import thpmc.vanilla_source.util.TaskHandler;
@@ -35,6 +39,8 @@ public class TestListener implements Listener {
     private int count = 0;
     
     private BezierCurve3D endCurve = null;
+    
+    private boolean set = false;
     
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event){
@@ -87,7 +93,9 @@ public class TestListener implements Listener {
                         if(player.getInventory().getItemInMainHand().getType() != Material.LAPIS_LAZULI) return;
                     
                         Location location = player.getLocation();
-                        endCurve.moveEndAnchorForExperiment(location.getX(), location.getY(), location.getZ());
+                        if (!set){
+                            endCurve.moveEndAnchorForExperiment(location.getX(), location.getY(), location.getZ());
+                        }
                     
                         BezierCurve3D current = endCurve;
                         while (true){
@@ -130,6 +138,8 @@ public class TestListener implements Listener {
             if (endCurve == null) {
                 return;
             }
+            
+            set = true;
     
             List<BezierCurve3D> bezierCurve3DList = new ArrayList<>();
             BezierCurve3D current = endCurve;
@@ -146,23 +156,20 @@ public class TestListener implements Listener {
     
             EasingBezier2D easingBezier2D = new EasingBezier2D(0.5, 0, 0, 0.5);
             Bezier3DPositions positions = new Bezier3DPositions(bezierCurve3DList, easingBezier2D, 300);
+    
+            EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer(player);
             
-            new BukkitRunnable() {
-                int i = 0;
-                
-                @Override
-                public void run() {
-                    
-                    Vector pos = positions.getTickPosition(i);
-                    Particle.DustOptions dustOptions = new Particle.DustOptions(Color.LIME, 1);
-                    player.spawnParticle(Particle.REDSTONE, pos.getX(), pos.getY(), pos.getZ(), 0, 0, 0, 0, dustOptions);
-                    
-                    i++;
-                    if (i > positions.endTick) {
-                        cancel();
-                    }
-                }
-            }.runTaskTimer(VanillaSource.getPlugin(), 0, 1);
+            if (enginePlayer == null) {
+                return;
+            }
+            TickThread tickThread = (TickThread) VanillaSourceAPI.getInstance().getContanEngine().getNextAsyncThread();
+            CameraHandler cameraHandler = new CameraHandler(enginePlayer, tickThread, ContanUtil.getEmptyClassInstance());
+            cameraHandler.setCameraPositions(positions);
+            
+            Vector lookAtPosition = bezierCurve3DList.get(0).getPosition(0).midpoint(bezierCurve3DList.get(bezierCurve3DList.size() - 1).getPosition(0));
+            cameraHandler.setLookAtPositions(new CameraPositionAt(lookAtPosition.getX(), lookAtPosition.getY(), lookAtPosition.getZ()));
+            
+            tickThread.addEntity(cameraHandler);
         }
     }
     

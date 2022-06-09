@@ -2,6 +2,7 @@ package thpmc.vanilla_source.api.contan;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 import org.contan_lang.ContanEngine;
 import org.contan_lang.ContanModule;
 import org.contan_lang.environment.ContanObjectReference;
@@ -10,6 +11,7 @@ import org.contan_lang.standard.functions.StandardFunctions;
 import org.contan_lang.syntax.tokens.Token;
 import org.contan_lang.variables.ContanObject;
 import org.contan_lang.variables.primitive.ContanClassInstance;
+import org.contan_lang.variables.primitive.JavaClassObject;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.contan.functions.Floor;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
@@ -42,6 +44,7 @@ public class ContanUtil {
         }
 
         StandardFunctions.FUNCTIONS.put("floor", new Floor(null, new Token(null, "floor", 5, null, null), null));
+        contanEngine.setRuntimeVariable("Vector", new JavaClassObject(contanEngine, Vector.class));
     }
     
     public static JavaContanFuture createFutureInstance() {
@@ -57,11 +60,9 @@ public class ContanUtil {
             throw new IllegalStateException(e);
         }
     }
-
-    public static void setEmptyClassInstance(ContanClassInstance emptyClassInstance) {
-        EMPTY_CLASS_INSTANCE = emptyClassInstance;
-    }
-
+    
+    public static ContanClassInstance getEmptyClassInstance() {return EMPTY_CLASS_INSTANCE;}
+    
     public static Location createLocation(World world, double x, double y, double z) {
         return new Location(world, x, y, z);
     }

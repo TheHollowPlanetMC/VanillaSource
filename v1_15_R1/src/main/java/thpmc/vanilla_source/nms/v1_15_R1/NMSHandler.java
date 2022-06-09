@@ -258,4 +258,9 @@ public class NMSHandler implements INMSHandler {
         return new PacketPlayOutEntityDestroy(((Entity) iEntity).getId());
     }
     
+    @Override
+    public Object createCameraPacket(Object target) {
+        return PacketManager.createCameraPacket((Entity) target);
+    }
+    
 }
