@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.api;
 
+import org.bukkit.Bukkit;
 import org.contan_lang.ContanEngine;
 import thpmc.vanilla_source.api.contan.MainTickThread;
 import thpmc.vanilla_source.api.contan.ContanUtil;
@@ -56,6 +57,8 @@ public abstract class VanillaSourceAPI {
         this.watchFogExecutor = Executors.newSingleThreadScheduledExecutor();
         
         this.mainThread = new MainTickThread(0);
+        Bukkit.getScheduler().runTaskTimer(plugin, mainThread::tickAtAsync, 0, 1);
+        
         this.contanEngine = new ContanEngine(mainThread, new ArrayList<>(tickThreadPool.getAsyncTickRunnerList()));
         ContanUtil.setUpContan(contanEngine);
     }

@@ -49,7 +49,7 @@ public class CameraHandler implements TickBase {
     
     private JavaContanFuture lookAtFuture = null;
     
-    private Vec2f lastLookAt;
+    private Vector lastLookAtPosition;
 
     public CameraHandler(EnginePlayer target, TickThread tickThread, @NotNull ContanClassInstance scriptHandle) {
         this.target = target;
@@ -58,9 +58,11 @@ public class CameraHandler implements TickBase {
     
         Location pl = target.getCurrentLocation();
         this.lastCameraPosition = pl.toVector();
-        this.lastLookAt = new Vec2f(pl.getYaw(), pl.getPitch());
+        this.lastLookAtPosition = pl.toVector().add(pl.getDirection());
     }
 
+    private long previous = System.currentTimeMillis();
+    
     @Override
     public void tick() {
         invokeScriptFunction("onTick");
@@ -88,29 +90,26 @@ public class CameraHandler implements TickBase {
         }
         
         //Get camera look at.
-        Vec2f lookAt;
+        Vector lookAtPosition;
         if (lookAtPositions == null) {
-            lookAt = lastLookAt;
+            lookAtPosition = lastLookAtPosition;
         } else {
-            Vector lookAtPosition = lookAtPositions.getTickPosition(lookAtTick);
-            
-            if (!cameraPosition.equals(lookAtPosition)) {
-                Location temp = new Location(null, cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ());
-                temp.setDirection(lookAtPosition);
-                lookAt = new Vec2f(temp.getYaw(), temp.getPitch());
-            } else {
-                lookAt = lastLookAt;
-            }
-            
-            lastLookAt = lookAt;
+            lookAtPosition = lookAtPositions.getTickPosition(lookAtTick);
             
             if (lookAtTick == lookAtPositions.getEndTick()) {
                 lookAtPositions = null;
-                lookAtFuture.complete(new JavaClassInstance(contanEngine, lookAt));
+                lookAtFuture.complete(new JavaClassInstance(contanEngine, lookAtPosition));
             }
     
             lookAtTick++;
         }
+        lastLookAtPosition = lookAtPosition;
+        
+        Vector direction = lookAtPosition.clone().add(cameraPosition.clone().multiply(-1.0));
+        Location temp = new Location(null, cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ());
+        temp.setDirection(direction);
+        Vec2f lookAt = new Vec2f(temp.getYaw(), temp.getPitch());
+        
         
         //Spawn entity if absent.
         World world = target.getBukkitPlayer().getWorld();
@@ -134,11 +133,22 @@ public class CameraHandler implements TickBase {
             movePacket = nmsHandler.createRelEntityMoveLookPacket(entityController, deltaX, deltaY, deltaZ, lookAt.x, lookAt.y);
         }
         Object rotationPacket = nmsHandler.createHeadRotationPacket(entityController, lookAt.x);
-        nmsHandler.sendPacket(player, movePacket);
         nmsHandler.sendPacket(player, rotationPacket);
+        nmsHandler.sendPacket(player, movePacket);
+        nmsHandler.sendPacket(player, nmsHandler.createCameraPacket(entityController));
+    }
+    
+    
+    private boolean end = false;
+    
+    public void end() {
+        this.end = true;
         
-        if (cameraTick - 1 % 20 == 0) {
-            nmsHandler.sendPacket(player, nmsHandler.createCameraPacket(entityController));
+        //Remove all entity.
+        INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
+        for (NMSEntityController entityController : advanceInitializedEntityMap.values()) {
+            Object destroyPacket = nmsHandler.createEntityDestroyPacket(entityController);
+            nmsHandler.sendPacket(target.getBukkitPlayer(), destroyPacket);
         }
     }
     
@@ -163,7 +173,7 @@ public class CameraHandler implements TickBase {
     
     @Override
     public boolean shouldRemove() {
-        return false;
+        return end;
     }
     
     public ContanClassInstance setCameraPositions(CameraPositions cameraPositions) {

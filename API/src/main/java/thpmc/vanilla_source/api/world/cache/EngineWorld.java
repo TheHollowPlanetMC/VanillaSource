@@ -38,6 +38,39 @@ public interface EngineWorld extends IWorld {
     @NotNull ContanClassInstance getScriptHandle();
     
     /**
+     * Gets the highest block at the specified coordinates.
+     * @param blockX Block x
+     * @param blockZ Block z
+     * @return Returns the highest block.
+     *         Returns null if not found or if no chunks have been loaded.
+     */
+    default @Nullable EngineBlock getHighestBlockAt(int blockX, int blockZ) {
+        EngineChunk chunk = getChunkAt(blockX >> 4, blockZ >> 4);
+        if (!chunk.isLoaded()) {
+            return null;
+        }
+        
+        int end;
+        int start;
+        if (VanillaSourceAPI.getInstance().isHigher_v1_18_R1()) {
+            end = -64;
+            start = 320 - 1;
+        } else {
+            end = 0;
+            start = 256 - 1;
+        }
+        
+        for (int y = start; y > end; y--) {
+            Object blockData = chunk.getNMSBlockData(blockX, y, blockZ);
+            if (blockData != null) {
+                return new EngineBlock(this, chunk, blockX, y, blockZ, blockData);
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
      * Gets entities that are within the specified radius.
      * @param centerX Center position X to look for entities
      * @param centerY Center position Y to look for entities

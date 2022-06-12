@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.api.contan;
 
+import org.bukkit.Bukkit;
 import org.contan_lang.ContanEngine;
 import org.contan_lang.thread.ContanTickBasedThread;
 import thpmc.vanilla_source.api.VanillaSourceAPI;

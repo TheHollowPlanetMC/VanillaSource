@@ -11,17 +11,17 @@ import java.util.Objects;
 
 public class EngineBlock {
     
-    protected final EngineWorld world;
+    public final EngineWorld world;
     
-    protected final EngineChunk chunk;
+    public final EngineChunk chunk;
     
-    protected final int x;
+    public final int x;
     
-    protected final int y;
+    public final int y;
     
-    protected final int z;
+    public final int z;
     
-    protected final Object nmsBlockData;
+    public final Object nmsBlockData;
     
     public EngineBlock(@NotNull EngineWorld world, @NotNull EngineChunk chunk, int x, int y, int z, @NotNull Object nmsBlockData) {
         this.world = world;

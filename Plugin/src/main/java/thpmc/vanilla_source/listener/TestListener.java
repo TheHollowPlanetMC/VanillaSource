@@ -10,6 +10,7 @@ import thpmc.vanilla_source.VanillaSource;
 import thpmc.vanilla_source.api.camera.Bezier3DPositions;
 import thpmc.vanilla_source.api.camera.CameraHandler;
 import thpmc.vanilla_source.api.camera.CameraPositionAt;
+import thpmc.vanilla_source.api.camera.CameraPositionsManager;
 import thpmc.vanilla_source.api.contan.ContanUtil;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.player.EnginePlayer;
@@ -154,14 +155,18 @@ public class TestListener implements Listener {
             }
             Collections.reverse(bezierCurve3DList);
     
-            EasingBezier2D easingBezier2D = new EasingBezier2D(0.5, 0, 0, 0.5);
-            Bezier3DPositions positions = new Bezier3DPositions(bezierCurve3DList, easingBezier2D, 300);
+            EasingBezier2D easingBezier2D = new EasingBezier2D(0.3, 0, 0, 0.3);
+            Bezier3DPositions positions = new Bezier3DPositions(bezierCurve3DList, easingBezier2D, 400);
     
             EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer(player);
             
             if (enginePlayer == null) {
                 return;
             }
+    
+            CameraPositionsManager.registerCameraPositions("test", positions);
+            
+            /*
             TickThread tickThread = (TickThread) VanillaSourceAPI.getInstance().getContanEngine().getNextAsyncThread();
             CameraHandler cameraHandler = new CameraHandler(enginePlayer, tickThread, ContanUtil.getEmptyClassInstance());
             cameraHandler.setCameraPositions(positions);
@@ -169,7 +174,7 @@ public class TestListener implements Listener {
             Vector lookAtPosition = bezierCurve3DList.get(0).getPosition(0).midpoint(bezierCurve3DList.get(bezierCurve3DList.size() - 1).getPosition(0));
             cameraHandler.setLookAtPositions(new CameraPositionAt(lookAtPosition.getX(), lookAtPosition.getY(), lookAtPosition.getZ()));
             
-            tickThread.addEntity(cameraHandler);
+            tickThread.addEntity(cameraHandler);*/
         }
     }
     
