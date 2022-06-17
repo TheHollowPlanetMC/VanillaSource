@@ -1,6 +1,7 @@
 mod minecraft;
 mod pathfinding;
 mod collision;
+mod util;
 
 extern crate jni;
 
