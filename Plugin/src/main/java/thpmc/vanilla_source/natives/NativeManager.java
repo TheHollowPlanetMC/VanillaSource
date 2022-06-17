@@ -30,7 +30,7 @@ public class NativeManager {
         for(int index = 0; index < max; index++){
             String fileName = environment.getLibraryFileNames()[index];
             try {
-                System.load(Paths.get("").toAbsolutePath() + "/plugins/THP-Engine/libs/" + fileName);
+                System.load(Paths.get("").toAbsolutePath() + "/plugins/VanillaSource/libs/" + fileName);
                 break;
             }catch (Error e){
                 if(index + 1 == max){

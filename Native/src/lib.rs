@@ -1,7 +1,6 @@
 mod minecraft;
 mod pathfinding;
 mod collision;
-mod util;
 
 extern crate jni;
 
@@ -23,13 +22,13 @@ static mut IS_HIGHER_V1_18_R1: bool = true;
 
 #[no_mangle]
 #[allow(unused_variables, non_snake_case)]
-pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_getLibraryVersion(env: JNIEnv, class: jclass) -> jint {
+pub extern "system" fn Java_thpmc_vanilla_1source_api_natives_NativeBridge_getLibraryVersion(env: JNIEnv, class: jclass) -> jint {
     return VERSION;
 }
 
 #[no_mangle]
 #[allow(unused_variables, non_snake_case)]
-pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_registerBlockInOrder(env: JNIEnv, class: jclass, id: jint, collision: jdoubleArray, shape: jdoubleArray, noised_direction: jint){
+pub extern "system" fn Java_thpmc_vanilla_1source_api_natives_NativeBridge_registerBlockInOrder(env: JNIEnv, class: jclass, id: jint, collision: jdoubleArray, shape: jdoubleArray, noised_direction: jint){
     let length: jsize = env.get_array_length(collision).unwrap();
 
     let mut array_buffer: Vec<jdouble> = vec![0.0; length as usize];
@@ -105,13 +104,13 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_registerBlockI
         direction,
         based_shape: shape
     };
-    
+
     minecraft::blocks::register_block_in_order(id as i32, noised_collision_shape, noised_shape);
 }
 
 #[no_mangle]
 #[allow(unused_variables, non_snake_case)]
-pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_test2(env: JNIEnv, class: jclass, worldName: jcharArray, block_x: jint, block_y: jint, block_z: jint){
+pub extern "system" fn Java_thpmc_vanilla_1source_api_natives_NativeBridge_test2(env: JNIEnv, class: jclass, worldName: jcharArray, block_x: jint, block_y: jint, block_z: jint){
     let length: jsize = env.get_array_length(worldName).unwrap();
 
     let mut world_name_buffer: Vec<u16> = vec![0; length as usize];
@@ -144,7 +143,7 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_test2(env: JNI
 
 #[no_mangle]
 #[allow(unused_variables, non_snake_case)]
-pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_setIsHigher(env: JNIEnv, class: jclass, isHigher: jboolean){
+pub extern "system" fn Java_thpmc_vanilla_1source_api_natives_NativeBridge_setIsHigher(env: JNIEnv, class: jclass, isHigher: jboolean){
     unsafe {
         IS_HIGHER_V1_18_R1 = isHigher == 1;
         minecraft::chunk_util::set_is_higher(IS_HIGHER_V1_18_R1);
@@ -153,7 +152,7 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_setIsHigher(en
 
 #[no_mangle]
 #[allow(unused_variables, non_snake_case)]
-pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_getIsHigher(env: JNIEnv, class: jclass) -> jboolean{
+pub extern "system" fn Java_thpmc_vanilla_1source_api_natives_NativeBridge_getIsHigher(env: JNIEnv, class: jclass) -> jboolean{
     unsafe {
         return if IS_HIGHER_V1_18_R1 {
             1 as jboolean
@@ -165,7 +164,7 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_getIsHigher(en
 
 #[no_mangle]
 #[allow(unused_variables, non_snake_case)]
-pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_addChunkData(env: JNIEnv, class: jclass, chunk_x: jint, chunk_z: jint, worldName: jcharArray, filledSections: jint, chunkData: jintArray){
+pub extern "system" fn Java_thpmc_vanilla_1source_api_natives_NativeBridge_addChunkData(env: JNIEnv, class: jclass, chunk_x: jint, chunk_z: jint, worldName: jcharArray, filledSections: jint, chunkData: jintArray){
     let length: jsize = env.get_array_length(worldName).unwrap();
 
     let mut world_name_buffer: Vec<u16> = vec![0; length as usize];
@@ -218,7 +217,7 @@ pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_addChunkData(e
 
 #[no_mangle]
 #[allow(unused_variables, non_snake_case)]
-pub extern "system" fn Java_thpmc_engine_api_natives_NativeBridge_runAStar(env: JNIEnv, class: jclass, worldName: jcharArray, options: jintArray) -> jintArray{
+pub extern "system" fn Java_thpmc_vanilla_1source_api_natives_NativeBridge_runAStar(env: JNIEnv, class: jclass, worldName: jcharArray, options: jintArray) -> jintArray{
     let s = Instant::now();
     //Get world
     let length: jsize = env.get_array_length(worldName).unwrap();

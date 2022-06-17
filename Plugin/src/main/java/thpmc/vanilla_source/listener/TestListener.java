@@ -12,10 +12,13 @@ import thpmc.vanilla_source.api.camera.CameraHandler;
 import thpmc.vanilla_source.api.camera.CameraPositionAt;
 import thpmc.vanilla_source.api.camera.CameraPositionsManager;
 import thpmc.vanilla_source.api.contan.ContanUtil;
+import thpmc.vanilla_source.api.entity.ai.pathfinding.AsyncAStarMachine;
+import thpmc.vanilla_source.api.entity.ai.pathfinding.BlockPosition;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.util.math.BezierCurve3D;
 import thpmc.vanilla_source.api.util.math.EasingBezier2D;
+import thpmc.vanilla_source.api.world.cache.EngineWorld;
 import thpmc.vanilla_source.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.EntityType;
@@ -244,7 +247,7 @@ public class TestListener implements Listener {
         
         Location location = player.getLocation();
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
-    
+        
         TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
         ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/event/EventHandler.cntn");
         if (contanModule != null) {
@@ -271,11 +274,10 @@ public class TestListener implements Listener {
     
         /*
         World world = player.getWorld();
-        BlockPosition start = new BlockPosition(173, 80, -23);
-        BlockPosition goal = new BlockPosition(172, 80, 4);
-    
-        ThreadLocalCache cache = new ThreadLocalCache();
-        ThreadLocalEngineWorld engineWorld = cache.getWorld(world.getName());
+        BlockPosition start = new BlockPosition(178, 80, -27);
+        BlockPosition goal = new BlockPosition(178, 80, -27);
+        
+        EngineWorld engineWorld = VanillaSourceAPI.getInstance().getMainThread().getThreadLocalCache().getParallelWorld(VanillaSourceAPI.getInstance().getDefaultUniverse(), "world");
         
         CollideOption collideOption = new CollideOption(FluidCollisionMode.NEVER, true);
         
