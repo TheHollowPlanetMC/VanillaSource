@@ -53,8 +53,6 @@ public class EngineEntity implements TickBase {
     protected Vector velocity = new Vector(0.0, 0.0, 0.0);
     
     protected boolean collideEntities = false;
-
-    protected boolean marker = false;
     
     protected boolean onGround = false;
     
@@ -511,6 +509,8 @@ public class EngineEntity implements TickBase {
             
             nextEntityList.add(this);
             previousEntityList.remove(this);
+            
+            chunk = nextChunk;
         }
     
         this.x = x;
@@ -556,9 +556,47 @@ public class EngineEntity implements TickBase {
     
         if(onGround) velocity.setY(0);
         
+        //AI tick
         aiController.tick(x, y, z);
     
+        //Collide with entity
+        if (collideEntities) {
+            performCollideEntity();
+        }
+        
         invokeScriptFunction("update2");
+    }
+    
+    protected void performCollideEntity() {
+        EngineBoundingBox thisBox = this.getBoundingBox();
+        if (thisBox == null) {
+            return;
+        }
+        
+        Collection<EngineEntity> entities = chunk.getEntitiesInSection(ChunkUtil.getSectionIndex(NumberConversions.floor(this.y)));
+        
+        for (EngineEntity entity : entities) {
+            if (entity == this) {
+                continue;
+            }
+            
+            EngineBoundingBox box = entity.getBoundingBox();
+            
+            if (box != null) {
+                if (box.overlaps(thisBox)) {
+                    Vector pos1 = this.getPosition();
+                    Vector pos2 = entity.getPosition();
+                    Vector direction = pos1.subtract(pos2);
+                    direction = new Vector(direction.getX(), 0, direction.getZ());
+                    
+                    if (direction.lengthSquared() > 0.0) {
+                        this.move(direction.normalize().multiply(0.1));
+                    }
+                    
+                    return;
+                }
+            }
+        }
     }
     
     protected ContanObject<?> invokeScriptFunction(String functionName, ContanObject<?>... arguments) {
