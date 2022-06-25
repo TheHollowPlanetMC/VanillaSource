@@ -21,10 +21,11 @@ public class ImplVSSettings extends VSSettings {
         //ロードと値の保持
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
         
-        if(yml.contains("use-cached-chunk-packet")) useCachedChunkPacket = yml.getBoolean("use-cached-chunk-packet");
-        if(yml.contains("rewrite-light-packet")) rewriteLightPacket = yml.getBoolean("rewrite-light-packet");
-        if(yml.contains("jni-library.use-jni-pathfinding")) useJNIPathfinding = yml.getBoolean("jni-library.use-jni-pathfinding");
-        if(yml.contains("entity-threads")) entityThreads = yml.getInt("entity-threads");
+        if (yml.contains("use-cached-chunk-packet")) useCachedChunkPacket = yml.getBoolean("use-cached-chunk-packet");
+        if (yml.contains("rewrite-light-packet")) rewriteLightPacket = yml.getBoolean("rewrite-light-packet");
+        if (yml.contains("jni-library.use-jni-pathfinding")) useJNIPathfinding = yml.getBoolean("jni-library.use-jni-pathfinding");
+        if (yml.contains("entity-threads")) entityThreads = yml.getInt("entity-threads");
+        if (yml.contains("chiyogami-parallel-bridge")) useChiyogamiParallelBridge = yml.getBoolean("chiyogami-parallel-bridge");
     }
     
 }

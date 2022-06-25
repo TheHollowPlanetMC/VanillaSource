@@ -90,7 +90,7 @@ public class ImplParallelChunk implements ParallelChunk {
     
     
     public SectionLevelArray createBlockLightSectionLevelArrayIfAbsent(int sectionY) {
-        int sectionIndex = ChunkUtil.getSectionIndex(sectionY << 4);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(sectionY << 4);
         SectionLevelArray sectionLevelArray = blockLightArrays[sectionIndex];
         if(sectionLevelArray == null) {
             sectionLevelArray = new SectionLevelArray();
@@ -101,7 +101,7 @@ public class ImplParallelChunk implements ParallelChunk {
     }
     
     public SectionLevelArray createSkyLightSectionLevelArrayIfAbsent(int sectionY) {
-        int sectionIndex = ChunkUtil.getSectionIndex(sectionY << 4);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(sectionY << 4);
         SectionLevelArray sectionLevelArray = skyLightArrays[sectionIndex];
         if(sectionLevelArray == null) {
             sectionLevelArray = new SectionLevelArray();
@@ -112,7 +112,7 @@ public class ImplParallelChunk implements ParallelChunk {
     }
     
     public SectionTypeArray createSectionTypeArrayIfAbsent(int sectionY) {
-        int sectionIndex = ChunkUtil.getSectionIndex(sectionY << 4);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(sectionY << 4);
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null) {
             sectionTypeArray = new SectionTypeArray();
@@ -125,7 +125,9 @@ public class ImplParallelChunk implements ParallelChunk {
 
     @Override
     public void setType(int blockX, int blockY, int blockZ, Material material) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
 
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null){
@@ -141,7 +143,9 @@ public class ImplParallelChunk implements ParallelChunk {
 
     @Override
     public @Nullable Material getType(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return null;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
 
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null) return engineChunk.getType(blockX, blockY, blockZ);
@@ -154,7 +158,9 @@ public class ImplParallelChunk implements ParallelChunk {
 
     @Override
     public void setBlockData(int blockX, int blockY, int blockZ, BlockData blockData) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
 
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null){
@@ -170,7 +176,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public void setNMSBlockData(int blockX, int blockY, int blockZ, Object blockData) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null){
@@ -185,7 +193,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public @Nullable BlockData getBlockData(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return null;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
 
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null) return engineChunk.getBlockData(blockX, blockY, blockZ);
@@ -198,7 +208,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public @Nullable Object getNMSBlockData(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return null;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null) return engineChunk.getNMSBlockData(blockX, blockY, blockZ);
@@ -212,7 +224,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public void removeBlockData(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null) return;
@@ -223,7 +237,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public void setBlockLightLevel(int blockX, int blockY, int blockZ, int level) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
 
         SectionLevelArray sectionLevelArray = blockLightArrays[sectionIndex];
         if(sectionLevelArray == null){
@@ -238,7 +254,9 @@ public class ImplParallelChunk implements ParallelChunk {
 
     @Override
     public int getBlockLightLevel(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return 0;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
 
         SectionLevelArray sectionLevelArray = blockLightArrays[sectionIndex];
         if(sectionLevelArray == null) return engineChunk.getBlockLightLevel(blockX, blockY, blockZ);
@@ -252,7 +270,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public void removeBlockLight(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionLevelArray sectionLevelArray = blockLightArrays[sectionIndex];
         if(sectionLevelArray == null) return;
@@ -263,7 +283,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public void setSkyLightLevel(int blockX, int blockY, int blockZ, int level) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionLevelArray sectionLevelArray = skyLightArrays[sectionIndex];
         if(sectionLevelArray == null){
@@ -278,7 +300,9 @@ public class ImplParallelChunk implements ParallelChunk {
 
     @Override
     public int getSkyLightLevel(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return 0;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionLevelArray sectionLevelArray = skyLightArrays[sectionIndex];
         if(sectionLevelArray == null) return engineChunk.getSkyLightLevel(blockX, blockY, blockZ);
@@ -292,7 +316,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public void removeSkyLight(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionLevelArray sectionLevelArray = skyLightArrays[sectionIndex];
         if(sectionLevelArray == null) return;
@@ -303,25 +329,27 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public @Nullable SectionLevelArray getBlockLightSectionLevelArray(int sectionY) {
-        int sectionIndex = ChunkUtil.getSectionIndex(sectionY << 4);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(sectionY << 4);
         return blockLightArrays[sectionIndex];
     }
 
     @Override
     public @Nullable SectionLevelArray getSkyLightSectionLevelArray(int sectionY) {
-        int sectionIndex = ChunkUtil.getSectionIndex(sectionY << 4);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(sectionY << 4);
         return skyLightArrays[sectionIndex];
     }
 
     @Override
     public @Nullable SectionTypeArray getSectionTypeArray(int sectionY) {
-        int sectionIndex = ChunkUtil.getSectionIndex(sectionY << 4);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(sectionY << 4);
         return sectionTypeArrays[sectionIndex];
     }
     
     @Override
     public boolean hasBlockData(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return false;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
         if(sectionTypeArray == null) return engineChunk.hasBlockData(blockX, blockY, blockZ);
@@ -335,7 +363,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public boolean hasBlockLight(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return false;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionLevelArray sectionLevelArray = blockLightArrays[sectionIndex];
         if(sectionLevelArray == null) return false;
@@ -345,7 +375,9 @@ public class ImplParallelChunk implements ParallelChunk {
     
     @Override
     public boolean hasSkyLight(int blockX, int blockY, int blockZ) {
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        if (!ChunkUtil.isInRangeHeight(blockY)) return false;
+        
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
     
         SectionLevelArray sectionLevelArray = skyLightArrays[sectionIndex];
         if(sectionLevelArray == null) return false;

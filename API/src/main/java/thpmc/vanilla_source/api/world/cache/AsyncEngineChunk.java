@@ -66,8 +66,9 @@ public class AsyncEngineChunk implements EngineChunk {
     @Override
     public @Nullable Material getType(int blockX, int blockY, int blockZ) {
         if (chunkSnapshot == null) return null;
+        if (!ChunkUtil.isInRangeHeight(blockY)) return null;
 
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
         if(isOutOfSectionIndex(sectionIndex)) return null;
         if(chunkSnapshot.isSectionEmpty(sectionIndex)) return null;
         return chunkSnapshot.getBlockType(blockX & 0xF, blockY, blockZ & 0xF);
@@ -76,8 +77,9 @@ public class AsyncEngineChunk implements EngineChunk {
     @Override
     public @Nullable BlockData getBlockData(int blockX, int blockY, int blockZ) {
         if (chunkSnapshot == null) return null;
+        if (!ChunkUtil.isInRangeHeight(blockY)) return null;
 
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
         if(isOutOfSectionIndex(sectionIndex)) return null;
         if(chunkSnapshot.isSectionEmpty(sectionIndex)) return null;
         return chunkSnapshot.getBlockData(blockX & 0xF, blockY, blockZ & 0xF);
@@ -86,6 +88,7 @@ public class AsyncEngineChunk implements EngineChunk {
     @Override
     public @Nullable Object getNMSBlockData(int blockX, int blockY, int blockZ) {
         if (chunkSnapshot == null) return null;
+        if (!ChunkUtil.isInRangeHeight(blockY)) return null;
 
         BlockData blockData = getBlockData(blockX, blockY, blockZ);
         if(blockData == null) return null;
@@ -96,6 +99,7 @@ public class AsyncEngineChunk implements EngineChunk {
     @Override
     public boolean hasBlockData(int blockX, int blockY, int blockZ) {
         if (chunkSnapshot == null) return false;
+        if (!ChunkUtil.isInRangeHeight(blockY)) return false;
 
         return getBlockData(blockX, blockY, blockZ) != null;
     }
@@ -103,8 +107,9 @@ public class AsyncEngineChunk implements EngineChunk {
     @Override
     public int getBlockLightLevel(int blockX, int blockY, int blockZ) {
         if (chunkSnapshot == null) return 0;
+        if (!ChunkUtil.isInRangeHeight(blockY)) return 0;
 
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
         if(isOutOfSectionIndex(sectionIndex)) return 0;
         if(chunkSnapshot.isSectionEmpty(sectionIndex)) return 0;
         return chunkSnapshot.getBlockEmittedLight(blockX & 0xF, blockY, blockZ & 0xF);
@@ -113,8 +118,9 @@ public class AsyncEngineChunk implements EngineChunk {
     @Override
     public int getSkyLightLevel(int blockX, int blockY, int blockZ) {
         if (chunkSnapshot == null) return 0;
+        if (!ChunkUtil.isInRangeHeight(blockY)) return 0;
 
-        int sectionIndex = ChunkUtil.getSectionIndex(blockY);
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
         if(isOutOfSectionIndex(sectionIndex)) return 0;
         if(chunkSnapshot.isSectionEmpty(sectionIndex)) return 0;
         return chunkSnapshot.getBlockSkyLight(blockX & 0xF, blockY, blockZ & 0xF);
