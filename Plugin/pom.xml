@@ -171,5 +171,16 @@
             <version>3.11</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>net.propromp</groupId>
+            <artifactId>neocommander</artifactId>
+            <version>1.5.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>brigadier</artifactId>
+            <version>1.0.18</version>
+        </dependency>
     </dependencies>
 </project>

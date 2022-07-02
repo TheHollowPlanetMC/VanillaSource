@@ -14,7 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,7 +24,11 @@ public class ContanManager {
 
     private static final String SCRIPT_PATH = "plugins/VanillaSource/scripts";
 
+    public static Set<String> loadedModuleNames = new HashSet<>();
+
     public static void loadAllModules() throws Exception {
+        loadedModuleNames = new HashSet<>();
+
         VanillaSource.getPlugin().getLogger().info("Load all Contan modules.");
 
         File file = new File(SCRIPT_PATH);
@@ -64,6 +70,8 @@ public class ContanManager {
 
             VanillaSource.getPlugin().getLogger().info("Compile script : " + modulePathName);
             ContanModule contanModule = contanEngine.compile(modulePathName, script.toString());
+
+            loadedModuleNames.add(modulePathName);
 
             if (modulePathName.endsWith("_initializer.cntn")) {
                 initializer = contanModule;

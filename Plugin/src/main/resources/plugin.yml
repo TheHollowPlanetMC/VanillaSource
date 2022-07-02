@@ -14,3 +14,5 @@ commands:
 permissions:
   parallel.admin:
     description: admin command.
+  vanilla_source.contan:
+    default: op
