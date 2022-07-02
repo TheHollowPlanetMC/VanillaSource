@@ -28,7 +28,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-public class parallelCommandExecutor implements CommandExecutor, TabExecutor {
+public class ParallelCommandExecutor implements CommandExecutor, TabExecutor {
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {

@@ -83,7 +83,6 @@ public class ImplParallelWorld implements ParallelWorld {
     public @Nullable Material getType(int blockX, int blockY, int blockZ) {
         int chunkX = blockX >> 4;
         int chunkZ = blockZ >> 4;
-        long coord = ChunkUtil.getCoordinateKey(chunkX, chunkZ);
         ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
         return parallelChunk.getType(blockX, blockY, blockZ);
     }

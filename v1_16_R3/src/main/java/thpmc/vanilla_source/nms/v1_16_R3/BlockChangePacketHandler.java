@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.nms.v1_16_R3;
 
+import org.bukkit.Material;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.api.nms.IPacketHandler;
@@ -26,8 +27,7 @@ public class BlockChangePacketHandler implements IPacketHandler {
     public Object rewrite(Object packet, EnginePlayer EnginePlayer, boolean cacheSetting) {
 
         ParallelUniverse universe = EnginePlayer.getUniverse();
-        if(universe == null) return packet;
-
+    
         String worldName = EnginePlayer.getBukkitPlayer().getWorld().getName();
         ParallelWorld parallelWorld = universe.getWorld(worldName);
 
@@ -37,6 +37,7 @@ public class BlockChangePacketHandler implements IPacketHandler {
 
             BlockData blockData = parallelWorld.getBlockData(bp.getX(), bp.getY(), bp.getZ());
             if(blockData == null) return packet;
+            if(blockData.getMaterial() == Material.AIR) return packet;
 
             PacketPlayOutBlockChange newPacket = new PacketPlayOutBlockChange();
             a.set(newPacket, bp);

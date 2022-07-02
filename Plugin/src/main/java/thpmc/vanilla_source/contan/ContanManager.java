@@ -22,7 +22,8 @@ import java.util.stream.Stream;
 
 public class ContanManager {
 
-    private static final String SCRIPT_PATH = "plugins/VanillaSource/scripts";
+    public static final String SCRIPT_PATH_NAME = "plugins/VanillaSource/scripts";
+    public static final Path SCRIPT_PATH = Paths.get(SCRIPT_PATH_NAME);
 
     public static Set<String> loadedModuleNames = new HashSet<>();
 
@@ -31,14 +32,14 @@ public class ContanManager {
 
         VanillaSource.getPlugin().getLogger().info("Load all Contan modules.");
 
-        File file = new File(SCRIPT_PATH);
+        File file = new File(SCRIPT_PATH_NAME);
         file.mkdirs();
 
         ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
 
         //Load all files
         List<Path> scriptFilePaths;
-        try (Stream<Path> paths = Files.walk(Paths.get(SCRIPT_PATH))) {
+        try (Stream<Path> paths = Files.walk(SCRIPT_PATH)) {
             scriptFilePaths = paths.filter(Files::isRegularFile).collect(Collectors.toList());
         }
 

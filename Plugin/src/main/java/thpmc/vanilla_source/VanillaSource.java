@@ -4,10 +4,11 @@ import be4rjp.artgui.ArtGUI;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.tick.MainThreadTimer;
 import thpmc.vanilla_source.api.player.EnginePlayer;
+import thpmc.vanilla_source.command.CommandRegistry;
 import thpmc.vanilla_source.config.ImplVSSettings;
 import thpmc.vanilla_source.contan.ContanManager;
 import thpmc.vanilla_source.listener.PlayerJoinQuitListener;
-import thpmc.vanilla_source.command.parallelCommandExecutor;
+import thpmc.vanilla_source.command.ParallelCommandExecutor;
 import thpmc.vanilla_source.natives.NativeManager;
 import thpmc.vanilla_source.util.TaskHandler;
 import thpmc.vanilla_source.impl.ImplVanillaSourceAPI;
@@ -68,12 +69,14 @@ public final class VanillaSource extends JavaPlugin {
         pluginManager.registerEvents(new TestListener(), this);
     
     
+        //Register commands.
         if(Bukkit.getPluginManager().getPlugin("WorldEdit") != null) {
             //Register command executors
             getLogger().info("Registering command executors...");
-            getCommand("parallel").setExecutor(new parallelCommandExecutor());
-            getCommand("parallel").setTabCompleter(new parallelCommandExecutor());
+            getCommand("parallel").setExecutor(new ParallelCommandExecutor());
+            getCommand("parallel").setTabCompleter(new ParallelCommandExecutor());
         }
+        CommandRegistry.register(this);
         
         
         ImplStructureData.loadAllStructureData();
@@ -100,6 +103,8 @@ public final class VanillaSource extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         if(api != null) api.stopAsyncThreads();
+        
+        CommandRegistry.unregister();
     }
     
     
