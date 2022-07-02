@@ -10,6 +10,8 @@ public abstract class VSSettings {
     
     protected static int entityThreads = 1;
     
+    protected static boolean useChiyogamiParallelBridge = true;
+    
     public static boolean isUseCachedChunkPacket() {return useCachedChunkPacket;}
     
     public static boolean isRewriteLightPacket() {return rewriteLightPacket;}
@@ -19,4 +21,7 @@ public abstract class VSSettings {
     public static boolean isUseJNI() {return useJNIPathfinding;}
     
     public static int getEntityThreads() {return entityThreads;}
+    
+    public static boolean isUseChiyogamiParallelBridge() {return useChiyogamiParallelBridge;}
+    
 }

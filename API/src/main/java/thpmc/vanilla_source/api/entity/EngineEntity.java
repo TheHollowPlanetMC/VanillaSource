@@ -157,7 +157,7 @@ public class EngineEntity implements TickBase {
 
         //remove from chunk
         if(chunk != null) {
-            int sectionIndex = ChunkUtil.getSectionIndex(NumberConversions.floor(y));
+            int sectionIndex = ChunkUtil.getSectionIndexAligned(NumberConversions.floor(y));
             Set<EngineEntity> entities = chunk.getEntitiesInSection(sectionIndex);
 
             if(entities.size() != 0){
@@ -283,7 +283,7 @@ public class EngineEntity implements TickBase {
 
         int chunkX = NumberConversions.floor(x) >> 4;
         int chunkZ = NumberConversions.floor(z) >> 4;
-        int sectionIndex = ChunkUtil.getSectionIndex(NumberConversions.floor(y));
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(NumberConversions.floor(y));
         EngineChunk chunk = world.getChunkAt(chunkX, chunkZ);
         chunk.getEntitiesInSection(sectionIndex).remove(this);
 
@@ -484,8 +484,8 @@ public class EngineEntity implements TickBase {
         int nextChunkX = nextBlockX >> 4;
         int nextChunkZ = nextBlockZ >> 4;
         
-        int previousSectionIndex = ChunkUtil.getSectionIndex(previousBlockY);
-        int nextSectionIndex = ChunkUtil.getSectionIndex(nextBlockY);
+        int previousSectionIndex = ChunkUtil.getSectionIndexAligned(previousBlockY);
+        int nextSectionIndex = ChunkUtil.getSectionIndexAligned(nextBlockY);
         
         //Moving between chunks
         if(!(previousChunkX == nextChunkX && previousChunkZ == nextChunkZ) ||
@@ -573,7 +573,7 @@ public class EngineEntity implements TickBase {
             return;
         }
         
-        Collection<EngineEntity> entities = chunk.getEntitiesInSection(ChunkUtil.getSectionIndex(NumberConversions.floor(this.y)));
+        Collection<EngineEntity> entities = chunk.getEntitiesInSection(ChunkUtil.getSectionIndexAligned(NumberConversions.floor(this.y)));
         
         for (EngineEntity entity : entities) {
             if (entity == this) {

@@ -11,3 +11,6 @@ rewrite-light-packet: true
 # Settings related to jni libraries.
 jni-library:
   use-jni-pathfinding: false
+
+# Setting whether to use Chiyogami's parallel universe function.
+chiyogami-parallel-bridge: true

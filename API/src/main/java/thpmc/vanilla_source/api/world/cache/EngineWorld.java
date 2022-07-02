@@ -92,7 +92,7 @@ public interface EngineWorld extends IWorld {
             for (int chunkY = startChunkY; chunkY <= endChunkY; chunkY++) {
                 for (int chunkZ = startChunkZ; chunkZ <= endChunkZ; chunkZ++) {
                     EngineChunk chunk = getChunkAt(chunkX, chunkZ);
-                    entities.addAll(chunk.getEntitiesInSection(ChunkUtil.getSectionIndex(chunkY << 4)));
+                    entities.addAll(chunk.getEntitiesInSection(ChunkUtil.getSectionIndexAligned(chunkY << 4)));
                 }
             }
         }
@@ -216,7 +216,7 @@ public interface EngineWorld extends IWorld {
             for(int chunkY = minY; chunkY <= maxY; chunkY++){
                 for(int chunkZ = minZ; chunkZ <= maxZ; chunkZ++){
                     EngineChunk chunk = this.getChunkAt(chunkX, chunkZ);
-                    entities.addAll(chunk.getEntitiesInSection(ChunkUtil.getSectionIndex(chunkY << 4)));
+                    entities.addAll(chunk.getEntitiesInSection(ChunkUtil.getSectionIndexAligned(chunkY << 4)));
                 }
             }
         }
