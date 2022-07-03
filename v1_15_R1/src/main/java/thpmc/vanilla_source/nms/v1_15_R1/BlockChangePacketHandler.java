@@ -1,6 +1,7 @@
 package thpmc.vanilla_source.nms.v1_15_R1;
 
 import org.bukkit.Material;
+import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.api.nms.IPacketHandler;
@@ -34,10 +35,18 @@ public class BlockChangePacketHandler implements IPacketHandler {
         try {
             PacketPlayOutBlockChange blockChange = (PacketPlayOutBlockChange) packet;
             BlockPosition bp = (BlockPosition) a.get(blockChange);
-
-            BlockData blockData = parallelWorld.getBlockData(bp.getX(), bp.getY(), bp.getZ());
+    
+            ParallelChunk chunk = parallelWorld.getChunk(bp.getX() >> 4, bp.getZ() >> 4);
+            if (chunk == null) {
+                return packet;
+            }
+            
+            if (!chunk.hasBlockDataDifference(bp.getX(), bp.getY(), bp.getZ())) {
+                return packet;
+            }
+            
+            BlockData blockData = chunk.getBlockData(bp.getX(), bp.getY(), bp.getZ());
             if(blockData == null) return packet;
-            if(blockData.getMaterial() == Material.AIR) return packet;
 
             PacketPlayOutBlockChange newPacket = new PacketPlayOutBlockChange();
             a.set(newPacket, bp);

@@ -126,6 +126,15 @@ public interface ParallelChunk extends EngineChunk {
     boolean hasSkyLight(int blockX, int blockY, int blockZ);
     
     /**
+     * Gets whether the difference in block data from the original world data is retained.
+     * @param blockX Block coordinate X
+     * @param blockY Block coordinate Y
+     * @param blockZ Block coordinate Z
+     * @return Whether the difference in block data from the original world data is retained.
+     */
+    boolean hasBlockDataDifference(int blockX, int blockY, int blockZ);
+    
+    /**
      * Sends the data of all blocks set in this chunk to the players.
      * @param player Player to sen
      */

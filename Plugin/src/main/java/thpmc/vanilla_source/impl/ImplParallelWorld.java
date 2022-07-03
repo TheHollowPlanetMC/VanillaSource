@@ -200,6 +200,14 @@ public class ImplParallelWorld implements ParallelWorld {
     }
     
     @Override
+    public boolean hasBlockDataDifference(int blockX, int blockY, int blockZ) {
+        int chunkX = blockX >> 4;
+        int chunkZ = blockZ >> 4;
+        ParallelChunk parallelChunk = getChunk(chunkX, chunkZ);
+        return parallelChunk.hasBlockDataDifference(blockX, blockY, blockZ);
+    }
+    
+    @Override
     public @NotNull ParallelChunk getChunk(int chunkX, int chunkZ){
         return chunkMap.computeIfAbsent(ChunkUtil.getCoordinateKey(chunkX, chunkZ), key -> new ImplParallelChunk(this, chunkX, chunkZ));
     }

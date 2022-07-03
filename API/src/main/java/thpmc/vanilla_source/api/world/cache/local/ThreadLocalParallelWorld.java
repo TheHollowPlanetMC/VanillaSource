@@ -118,7 +118,13 @@ public class ThreadLocalParallelWorld implements ParallelWorld {
     public boolean hasSkyLight(int blockX, int blockY, int blockZ) {
         return parallelWorld.hasSkyLight(blockX, blockY, blockZ);
     }
-
+    
+    @Override
+    public boolean hasBlockDataDifference(int blockX, int blockY, int blockZ) {
+        ParallelChunk parallelChunk = getChunkFromBlockXZ(blockX, blockZ);
+        return parallelChunk.hasBlockDataDifference(blockX, blockY, blockZ);
+    }
+    
     @Override
     public @Nullable ParallelChunk getChunk(int chunkX, int chunkZ) {
         return getChunkAt(chunkX, chunkZ);

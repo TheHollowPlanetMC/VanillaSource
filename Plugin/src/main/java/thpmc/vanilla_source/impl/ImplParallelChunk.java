@@ -386,6 +386,18 @@ public class ImplParallelChunk implements ParallelChunk {
     }
     
     @Override
+    public boolean hasBlockDataDifference(int blockX, int blockY, int blockZ) {
+        if (!ChunkUtil.isInRangeHeight(blockY)) return false;
+    
+        int sectionIndex = ChunkUtil.getSectionIndexAligned(blockY);
+    
+        SectionTypeArray sectionTypeArray = sectionTypeArrays[sectionIndex];
+        if(sectionTypeArray == null) return false;
+    
+        return sectionTypeArray.contains(blockX & 0xF, blockY & 0xF, blockZ & 0xF);
+    }
+    
+    @Override
     public void sendUpdate(Player player) {
         INMSHandler nmsHandler = NMSManager.getNMSHandler();
     

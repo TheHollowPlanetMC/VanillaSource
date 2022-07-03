@@ -110,6 +110,15 @@ public interface ParallelWorld extends EngineWorld {
      * @return Whether the specified block is set with sky light.
      */
     boolean hasSkyLight(int blockX, int blockY, int blockZ);
+    
+    /**
+     * Gets whether the difference in block data from the original world data is retained.
+     * @param blockX Block coordinate X
+     * @param blockY Block coordinate Y
+     * @param blockZ Block coordinate Z
+     * @return Whether the difference in block data from the original world data is retained.
+     */
+    boolean hasBlockDataDifference(int blockX, int blockY, int blockZ);
 
     /**
      * Get a chunk that exist in this world.
