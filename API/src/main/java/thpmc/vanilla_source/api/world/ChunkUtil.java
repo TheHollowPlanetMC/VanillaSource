@@ -15,7 +15,7 @@ public class ChunkUtil {
         } else {
             int section = blockY >> 4;
             section = Math.min(15, section);
-            section = Math.min(0, section);
+            section = Math.max(0, section);
             return section;
         }
     }

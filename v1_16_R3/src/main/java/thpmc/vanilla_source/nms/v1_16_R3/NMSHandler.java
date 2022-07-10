@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.nms.v1_16_R3;
 
+import org.bukkit.util.NumberConversions;
 import thpmc.vanilla_source.api.world.cache.AsyncEngineChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
@@ -202,6 +203,43 @@ public class NMSHandler implements INMSHandler {
     @Override
     public void registerChunkForNative(String worldName, AsyncEngineChunk chunk) {
     
+    }
+    
+    @Override
+    public float getBlockSpeedFactor(EngineWorld world, double x, double y, double z) {
+        int blockX = NumberConversions.floor(x);
+        int blockY = NumberConversions.floor(y);
+        int blockZ = NumberConversions.floor(z);
+    
+        IBlockData iBlockData = (IBlockData) world.getNMSBlockData(blockX, blockY, blockZ);
+        if (iBlockData == null) {
+            return 1.0F;
+        }
+    
+        Block block = iBlockData.getBlock();
+        float factor = iBlockData.getBlock().getSpeedFactor();
+        if (block != Blocks.WATER && block != Blocks.BUBBLE_COLUMN) {
+            if (factor == 1.0F) {
+                int downY = NumberConversions.floor(y - 0.5000001D);
+                IBlockData halfDown = (IBlockData) world.getNMSBlockData(blockX, downY, blockZ);
+            
+                if (halfDown == null) {
+                    return 1.0F;
+                }
+            
+                return halfDown.getBlock().getSpeedFactor();
+            } else {
+                return factor;
+            }
+        } else {
+            return factor;
+        }
+    }
+    
+    @Override
+    public float getBlockFrictionFactor(BlockData blockData) {
+        IBlockData iBlockData = (IBlockData) this.getIBlockData(blockData);
+        return iBlockData.getBlock().getFrictionFactor();
     }
     
     @Override

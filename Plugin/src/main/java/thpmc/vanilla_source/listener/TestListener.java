@@ -12,8 +12,10 @@ import thpmc.vanilla_source.api.camera.CameraHandler;
 import thpmc.vanilla_source.api.camera.CameraPositionAt;
 import thpmc.vanilla_source.api.camera.CameraPositionsManager;
 import thpmc.vanilla_source.api.contan.ContanUtil;
+import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.ai.pathfinding.AsyncAStarMachine;
 import thpmc.vanilla_source.api.entity.ai.pathfinding.BlockPosition;
+import thpmc.vanilla_source.api.entity.controller.EntityController;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.util.math.BezierCurve3D;
@@ -46,7 +48,7 @@ public class TestListener implements Listener {
     
     private boolean set = false;
     
-    @EventHandler
+    //@EventHandler
     public void onChat(AsyncPlayerChatEvent event){
         Player player = event.getPlayer();
         if(!event.getMessage().equals("spawn")) return;
@@ -75,7 +77,7 @@ public class TestListener implements Listener {
         });
     }
     
-    @EventHandler
+    //@EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
     
@@ -186,6 +188,15 @@ public class TestListener implements Listener {
         Player player = event.getPlayer();
         if(!player.isSneaking()) return;
         
+        VanillaSourceAPI api = VanillaSourceAPI.getInstance();
+        EngineWorld world = api.getDefaultUniverse().getWorld("world");
+        Location loc = player.getLocation();
+        EntityController controller = api.getNMSHandler().createNMSEntityController(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), EntityType.DROPPED_ITEM, new ItemStack(Material.STONE));
+        EngineEntity entity = new EngineEntity(world, controller, api.getTickThreadPool().getNextTickThread(), null);
+        entity.setVelocity(player.getEyeLocation().getDirection().normalize().multiply(0.5));
+        entity.setAutoClimbHeight(0.0F);
+        entity.spawn();
+        
         /*
         Location loc = player.getLocation();
         NativeBridge.test2(player.getWorld().getName().toCharArray(), loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ());
@@ -244,7 +255,7 @@ public class TestListener implements Listener {
             }
         });*/
         
-        
+        /*
         Location location = player.getLocation();
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
         
@@ -256,7 +267,7 @@ public class TestListener implements Listener {
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         
     
         /*

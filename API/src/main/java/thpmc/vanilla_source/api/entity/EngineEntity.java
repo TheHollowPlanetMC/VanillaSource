@@ -1,6 +1,7 @@
 package thpmc.vanilla_source.api.entity;
 
 import org.bukkit.FluidCollisionMode;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 import org.contan_lang.variables.ContanObject;
@@ -495,7 +496,10 @@ public class EngineEntity implements TickBase {
                 chunk = world.getChunkAt(previousChunkX, previousChunkZ);
                 if(!chunk.isLoaded()) return; //unload chunk teleport cancel
             }
-            Set<EngineEntity> previousEntityList = chunk.getEntitiesInSection(previousSectionIndex);
+            Set<EngineEntity> previousEntityList = null;
+            if (ChunkUtil.isInRangeHeight(previousBlockY)) {
+                previousEntityList = chunk.getEntitiesInSection(previousSectionIndex);
+            }
     
             EngineChunk nextChunk;
             if(previousChunkX != nextChunkX || previousChunkZ != nextChunkZ){
@@ -505,10 +509,15 @@ public class EngineEntity implements TickBase {
             }
             if(nextChunk == null) return; //unload chunk teleport cancel
             
-            Set<EngineEntity> nextEntityList = nextChunk.getEntitiesInSection(nextSectionIndex);
+            Set<EngineEntity> nextEntityList = null;
+            if (ChunkUtil.isInRangeHeight(nextBlockY)) {
+                nextEntityList = nextChunk.getEntitiesInSection(nextSectionIndex);
+            }
             
-            nextEntityList.add(this);
-            previousEntityList.remove(this);
+            if (nextEntityList != null){
+                nextEntityList.add(this);
+            }
+            if (previousEntityList != null) previousEntityList.remove(this);
             
             chunk = nextChunk;
         }
@@ -554,7 +563,15 @@ public class EngineEntity implements TickBase {
         
         move(velocity);
     
-        if(onGround) velocity.setY(0);
+        //Apply block speed factor.
+        applySpeedFactor(getBlockSpeedFactor());
+        
+        if(onGround){
+            velocity.setY(0);
+    
+            //Apply friction factor.
+            applySpeedFactor(getBlockFrictionFactor());
+        }
         
         //AI tick
         aiController.tick(x, y, z);
@@ -567,6 +584,50 @@ public class EngineEntity implements TickBase {
         invokeScriptFunction("update2");
     }
     
+    /**
+     * Apply speed factor.
+     * @param factor Speed factor for xz.
+     */
+    protected void applySpeedFactor(float factor) {
+        Vector xzVec = new Vector(velocity.getX(), 0.0, velocity.getZ());
+        xzVec.multiply(factor);
+        velocity.setX(xzVec.getX());
+        velocity.setZ(xzVec.getZ());
+    }
+    
+    /**
+     * Gets the speed factor of the block on which the entity stands.
+     * @return Speed factor of block.
+     */
+    protected float getBlockSpeedFactor() {
+        INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
+        return nmsHandler.getBlockSpeedFactor(world, x, y, z);
+    }
+    
+    /**
+     * Gets the friction factor of the block on which the entity stands.
+     * @return Friction factor of block.
+     */
+    protected float getBlockFrictionFactor() {
+        BlockData blockData = this.getGroundBlock();
+        if (blockData == null) {
+            return 0.91F;
+        }
+        INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
+        float factor = nmsHandler.getBlockFrictionFactor(blockData);
+        return this.onGround ? factor * 0.91F : 0.91F;
+    }
+    
+    public BlockData getGroundBlock() {
+        int blockX = NumberConversions.floor(x);
+        int blockY = NumberConversions.floor(y - 0.5000001D);
+        int blockZ = NumberConversions.floor(z);
+        return world.getBlockData(blockX, blockY, blockZ);
+    }
+    
+    /**
+     * Performs collisions with entities in contact.
+     */
     protected void performCollideEntity() {
         EngineBoundingBox thisBox = this.getBoundingBox();
         if (thisBox == null) {
@@ -599,6 +660,12 @@ public class EngineEntity implements TickBase {
         }
     }
     
+    /**
+     * Invoke contan script function.
+     * @param functionName
+     * @param arguments
+     * @return
+     */
     protected ContanObject<?> invokeScriptFunction(String functionName, ContanObject<?>... arguments) {
         if (scriptHandle != null) {
             return scriptHandle.invokeFunctionIgnoreNotFound(tickThread, functionName, arguments);

@@ -30,11 +30,11 @@ public class EntityTracker {
         this.enginePlayer = enginePlayer;
     }
     
-    public void tick(Set<EngineEntity> entities){
+    public void tick(Set<EngineEntity> entities, boolean forceTrack){
         tick++;
     
         //Collect tracking entities
-        if(tick % TRACK_INTERVAL == 0) {
+        if(tick % TRACK_INTERVAL == 0 || forceTrack) {
             Location pl = enginePlayer.getCurrentLocation();
             int playerChunkX = pl.getBlockX() >> 4;
             int playerChunkZ = pl.getBlockZ() >> 4;
@@ -79,6 +79,10 @@ public class EntityTracker {
         //Show tick result
         boolean absolute = tick % ABSOLUTE_PACKET_INTERVAL == 0;
         trackedEntities.forEach(engineEntity -> engineEntity.playTickResult(enginePlayer, absolute));
+    }
+    
+    public void removeTrackerEntity(EngineEntity entity) {
+        trackedEntities.remove(entity);
     }
     
     

@@ -6,7 +6,9 @@ import net.minecraft.server.v1_16_R3.PlayerInteractManager;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import thpmc.vanilla_source.api.nms.entity.NMSEntityController;
 
@@ -16,8 +18,13 @@ public class EntityManager {
         WorldServer worldServer = ((CraftWorld) world).getHandle();
         
         switch (type){
-            case PLAYER:{
+            case PLAYER: {
                 return new ImplEntityControllerPlayer(MinecraftServer.getServer(), worldServer, (GameProfile) data, new PlayerInteractManager(worldServer));
+            }
+            
+            case DROPPED_ITEM: {
+                net.minecraft.server.v1_16_R3.ItemStack itemStack = CraftItemStack.asNMSCopy((ItemStack) data);
+                return new ImplEntityControllerItem(worldServer, x, y, z, itemStack);
             }
         }
         

@@ -81,6 +81,8 @@ public class TickThread implements Runnable, ContanTickBasedThread {
     
     private Thread currentThread = Thread.currentThread();
     
+    public void removeEngineEntityUnsafe(EngineEntity entity) {entities.remove(entity);}
+    
     /**
      * Gets the current thread executing tick.
      * @return {@link Thread}
@@ -113,9 +115,19 @@ public class TickThread implements Runnable, ContanTickBasedThread {
         this.lastTickMS = System.currentTimeMillis();
         
         //Should remove check
-        entities.removeIf(TickBase::shouldRemove);
+        entities.removeIf(entity -> {
+            for(EnginePlayer enginePlayer : EnginePlayer.getAllPlayers()){
+                EntityTracker entityTracker = getEntityTracker(enginePlayer);
+                entityTracker.removeTrackerEntity(entity);
+                entity.hide(enginePlayer);
+            }
+            return entity.shouldRemove();
+        });
         tickOnlyEntities.removeIf(TickBase::shouldRemove);
     
+    
+        boolean forceTrack = false;
+        
         //Add entities
         if(addEntities.size() != 0) {
             try {
@@ -124,6 +136,7 @@ public class TickThread implements Runnable, ContanTickBasedThread {
                 for (TickBase entity : addEntities) {
                     if (entity instanceof EngineEntity) {
                         entities.add((EngineEntity) entity);
+                        forceTrack = true;
                     } else {
                         tickOnlyEntities.add(entity);
                     }
@@ -142,7 +155,7 @@ public class TickThread implements Runnable, ContanTickBasedThread {
         //Tracker
         for(EnginePlayer enginePlayer : EnginePlayer.getAllPlayers()){
             EntityTracker entityTracker = getEntityTracker(enginePlayer);
-            entityTracker.tick(entities);
+            entityTracker.tick(entities, forceTrack);
         }
         if(i % 40 == 0){
             //Remove offline player

@@ -1,6 +1,7 @@
 package thpmc.vanilla_source.api.nms;
 
 import thpmc.vanilla_source.api.world.cache.AsyncEngineChunk;
+import thpmc.vanilla_source.api.world.cache.EngineWorld;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
 import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.api.util.BlockPosition3i;
@@ -84,5 +85,9 @@ public interface INMSHandler {
     void registerBlocksForNative();
     
     void registerChunkForNative(String worldName, AsyncEngineChunk chunk);
+    
+    float getBlockSpeedFactor(EngineWorld world, double x, double y, double z);
+    
+    float getBlockFrictionFactor(BlockData blockData);
     
 }
