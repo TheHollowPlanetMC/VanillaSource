@@ -116,12 +116,15 @@ public class TickThread implements Runnable, ContanTickBasedThread {
         
         //Should remove check
         entities.removeIf(entity -> {
-            for(EnginePlayer enginePlayer : EnginePlayer.getAllPlayers()){
-                EntityTracker entityTracker = getEntityTracker(enginePlayer);
-                entityTracker.removeTrackerEntity(entity);
-                entity.hide(enginePlayer);
+            boolean shouldRemove = entity.shouldRemove();
+            if (shouldRemove) {
+                for (EnginePlayer enginePlayer : EnginePlayer.getAllPlayers()) {
+                    EntityTracker entityTracker = getEntityTracker(enginePlayer);
+                    entityTracker.removeTrackerEntity(entity);
+                    entity.hide(enginePlayer);
+                }
             }
-            return entity.shouldRemove();
+            return shouldRemove;
         });
         tickOnlyEntities.removeIf(TickBase::shouldRemove);
     
