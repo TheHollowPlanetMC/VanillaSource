@@ -3,6 +3,7 @@ package thpmc.vanilla_source.api.contan;
 import org.bukkit.Bukkit;
 import org.contan_lang.ContanEngine;
 import org.contan_lang.thread.ContanTickBasedThread;
+import org.contan_lang.variables.primitive.ContanFunctionExpression;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.util.ThreadUtil;
@@ -34,6 +35,20 @@ public class MainTickThread extends TickThread implements ContanTickBasedThread 
             ThreadUtil.runAtMainThread(future);
             return future.get();
         }
+    }
+    
+    public void runTaskLater(ContanFunctionExpression functionExpression, long delay) {
+        Runnable task = () -> {
+            functionExpression.eval(this, functionExpression.getBasedJavaObject().getFunctionName());
+        };
+        Bukkit.getScheduler().runTaskLater(VanillaSourceAPI.getInstance().getPlugin(), task, delay);
+    }
+    
+    public void runTaskTimer(ContanFunctionExpression functionExpression, long delay, long period) {
+        Runnable task = () -> {
+            functionExpression.eval(this, functionExpression.getBasedJavaObject().getFunctionName());
+        };
+        Bukkit.getScheduler().runTaskTimer(VanillaSourceAPI.getInstance().getPlugin(), task, delay, period);
     }
     
     @Override

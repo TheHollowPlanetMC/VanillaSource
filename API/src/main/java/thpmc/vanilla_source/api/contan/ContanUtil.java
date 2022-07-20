@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.api.contan;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
@@ -45,6 +46,10 @@ public class ContanUtil {
 
         StandardFunctions.FUNCTIONS.put("floor", new Floor(null, new Token(null, "floor", 5, null, null), null));
         contanEngine.setRuntimeVariable("Vector", new JavaClassObject(contanEngine, Vector.class));
+        contanEngine.setRuntimeVariable("Bukkit", new JavaClassObject(contanEngine, Bukkit.class));
+        contanEngine.setRuntimeVariable("World", new JavaClassObject(contanEngine, World.class));
+        contanEngine.setRuntimeVariable("Location", new JavaClassObject(contanEngine, Location.class));
+        contanEngine.setRuntimeVariable("ContanUtil", new JavaClassObject(contanEngine, ContanUtil.class));
     }
     
     public static JavaContanFuture createFutureInstance() {
