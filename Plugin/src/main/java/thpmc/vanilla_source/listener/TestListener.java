@@ -183,7 +183,7 @@ public class TestListener implements Listener {
         }
     }
     
-    @EventHandler
+    //@EventHandler
     public void onPlayerClick(PlayerAnimationEvent event){
         Player player = event.getPlayer();
         if(!player.isSneaking()) return;
