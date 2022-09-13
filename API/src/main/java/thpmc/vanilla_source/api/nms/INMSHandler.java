@@ -1,5 +1,7 @@
 package thpmc.vanilla_source.api.nms;
 
+import org.bukkit.block.Block;
+import thpmc.vanilla_source.api.biome.BiomeDataContainer;
 import thpmc.vanilla_source.api.world.cache.AsyncEngineChunk;
 import thpmc.vanilla_source.api.world.cache.EngineWorld;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
@@ -89,5 +91,15 @@ public interface INMSHandler {
     float getBlockSpeedFactor(EngineWorld world, double x, double y, double z);
     
     float getBlockFrictionFactor(BlockData blockData);
+    
+    Object getNMSBiomeByKey(String key);
+    
+    void setDefaultBiomeData(BiomeDataContainer container);
+    
+    Object createBiome(String name, BiomeDataContainer container);
+    
+    void setBiomeSettings(String name, BiomeDataContainer container);
+    
+    void setBiomeForBlock(Block block, String name);
     
 }

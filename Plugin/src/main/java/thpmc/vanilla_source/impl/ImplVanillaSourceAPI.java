@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.impl;
 
+import be4rjp.artgui.ArtGUI;
 import thpmc.vanilla_source.nms.NMSManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
@@ -19,8 +20,8 @@ public class ImplVanillaSourceAPI extends VanillaSourceAPI {
     //All universes
     private static final Map<String, ParallelUniverse> universeMap = new ConcurrentHashMap<>();
     
-    public ImplVanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads) {
-        super(plugin, nmsHandler, tickRunnerThreads);
+    public ImplVanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads, ArtGUI artGUI) {
+        super(plugin, nmsHandler, tickRunnerThreads, artGUI);
         instance = this;
     }
     

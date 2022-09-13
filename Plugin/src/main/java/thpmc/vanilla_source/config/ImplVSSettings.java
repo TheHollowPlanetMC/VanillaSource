@@ -3,6 +3,7 @@ package thpmc.vanilla_source.config;
 import org.bukkit.configuration.file.YamlConfiguration;
 import thpmc.vanilla_source.VanillaSource;
 import thpmc.vanilla_source.api.setting.VSSettings;
+import thpmc.vanilla_source.lang.SystemLanguage;
 
 import java.io.File;
 
@@ -26,6 +27,7 @@ public class ImplVSSettings extends VSSettings {
         if (yml.contains("jni-library.use-jni-pathfinding")) useJNIPathfinding = yml.getBoolean("jni-library.use-jni-pathfinding");
         if (yml.contains("entity-threads")) entityThreads = yml.getInt("entity-threads");
         if (yml.contains("chiyogami-parallel-bridge")) useChiyogamiParallelBridge = yml.getBoolean("chiyogami-parallel-bridge");
+        if (yml.contains("system-language")) SystemLanguage.setLang(yml.getString("system-language"));
     }
     
 }

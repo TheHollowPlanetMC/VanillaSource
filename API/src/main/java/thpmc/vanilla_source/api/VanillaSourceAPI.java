@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.api;
 
+import be4rjp.artgui.ArtGUI;
 import org.bukkit.Bukkit;
 import org.contan_lang.ContanEngine;
 import thpmc.vanilla_source.api.contan.MainTickThread;
@@ -45,10 +46,12 @@ public abstract class VanillaSourceAPI {
     protected final ContanEngine contanEngine;
     
     protected final MainTickThread mainThread;
+    
+    protected final ArtGUI artGUI;
 
     protected ParallelUniverse defaultUniverse;
     
-    public VanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads){
+    public VanillaSourceAPI(JavaPlugin plugin, INMSHandler nmsHandler, int tickRunnerThreads, ArtGUI artGUI){
         this.javaPlugin = plugin;
         this.nmsHandler = nmsHandler;
         this.tickThreadPool = new TickThreadPool(tickRunnerThreads);
@@ -61,6 +64,8 @@ public abstract class VanillaSourceAPI {
         
         this.contanEngine = new ContanEngine(mainThread, new ArrayList<>(tickThreadPool.getAsyncTickRunnerList()));
         ContanUtil.setUpContan(contanEngine);
+        
+        this.artGUI = artGUI;
     }
     
     /**
@@ -76,7 +81,9 @@ public abstract class VanillaSourceAPI {
     public MainTickThread getMainThread() {return mainThread;}
 
     public ParallelUniverse getDefaultUniverse() {return defaultUniverse;}
-
+    
+    public ArtGUI getArtGUI() {return artGUI;}
+    
     /**
      * Get Contan script engine.
      * @return Singleton {@link ContanEngine} instance.

@@ -176,7 +176,10 @@ public class TickThread implements Runnable, ContanTickBasedThread {
         tickExecutor.shutdown();
     }
 
-    public void start(){MainThreadTimer.instance.addTickRunner(this);}
+    public void start(){
+        this.lastTickMS = System.currentTimeMillis();
+        MainThreadTimer.instance.addTickRunner(this);
+    }
 
     public void tickAtAsync(){
         tickExecutor.submit(() -> {

@@ -124,7 +124,7 @@ public class NodeData {
         Object nmsBlockData2 = chunk.getNMSBlockData(blockX, blockY + 1, blockZ);
         Object nmsBlockData3 = chunk.getNMSBlockData(blockX, blockY - 1, blockZ);
 
-        Function<EngineBlock, Boolean> collideBlockFunction = collideOption.getCollideBlockFunction();
+        Function<EngineBlock, Boolean> collideBlockFunction = collideOption.getBlockCollisionFilter();
         if(collideBlockFunction != null){
             if(nmsBlockData1 != null){
                 if(!collideBlockFunction.apply(new EngineBlock(world, chunk, blockX, blockY, blockZ, nmsBlockData1))){
@@ -171,7 +171,7 @@ public class NodeData {
         Object nmsBlockData1 = chunk.getNMSBlockData(blockX, blockY, blockZ);
         Object nmsBlockData2 = chunk.getNMSBlockData(blockX, blockY + 1, blockZ);
 
-        Function<EngineBlock, Boolean> collideBlockFunction = collideOption.getCollideBlockFunction();
+        Function<EngineBlock, Boolean> collideBlockFunction = collideOption.getBlockCollisionFilter();
         if(collideBlockFunction != null){
             if(nmsBlockData1 != null){
                 if(!collideBlockFunction.apply(new EngineBlock(world, chunk, blockX, blockY, blockZ, nmsBlockData1))){

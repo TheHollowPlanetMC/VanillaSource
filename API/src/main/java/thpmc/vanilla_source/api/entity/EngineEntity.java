@@ -389,21 +389,21 @@ public class EngineEntity implements TickBase {
 
         //apply collision option
         boxList.removeIf(boundingBox -> {
-            if(movementCollideOption.getCollideBoundingBoxFunction() != null){
-                if(!movementCollideOption.getCollideBoundingBoxFunction().apply(boundingBox)){
+            if(movementCollideOption.getBoundingBoxCollisionFilter() != null){
+                if(!movementCollideOption.getBoundingBoxCollisionFilter().apply(boundingBox)){
                     return true;
                 }
             }
-            if(movementCollideOption.getCollideBlockFunction() != null){
+            if(movementCollideOption.getBlockCollisionFilter() != null){
                 if(boundingBox instanceof EngineBlockBoundingBox) {
-                    if (!movementCollideOption.getCollideBlockFunction().apply(((EngineBlockBoundingBox) boundingBox).getBlock())){
+                    if (!movementCollideOption.getBlockCollisionFilter().apply(((EngineBlockBoundingBox) boundingBox).getBlock())){
                         return true;
                     }
                 }
             }
-            if(movementCollideOption.getCollideEntityFunction() != null){
+            if(movementCollideOption.getEntityCollisionFilter() != null){
                 if(boundingBox instanceof EngineEntityBoundingBox){
-                    return !movementCollideOption.getCollideEntityFunction().apply(((EngineEntityBoundingBox) boundingBox).getEntity());
+                    return !movementCollideOption.getEntityCollisionFilter().apply(((EngineEntityBoundingBox) boundingBox).getEntity());
                 }
             }
             return false;

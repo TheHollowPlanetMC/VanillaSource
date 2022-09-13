@@ -1,6 +1,7 @@
 package thpmc.vanilla_source;
 
 import be4rjp.artgui.ArtGUI;
+import thpmc.vanilla_source.api.biome.BiomeStore;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.tick.MainThreadTimer;
 import thpmc.vanilla_source.api.player.EnginePlayer;
@@ -47,17 +48,22 @@ public final class VanillaSource extends JavaPlugin {
         NMSManager.setup();
         
         NativeManager.registerBlocksForNative();
+    
+        //Setup gui
+        artGUI = new ArtGUI(this);
         
         //Create api instance
-        api = new ImplVanillaSourceAPI(this, NMSManager.getNMSHandler(), ImplVSSettings.getEntityThreads());
+        api = new ImplVanillaSourceAPI(this, NMSManager.getNMSHandler(), ImplVSSettings.getEntityThreads(), artGUI);
+    
+        //Load biomes
+        BiomeStore.importVanillaBiomes();
+        BiomeStore.loadCustomBiomes();
         
         //Start async tick runners
         TaskHandler.runSync(() -> {
             MainThreadTimer.instance.runTaskTimer(this, 0, 1);
             api.startAsyncThreads();
         });
-
-        artGUI = new ArtGUI(this);
 
         
     

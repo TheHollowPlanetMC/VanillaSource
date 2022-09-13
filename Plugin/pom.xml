@@ -130,12 +130,6 @@
             <version>5.0.9</version>
         </dependency>
         <dependency>
-            <groupId>com.github.Be4rJP</groupId>
-            <artifactId>ArtGUI</artifactId>
-            <version>3146ff51b7</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>thpmc</groupId>
             <artifactId>vanilla_source_api</artifactId>
             <type>jar</type>

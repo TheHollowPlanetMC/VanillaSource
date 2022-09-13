@@ -1,5 +1,13 @@
 package thpmc.vanilla_source.listener;
 
+import be4rjp.artgui.ArtGUI;
+import be4rjp.artgui.button.*;
+import be4rjp.artgui.frame.ArtFrame;
+import be4rjp.artgui.frame.Artist;
+import be4rjp.artgui.menu.ArtMenu;
+import be4rjp.artgui.menu.HistoryData;
+import be4rjp.artgui.menu.MenuHistory;
+import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -7,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.contan_lang.ContanModule;
 import thpmc.vanilla_source.VanillaSource;
+import thpmc.vanilla_source.api.biome.BiomeDataContainer;
 import thpmc.vanilla_source.api.camera.Bezier3DPositions;
 import thpmc.vanilla_source.api.camera.CameraHandler;
 import thpmc.vanilla_source.api.camera.CameraPositionAt;
@@ -34,10 +43,7 @@ import thpmc.vanilla_source.api.nms.INMSHandler;
 import thpmc.vanilla_source.api.nms.entity.NMSEntityController;
 import thpmc.vanilla_source.api.util.collision.CollideOption;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class TestListener implements Listener {
@@ -183,19 +189,121 @@ public class TestListener implements Listener {
         }
     }
     
-    //@EventHandler
+    
+    private final Set<String> names = new HashSet<>();
+    
+    Color color = Color.BLUE;
+    boolean flag = false;
+    
+    @EventHandler
     public void onPlayerClick(PlayerAnimationEvent event){
         Player player = event.getPlayer();
         if(!player.isSneaking()) return;
-        
+    
         VanillaSourceAPI api = VanillaSourceAPI.getInstance();
-        EngineWorld world = api.getDefaultUniverse().getWorld("world");
-        Location loc = player.getLocation();
-        EntityController controller = api.getNMSHandler().createNMSEntityController(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), EntityType.DROPPED_ITEM, new ItemStack(Material.STONE));
-        EngineEntity entity = new EngineEntity(world, controller, api.getTickThreadPool().getNextTickThread(), null);
-        entity.setVelocity(player.getEyeLocation().getDirection().normalize().multiply(0.5));
-        entity.setAutoClimbHeight(0.0F);
-        entity.spawn();
+        INMSHandler nmsHandler = api.getNMSHandler();
+    
+        BiomeDataContainer container = new BiomeDataContainer();
+        nmsHandler.setDefaultBiomeData(container);
+        container.fogColorRGB = color.asRGB();
+        container.skyColorRGB = color.asRGB();
+        color = Color.GREEN;
+        container.particle = Particle.valueOf("ASH");
+        
+        if (!flag) {
+            nmsHandler.createBiome("test", container);
+            flag = true;
+            player.sendMessage("1");
+        } else {
+            nmsHandler.setBiomeSettings("test", container);
+            player.sendMessage("2");
+        }
+        nmsHandler.setBiomeForBlock(player.getLocation().getBlock(), "test");
+        
+        if (true) {
+            return;
+        }
+        
+        //Artistクラスのインスタンスを作成
+        //GUIの大きさと全てのページに配置するボタンを定義する
+        //ここで定義したボタンは全てのページで表示されます
+        Artist artist = new Artist(() -> {
+        
+            //nullを指定すると空白になりアイテムを配置したりできるようになる
+            ArtButton V = null;
+            //ボタンを作成
+            ArtButton G = new ArtButton(new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&a").build());
+        
+            //ページ移動用ボタンを作成
+            PageNextButton N = new PageNextButton(new ItemBuilder(Material.ARROW).name("&r次のページ &7[{NextPage}/{MaxPage}]").build());
+        
+            //ページ移動用ボタンを作成
+            PageBackButton P = new PageBackButton(new ItemBuilder(Material.ARROW).name("&r前のページ &7[{PreviousPage}/{MaxPage}]").build());
+            //戻るボタンを作成
+            //もしこのGUIを開く前に別のGUIを開いていた場合はそのGUIに戻ります
+            MenuBackButton B = new MenuBackButton(new ItemBuilder(Material.OAK_DOOR).name("&r{PreviousName}&7に戻る").build());
+            
+            ArtButton C = new ArtButton(new ItemBuilder(Material.COMMAND_BLOCK).name("&n作成").build()).listener((e, menu) -> {
+                HistoryData historyData = HistoryData.getHistoryData(VanillaSource.getPlugin().getArtGUI(), player);
+                historyData.clearOnClose = false;
+                
+                new AnvilGUI.Builder()
+                        .onClose(p -> {                                               //called when the inventory is closing
+                            player.sendMessage("You closed the inventory.");
+                        })
+                        .onComplete((p, text) -> {                                    //called when the inventory output slot is clicked
+                            names.add(text);
+                            Bukkit.getScheduler().runTaskLater(VanillaSource.getPlugin(), () -> {
+                                historyData.clearOnClose = true;
+                                MenuHistory history = historyData.getCurrentMenu();
+                                if (history == null){
+                                    player.sendMessage("NULL!!");
+                                    return;
+                                }
+                                history.getArtMenu().open(player);
+                                player.sendMessage("OPEN!");
+                            }, 1);
+                            return AnvilGUI.Response.close();
+                        })
+                        .preventClose()                                                    //prevents the inventory from being closed
+                        .text("")                              //sets the text the GUI should start with
+                        .itemLeft(new ItemStack(Material.PAPER))                      //use a custom item for the first slot//use a custom item for the second slot
+                        .onLeftInputClick(p -> player.sendMessage("first sword"))     //called when the left input slot is clicked
+                        .title("Enter your answer.")                                       //set the title of the GUI (only works in 1.14+)
+                        .plugin(VanillaSource.getPlugin())                                          //set the plugin instance
+                        .open(player);
+            });
+        
+            //現在のページを表示するボタンを作成
+            //ReplaceableButtonを継承したボタンの名前は特定の文字列が置き換わるようになります
+            //詳細はReplaceNameManagerを参照
+            ReplaceableButton I = new ReplaceableButton(new ItemBuilder(Material.NAME_TAG).name("&7現在のページ&r[{CurrentPage}/{MaxPage}]").build());
+        
+            //配列として視覚的に表記
+            //配列の長さは必ず9の倍数である必要があります
+            return new ArtButton[]{
+                    V, V, V, V, V, V, V, G, G,
+                    V, V, V, V, V, V, V, G, N,
+                    V, V, V, V, V, V, V, G, I,
+                    V, V, V, V, V, V, V, G, P,
+                    V, V, V, V, V, V, V, G, C,
+                    V, V, V, V, V, V, V, G, B,
+            };
+        });
+    
+        //GUIを作成
+        ArtMenu artMenu = artist.createMenu(VanillaSource.getPlugin().getArtGUI(), "&nテストGUI&r [{CurrentPage}/{MaxPage}]");
+    
+        //非同期でアイテムを配置
+        //GUIを開くたびに実行されます
+        artMenu.asyncCreate(menu -> {
+            for (String name : names) {
+                menu.addButton(new ArtButton(new ItemBuilder(Material.MUSIC_DISC_11).name("&r&n" + name).build()));
+            }
+        });
+    
+        //GUIを開く
+        artMenu.open(player);
         
         /*
         Location loc = player.getLocation();

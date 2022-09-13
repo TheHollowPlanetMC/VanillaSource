@@ -74,6 +74,28 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <relocations>
+                <relocation>
+                  <pattern>net.wesjd.anvilgui</pattern>
+                  <shadedPattern>thpmc.vanilla_source.anvilgui</shadedPattern>
+                </relocation>
+              </relocations>
+              <minimizeJar>false</minimizeJar>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -102,6 +124,10 @@
     <repository>
       <id>github</id>
       <url>https://maven.pkg.github.com/Be4rJP/Contan</url>
+    </repository>
+    <repository>
+      <id>codemc-snapshots</id>
+      <url>https://repo.codemc.io/repository/maven-snapshots/</url>
     </repository>
   </repositories>
 
@@ -145,6 +171,17 @@
       <groupId>com.github.Be4rJP</groupId>
       <artifactId>Contan</artifactId>
       <version>c81739fb66</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.wesjd</groupId>
+      <artifactId>anvilgui</artifactId>
+      <version>1.5.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.bea4dev</groupId>
+      <artifactId>ArtGUI</artifactId>
+      <version>c97620ebed</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>

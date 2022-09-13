@@ -1,6 +1,7 @@
 package thpmc.vanilla_source.nms.v1_15_R1;
 
 import org.bukkit.util.NumberConversions;
+import thpmc.vanilla_source.api.biome.BiomeDataContainer;
 import thpmc.vanilla_source.api.world.cache.AsyncEngineChunk;
 import thpmc.vanilla_source.api.world.cache.EngineWorld;
 import thpmc.vanilla_source.api.world.parallel.ParallelChunk;
@@ -247,6 +248,31 @@ public class NMSHandler implements INMSHandler {
     public float getBlockFrictionFactor(BlockData blockData) {
         IBlockData iBlockData = (IBlockData) this.getIBlockData(blockData);
         return iBlockData.getBlock().l();
+    }
+    
+    @Override
+    public Object getNMSBiomeByKey(String key) {
+        return null;
+    }
+    
+    @Override
+    public void setDefaultBiomeData(BiomeDataContainer container) {
+        //None
+    }
+    
+    @Override
+    public Object createBiome(String name, BiomeDataContainer container) {
+        return null;
+    }
+    
+    @Override
+    public void setBiomeSettings(String name, BiomeDataContainer container) {
+        //None
+    }
+    
+    @Override
+    public void setBiomeForBlock(org.bukkit.block.Block block, String name) {
+        //None
     }
     
     @Override

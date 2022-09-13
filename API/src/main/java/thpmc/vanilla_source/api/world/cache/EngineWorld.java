@@ -297,21 +297,21 @@ public interface EngineWorld extends IWorld {
                 boundingBox = (EngineBoundingBox) boundingBox.clone().expand(collideOption.getBoundingBoxGrow());
             }
             
-            if(collideOption.getCollideBoundingBoxFunction() != null){
-                if(!collideOption.getCollideBoundingBoxFunction().apply(boundingBox)){
+            if(collideOption.getBoundingBoxCollisionFilter() != null){
+                if(!collideOption.getBoundingBoxCollisionFilter().apply(boundingBox)){
                     continue;
                 }
             }
-            if(collideOption.getCollideBlockFunction() != null){
+            if(collideOption.getBlockCollisionFilter() != null){
                 if(boundingBox instanceof EngineBlockBoundingBox){
-                    if(!collideOption.getCollideBlockFunction().apply(((EngineBlockBoundingBox) boundingBox).getBlock())){
+                    if(!collideOption.getBlockCollisionFilter().apply(((EngineBlockBoundingBox) boundingBox).getBlock())){
                         continue;
                     }
                 }
             }
-            if(collideOption.getCollideEntityFunction() != null){
+            if(collideOption.getEntityCollisionFilter() != null){
                 if(boundingBox instanceof EngineEntityBoundingBox){
-                    if(!collideOption.getCollideEntityFunction().apply(((EngineEntityBoundingBox) boundingBox).getEntity())){
+                    if(!collideOption.getEntityCollisionFilter().apply(((EngineEntityBoundingBox) boundingBox).getEntity())){
                         continue;
                     }
                 }
