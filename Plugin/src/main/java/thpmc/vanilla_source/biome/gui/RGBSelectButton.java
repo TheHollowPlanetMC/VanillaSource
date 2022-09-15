@@ -3,7 +3,11 @@ package thpmc.vanilla_source.biome.gui;
 import be4rjp.artgui.button.*;
 import be4rjp.artgui.frame.Artist;
 import be4rjp.artgui.menu.ArtMenu;
+import be4rjp.artgui.menu.HistoryData;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import thpmc.vanilla_source.VanillaSource;
@@ -15,21 +19,18 @@ import java.util.function.Consumer;
 @SuppressWarnings("ConstantConditions")
 public class RGBSelectButton extends ArtButton {
     
-    private Consumer<Integer> onInput = null;
-    
-    public RGBSelectButton(ItemStack itemStack) {
+    public RGBSelectButton(ItemStack itemStack, Consumer<Integer> onInput) {
         super(itemStack);
         
         listener((event, menu) -> {
-        
+            HumanEntity humanEntity = event.getWhoClicked();
+            if (!(humanEntity instanceof Player)) {
+                return;
+            }
+            
+            openRGBSelectGUI((Player) humanEntity, onInput);
         });
     }
-    
-    public RGBSelectButton onInput(Consumer<Integer> onInput) {
-        this.onInput = onInput;
-        return this;
-    }
-    
     
     
     public static void openRGBSelectGUI(Player player, Consumer<Integer> onInput) {
@@ -68,14 +69,57 @@ public class RGBSelectButton extends ArtButton {
                 try {
                     int rgb = Integer.parseInt(text, 16);
                     onInput.accept(rgb);
-                    return null;
+                    return "back";
                 } catch (NumberFormatException e) {
                     return "Invalid color code!";
                 }
             });
+            menu.addButton(inputButton);
+            
+            menu.addButton(new ColorButton(Material.WHITE_WOOL, Color.WHITE, SystemLanguage.getText("color-white"), onInput));
+            menu.addButton(new ColorButton(Material.BLACK_WOOL, Color.BLACK, SystemLanguage.getText("color-black"), onInput));
+            menu.addButton(new ColorButton(Material.BLUE_WOOL, Color.BLUE, SystemLanguage.getText("color-blue"), onInput));
+            menu.addButton(new ColorButton(Material.BROWN_WOOL, "#56331C", SystemLanguage.getText("color-brown"), onInput));
+            menu.addButton(new ColorButton(Material.CYAN_WOOL, "#267191", SystemLanguage.getText("color-cyan"), onInput));
+            menu.addButton(new ColorButton(Material.GRAY_WOOL, Color.GRAY, SystemLanguage.getText("color-gray"), onInput));
+            menu.addButton(new ColorButton(Material.GREEN_WOOL, Color.GREEN, SystemLanguage.getText("color-green"), onInput));
+            menu.addButton(new ColorButton(Material.LIGHT_BLUE_WOOL, "#6387D2", SystemLanguage.getText("color-light-blue"), onInput));
+            menu.addButton(new ColorButton(Material.LIGHT_GRAY_WOOL, "#A0A7A7", SystemLanguage.getText("color-light-gray"), onInput));
+            menu.addButton(new ColorButton(Material.LIME_WOOL, Color.LIME, SystemLanguage.getText("color-lime"), onInput));
+            menu.addButton(new ColorButton(Material.MAGENTA_WOOL, "#BE49C9", SystemLanguage.getText("color-magenta"), onInput));
+            menu.addButton(new ColorButton(Material.ORANGE_WOOL, Color.ORANGE, SystemLanguage.getText("color-orange"), onInput));
+            menu.addButton(new ColorButton(Material.PINK_WOOL, "#D98199", SystemLanguage.getText("color-pink"), onInput));
+            menu.addButton(new ColorButton(Material.PURPLE_WOOL, Color.PURPLE, SystemLanguage.getText("color-purple"), onInput));
+            menu.addButton(new ColorButton(Material.RED_WOOL, Color.RED, SystemLanguage.getText("color-red"), onInput));
+            menu.addButton(new ColorButton(Material.YELLOW_WOOL, Color.YELLOW, SystemLanguage.getText("color-yellow"), onInput));
         });
     
         artMenu.open(player);
+    }
+    
+    
+    static class ColorButton extends ArtButton {
+        
+        public ColorButton(Material woolMaterial, Color color, String name, Consumer<Integer> onInput) {
+            super(new ItemBuilder(woolMaterial).name(ChatColor.of("#" + Integer.toHexString(color.asRGB())) + "&n" + name)
+                    .lore("&r&7RGB : #" + Integer.toHexString(color.asRGB())).build());
+            listener((event, menu) -> {
+                onInput.accept(color.asBGR());
+                HumanEntity humanEntity = event.getWhoClicked();
+                if (!(humanEntity instanceof Player)) {
+                    return;
+                }
+                HistoryData historyData = HistoryData.getHistoryData(menu.getArtMenu().getArtGUI(), (Player) humanEntity);
+                if (historyData != null) {
+                    historyData.back();
+                }
+            });
+        }
+    
+        public ColorButton(Material woolMaterial, String rgb, String name, Consumer<Integer> onInput) {
+            this(woolMaterial, Color.fromRGB(Integer.parseInt(rgb.replace("#", ""), 16)), name, onInput);
+        }
+        
     }
     
 }

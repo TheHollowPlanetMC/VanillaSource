@@ -31,14 +31,26 @@ public class BiomeDataContainer {
     
     
     public static enum TemperatureAttribute {
-        NORMAL,
-        FROZEN
+        NORMAL("gui-temperature-attribute-normal"),
+        FROZEN("gui-temperature-attribute-frozen");
+        
+        public final String name;
+    
+        TemperatureAttribute(String name) {
+            this.name = name;
+        }
     }
     
     public static enum GrassColorAttribute {
-        NORMAL,
-        DARK_FOREST,
-        SWAMP
+        NORMAL("gui-grass-color-attribute-normal"),
+        DARK_FOREST("gui-grass-color-attribute-dark-forest"),
+        SWAMP("gui-grass-color-attribute-swamp");
+    
+        public final String name;
+    
+        GrassColorAttribute(String name) {
+            this.name = name;
+        }
     }
 
 }

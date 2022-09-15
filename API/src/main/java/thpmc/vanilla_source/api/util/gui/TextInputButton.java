@@ -32,6 +32,13 @@ public class TextInputButton extends ArtButton {
                     if (inputListener != null) {
                         String incorrectText = inputListener.onInput(p, text);
                         if (incorrectText != null) {
+                            if (incorrectText.equals("back")) {
+                                Bukkit.getScheduler().runTaskLater(VanillaSourceAPI.getInstance().getPlugin(), () -> {
+                                    historyData.clearOnClose = true;
+                                    historyData.back();
+                                }, 1);
+                                return AnvilGUI.Response.close();
+                            }
                             return AnvilGUI.Response.text(incorrectText);
                         }
                     }

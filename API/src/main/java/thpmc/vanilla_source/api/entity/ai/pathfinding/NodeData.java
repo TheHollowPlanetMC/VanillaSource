@@ -118,7 +118,6 @@ public class NodeData {
     
     public static boolean canStand(EngineWorld world, int blockX, int blockY, int blockZ, CollideOption collideOption){
         EngineChunk chunk = world.getChunkAt(blockX >> 4, blockZ >> 4);
-        if(chunk == null) return false;
         
         Object nmsBlockData1 = chunk.getNMSBlockData(blockX, blockY, blockZ);
         Object nmsBlockData2 = chunk.getNMSBlockData(blockX, blockY + 1, blockZ);
@@ -164,7 +163,6 @@ public class NodeData {
     
     public static boolean isTraversable(EngineWorld world, int blockX, int blockY, int blockZ, CollideOption collideOption){
         EngineChunk chunk = world.getChunkAt(blockX >> 4, blockZ >> 4);
-        if(chunk == null) return false;
     
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
         
