@@ -30,8 +30,9 @@ public class SystemLanguage {
             throw new IllegalStateException("File IO error.");
         }
         if (files.length == 0) {
-            VanillaSource.getPlugin().saveResource("en_US.yml", false);
-            VanillaSource.getPlugin().saveResource("ja_JP.yml", false);
+            VanillaSource.getPlugin().saveResource("lang/en_US.yml", false);
+            VanillaSource.getPlugin().saveResource("lang/ja_JP.yml", false);
+            files = dir.listFiles();
         }
     
         for (File file : files) {

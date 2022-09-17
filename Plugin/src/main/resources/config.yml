@@ -1,4 +1,4 @@
-# The language to be used within the plugin.
+# The language to be used within this plugin.
 system-language: 'en_US'
 
 # Setting of how many asynchronous entity threads to use.

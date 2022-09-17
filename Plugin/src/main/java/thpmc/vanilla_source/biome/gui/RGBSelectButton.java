@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("ConstantConditions")
 public class RGBSelectButton extends ArtButton {
     
-    public RGBSelectButton(ItemStack itemStack, Consumer<Integer> onInput) {
+    public RGBSelectButton(ItemStack itemStack, boolean nullable, Consumer<Integer> onInput) {
         super(itemStack);
         
         listener((event, menu) -> {
@@ -28,12 +28,16 @@ public class RGBSelectButton extends ArtButton {
                 return;
             }
             
-            openRGBSelectGUI((Player) humanEntity, onInput);
+            openRGBSelectGUI((Player) humanEntity, nullable, onInput);
         });
     }
     
+    public RGBSelectButton(ItemStack itemStack, Consumer<Integer> onInput) {
+        this(itemStack, false, onInput);
+    }
     
-    public static void openRGBSelectGUI(Player player, Consumer<Integer> onInput) {
+    
+    public static void openRGBSelectGUI(Player player, boolean nullable, Consumer<Integer> onInput) {
         Artist artist = new Artist(() -> {
             ArtButton V = null;
             ArtButton G = new ArtButton(new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&a").build());
@@ -61,6 +65,15 @@ public class RGBSelectButton extends ArtButton {
         ArtMenu artMenu = artist.createMenu(VanillaSource.getPlugin().getArtGUI(), SystemLanguage.getText("gui-select-color"));
     
         artMenu.asyncCreate(menu -> {
+            if (nullable) {
+                menu.addButton(new ArtButton(new ItemBuilder(Material.BARRIER).name(SystemLanguage.getText("gui-rgb-none")).build())
+                        .listener((e, m) -> {
+                            onInput.accept(null);
+                            HistoryData historyData = HistoryData.getHistoryData(VanillaSource.getPlugin().getArtGUI(), player);
+                            historyData.back();
+                        }));
+            }
+            
             ItemStack inputButtonItem = new ItemBuilder(Material.NAME_TAG).name(SystemLanguage.getText("gui-input-rgb")).build();
             String title = SystemLanguage.getText("gui-select-color");
             String defaultText = "#FFFFFF";
@@ -101,8 +114,8 @@ public class RGBSelectButton extends ArtButton {
     static class ColorButton extends ArtButton {
         
         public ColorButton(Material woolMaterial, Color color, String name, Consumer<Integer> onInput) {
-            super(new ItemBuilder(woolMaterial).name(ChatColor.of("#" + Integer.toHexString(color.asRGB())) + "&n" + name)
-                    .lore("&r&7RGB : #" + Integer.toHexString(color.asRGB())).build());
+            super(new ItemBuilder(woolMaterial).name(ChatColor.of("#" + String.format("%06x", color.asRGB())) + "&n" + name)
+                    .lore("&r&7RGB : #" + String.format("%06x", color.asRGB())).build());
             listener((event, menu) -> {
                 onInput.accept(color.asBGR());
                 HumanEntity humanEntity = event.getWhoClicked();

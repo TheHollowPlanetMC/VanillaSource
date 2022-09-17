@@ -8,6 +8,7 @@ import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.command.CommandRegistry;
 import thpmc.vanilla_source.config.ImplVSSettings;
 import thpmc.vanilla_source.contan.ContanManager;
+import thpmc.vanilla_source.lang.SystemLanguage;
 import thpmc.vanilla_source.listener.PlayerJoinQuitListener;
 import thpmc.vanilla_source.command.ParallelCommandExecutor;
 import thpmc.vanilla_source.natives.NativeManager;
@@ -38,6 +39,9 @@ public final class VanillaSource extends JavaPlugin {
         
         //Load config
         ImplVSSettings.load();
+        
+        //Load language files
+        SystemLanguage.loadTexts();
         
         //Load native library
         NativeManager.loadNativeLibrary();
@@ -111,6 +115,8 @@ public final class VanillaSource extends JavaPlugin {
         if(api != null) api.stopAsyncThreads();
         
         CommandRegistry.unregister();
+        
+        BiomeStore.saveCustomBiomes();
     }
     
     

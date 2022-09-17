@@ -38,6 +38,8 @@ public class TextInputButton extends ArtButton {
                                     historyData.back();
                                 }, 1);
                                 return AnvilGUI.Response.close();
+                            } else if (incorrectText.equals("close")) {
+                                return AnvilGUI.Response.close();
                             }
                             return AnvilGUI.Response.text(incorrectText);
                         }

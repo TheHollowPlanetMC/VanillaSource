@@ -30,6 +30,39 @@ public class BiomeDataContainer {
     public float particleAmount = 0.1F;
     
     
+    public BiomeDataContainer clone() {
+        BiomeDataContainer container = new BiomeDataContainer();
+        container.temperatureAttribute = this.temperatureAttribute;
+        container.grassColorAttribute = this.grassColorAttribute;
+        container.fogColorRGB = this.fogColorRGB;
+        container.waterColorRGB = this.waterColorRGB;
+        container.waterFogColorRGB = this.waterFogColorRGB;
+        container.skyColorRGB = this.skyColorRGB;
+        container.foliageColorRGB = this.foliageColorRGB;
+        container.grassBlockColorRGB = this.grassBlockColorRGB;
+        container.environmentSound = this.environmentSound;
+        container.particle = this.particle;
+        container.particleData = this.particleData;
+        container.particleAmount = this.particleAmount;
+        return container;
+    }
+    
+    public void write(BiomeDataContainer container) {
+        this.temperatureAttribute = container.temperatureAttribute;
+        this.grassColorAttribute = container.grassColorAttribute;
+        this.fogColorRGB = container.fogColorRGB;
+        this.waterColorRGB = container.waterColorRGB;
+        this.waterFogColorRGB = container.waterFogColorRGB;
+        this.skyColorRGB = container.skyColorRGB;
+        this.foliageColorRGB = container.foliageColorRGB;
+        this.grassBlockColorRGB = container.grassBlockColorRGB;
+        this.environmentSound = container.environmentSound;
+        this.particle = container.particle;
+        this.particleData = container.particleData;
+        this.particleAmount = container.particleAmount;
+    }
+    
+    
     public static enum TemperatureAttribute {
         NORMAL("gui-temperature-attribute-normal"),
         FROZEN("gui-temperature-attribute-frozen");

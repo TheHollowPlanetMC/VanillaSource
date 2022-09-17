@@ -50,6 +50,19 @@ public class CustomBiome extends BiomeSource {
         }
         if (yml.contains("particle-data")) {
             String particleDataString = yml.getString("particle-data");
+            setParticleData(container, Objects.requireNonNull(particleDataString));
+        }
+        
+        String name = file.getName().replace(".yml", "");
+        Object nmsBiome = VanillaSourceAPI.getInstance().getNMSHandler().createBiome(name, container);
+        
+        return new CustomBiome("custom:" + name, nmsBiome, container, file);
+    }
+    
+    public static void setParticleData(BiomeDataContainer container, String particleString) {
+        if (particleString.contains(":")) {
+            container.particle = Particle.valueOf(particleString.split(":")[0]);
+            String particleDataString = particleString.split(":")[1];
             String[] args = Objects.requireNonNull(particleDataString).split(":");
             switch (args[0]) {
                 case "ITEM":
@@ -63,12 +76,32 @@ public class CustomBiome extends BiomeSource {
                     container.particleData = new Particle.DustOptions(Color.fromRGB(rgb), Float.parseFloat(args[2]));
                     break;
             }
+        } else {
+            container.particle = Particle.valueOf(particleString);
         }
-        
-        String name = yml.getString("name");
-        Object nmsBiome = VanillaSourceAPI.getInstance().getNMSHandler().createBiome(name, container);
-        
-        return new CustomBiome("custom:" + name, nmsBiome, container, file);
+    }
+    
+    public static String getParticleDataString(BiomeDataContainer container) {
+        if (container.particleData != null) {
+            String arg2 = "";
+            Object particleData = container.particleData;
+            if (particleData instanceof ItemStack) {
+                ItemStack itemStack = (ItemStack) particleData;
+                arg2 = "ITEM:" + itemStack.getType();
+            } else if (particleData instanceof BlockData) {
+                BlockData blockData = (BlockData) particleData;
+                arg2 = "BLOCK:" + blockData.getMaterial();
+            } else if (particleData instanceof Particle.DustOptions) {
+                Particle.DustOptions dustOptions = (Particle.DustOptions) particleData;
+                String rgb = "#" + String.format("%06x", dustOptions.getColor().asRGB());
+                String size = String.valueOf(dustOptions.getSize());
+                arg2 = "DUST:" + rgb + ":" + size;
+            } else {
+                return container.particle.toString();
+            }
+            return container.particle + ":" + arg2;
+        }
+        return "NULL";
     }
     
     
@@ -95,16 +128,16 @@ public class CustomBiome extends BiomeSource {
         
         yml.set("temperature-attribute", biomeDataContainer.temperatureAttribute.toString());
         yml.set("grass-color-attribute", biomeDataContainer.grassColorAttribute.toString());
-        yml.set("fog-color", "#" + Integer.toHexString(biomeDataContainer.fogColorRGB));
-        yml.set("water-color", "#" + Integer.toHexString(biomeDataContainer.waterColorRGB));
-        yml.set("water-fog-color", "#" + Integer.toHexString(biomeDataContainer.waterFogColorRGB));
-        yml.set("sky-color", "#" + Integer.toHexString(biomeDataContainer.skyColorRGB));
+        yml.set("fog-color", "#" + String.format("%06x", biomeDataContainer.fogColorRGB));
+        yml.set("water-color", "#" + String.format("%06x", biomeDataContainer.waterColorRGB));
+        yml.set("water-fog-color", "#" + String.format("%06x", biomeDataContainer.waterFogColorRGB));
+        yml.set("sky-color", "#" + String.format("%06x", biomeDataContainer.skyColorRGB));
         
         if (biomeDataContainer.foliageColorRGB != null) {
-            yml.set("foliage-color", "#" + Integer.toHexString(biomeDataContainer.foliageColorRGB));
+            yml.set("foliage-color", "#" + String.format("%06x", biomeDataContainer.foliageColorRGB));
         }
         if (biomeDataContainer.grassBlockColorRGB != null) {
-            yml.set("grass-block-color", "#" + Integer.toHexString(biomeDataContainer.grassBlockColorRGB));
+            yml.set("grass-block-color", "#" + String.format("%06x", biomeDataContainer.grassBlockColorRGB));
         }
         if (biomeDataContainer.environmentSound != null) {
             yml.set("environment-sound", biomeDataContainer.environmentSound.toString());
@@ -121,7 +154,7 @@ public class CustomBiome extends BiomeSource {
                     yml.set("particle-data", "BLOCK:" + blockData.getMaterial());
                 } else if (particleData instanceof Particle.DustOptions) {
                     Particle.DustOptions dustOptions = (Particle.DustOptions) particleData;
-                    String rgb = "#" + Integer.toHexString(dustOptions.getColor().asRGB());
+                    String rgb = "#" + String.format("%06x", dustOptions.getColor().asRGB());
                     String size = String.valueOf(dustOptions.getSize());
                     yml.set("particle-data", "DUST:" + rgb + ":" + size);
                 }

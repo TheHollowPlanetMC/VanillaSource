@@ -30,6 +30,7 @@ import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.util.math.BezierCurve3D;
 import thpmc.vanilla_source.api.util.math.EasingBezier2D;
 import thpmc.vanilla_source.api.world.cache.EngineWorld;
+import thpmc.vanilla_source.biome.gui.BiomeGUI;
 import thpmc.vanilla_source.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.entity.EntityType;
@@ -203,6 +204,9 @@ public class TestListener implements Listener {
         VanillaSourceAPI api = VanillaSourceAPI.getInstance();
         INMSHandler nmsHandler = api.getNMSHandler();
     
+        BiomeGUI.openBiomeSelectGUI(player, "&nバイオームを選択", biomeSource -> System.out.println(biomeSource.getKey()));
+    
+        /*
         BiomeDataContainer container = new BiomeDataContainer();
         nmsHandler.setDefaultBiomeData(container);
         container.fogColorRGB = color.asRGB();
@@ -303,7 +307,7 @@ public class TestListener implements Listener {
         });
     
         //GUIを開く
-        artMenu.open(player);
+        artMenu.open(player);*/
         
         /*
         Location loc = player.getLocation();

@@ -48,5 +48,9 @@ public class BiomeStore {
     public static BiomeSource getVanillaBiome(String key) {return vanillaBiomeMap.get(key);}
     
     public static CustomBiome getCustomBiome(String key) {return customBiomeMap.get(key);}
+    
+    public static void registerCustomBiome(CustomBiome customBiome) {
+        customBiomeMap.put(customBiome.getKey(), customBiome);
+    }
 
 }
