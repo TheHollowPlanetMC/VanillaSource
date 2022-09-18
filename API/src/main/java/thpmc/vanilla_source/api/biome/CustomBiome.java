@@ -82,24 +82,27 @@ public class CustomBiome extends BiomeSource {
     }
     
     public static String getParticleDataString(BiomeDataContainer container) {
-        if (container.particleData != null) {
-            String arg2 = "";
-            Object particleData = container.particleData;
-            if (particleData instanceof ItemStack) {
-                ItemStack itemStack = (ItemStack) particleData;
-                arg2 = "ITEM:" + itemStack.getType();
-            } else if (particleData instanceof BlockData) {
-                BlockData blockData = (BlockData) particleData;
-                arg2 = "BLOCK:" + blockData.getMaterial();
-            } else if (particleData instanceof Particle.DustOptions) {
-                Particle.DustOptions dustOptions = (Particle.DustOptions) particleData;
-                String rgb = "#" + String.format("%06x", dustOptions.getColor().asRGB());
-                String size = String.valueOf(dustOptions.getSize());
-                arg2 = "DUST:" + rgb + ":" + size;
-            } else {
-                return container.particle.toString();
+        if (container.particle != null) {
+            if (container.particleData != null) {
+                String arg2 = "";
+                Object particleData = container.particleData;
+                if (particleData instanceof ItemStack) {
+                    ItemStack itemStack = (ItemStack) particleData;
+                    arg2 = "ITEM:" + itemStack.getType();
+                } else if (particleData instanceof BlockData) {
+                    BlockData blockData = (BlockData) particleData;
+                    arg2 = "BLOCK:" + blockData.getMaterial();
+                } else if (particleData instanceof Particle.DustOptions) {
+                    Particle.DustOptions dustOptions = (Particle.DustOptions) particleData;
+                    String rgb = "#" + String.format("%06x", dustOptions.getColor().asRGB());
+                    String size = String.valueOf(dustOptions.getSize());
+                    arg2 = "DUST:" + rgb + ":" + size;
+                } else {
+                    return container.particle.toString();
+                }
+                return container.particle + ":" + arg2;
             }
-            return container.particle + ":" + arg2;
+            return container.particle.toString();
         }
         return "NULL";
     }

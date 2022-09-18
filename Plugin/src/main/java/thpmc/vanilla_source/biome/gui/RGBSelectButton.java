@@ -117,7 +117,7 @@ public class RGBSelectButton extends ArtButton {
             super(new ItemBuilder(woolMaterial).name(ChatColor.of("#" + String.format("%06x", color.asRGB())) + "&n" + name)
                     .lore("&r&7RGB : #" + String.format("%06x", color.asRGB())).build());
             listener((event, menu) -> {
-                onInput.accept(color.asBGR());
+                onInput.accept(color.asRGB());
                 HumanEntity humanEntity = event.getWhoClicked();
                 if (!(humanEntity instanceof Player)) {
                     return;

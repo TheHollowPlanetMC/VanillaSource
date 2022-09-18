@@ -186,21 +186,22 @@ public class BiomeGUI {
     
     
     public static void openCustomBiomeEditor(Player player, CustomBiome customBiome) {
+        BiomeDataContainer original = customBiome.getBiomeData();
+        BiomeDataContainer newContainer = original.clone();
+        
         Artist artist = new Artist(() -> {
+            ArtButton V = null;
             ArtButton G = new ArtButton(new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&a").build());
             ArtButton H = new ArtButton(new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).name("&a").build());
         
             ArtButton E = new ArtButton(new ItemBuilder(Material.BARRIER).name(SystemLanguage.getText("gui-exit")).build());
             E.listener((event, menu) -> player.closeInventory());
-    
-            BiomeDataContainer original = customBiome.getBiomeData();
-            BiomeDataContainer newContainer = original.clone();
             
             MenuBackButton B = new MenuBackButton(new ItemBuilder(Material.OAK_DOOR).name(SystemLanguage.getText("gui-back-without-save")).build());
             ItemStack backWithSaveItem = new ItemBuilder(Material.WRITABLE_BOOK).name(SystemLanguage.getText("gui-back-with-save")).build();
             ItemMeta backWithSaveItemMeta = backWithSaveItem.getItemMeta();
             backWithSaveItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            backWithSaveItemMeta.addEnchant(Enchantment.DURABILITY, 1, false);
+            backWithSaveItemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
             MenuBackButton P = new MenuBackButton(backWithSaveItem);
             P.listener((event, menu) -> {
                 original.write(newContainer);
@@ -209,6 +210,18 @@ public class BiomeGUI {
                 historyData.back();
             });
             
+            return new ArtButton[]{
+                    H, H, H, H, H, H, H, H, H,
+                    H, V, V, V, V, V, V, V, H,
+                    H, V, V, V, G, G, G, G, H,
+                    H, H, H, H, H, H, H, H, H,
+                    G, G, G, G, G, G, P, B, E,
+            };
+        });
+    
+        ArtMenu artMenu = artist.createMenu(VanillaSource.getPlugin().getArtGUI(), SystemLanguage.getText("gui-edit-custom-biome", customBiome.getKey()));
+    
+        artMenu.asyncCreate(menu -> {
             ArtButton F = new RGBSelectButton(new ItemBuilder(Material.WHITE_STAINED_GLASS)
                     .name(SystemLanguage.getText("gui-fog-color"))
                     .lore(getRGBText(newContainer.fogColorRGB)).build(), rgb -> newContainer.fogColorRGB = rgb);
@@ -228,10 +241,10 @@ public class BiomeGUI {
             ArtButton T = new ArtButton(
                     new ItemBuilder(newContainer.temperatureAttribute == BiomeDataContainer.TemperatureAttribute.NORMAL ? Material.GRASS_BLOCK : Material.ICE)
                             .name(SystemLanguage.getText("gui-temperature-attribute"))
-                            .lore(SystemLanguage.getText("gui-current-selected", SystemLanguage.getText(newContainer.grassColorAttribute.name))).build()).listener((event, menu) -> {
-                        openTemperatureAttributeGUI(player, SystemLanguage.getText("gui-temperature-attribute"), newContainer);
+                            .lore(SystemLanguage.getText("gui-current-selected", SystemLanguage.getText(newContainer.grassColorAttribute.name))).build()).listener((event, m) -> {
+                openTemperatureAttributeGUI(player, SystemLanguage.getText("gui-temperature-attribute"), newContainer);
             });
-            
+    
             Material grassColorAttributeMaterial = Material.GRASS_BLOCK;
             switch (newContainer.grassColorAttribute) {
                 case NORMAL:
@@ -246,8 +259,8 @@ public class BiomeGUI {
             ArtButton K = new ArtButton(
                     new ItemBuilder(grassColorAttributeMaterial)
                             .name(SystemLanguage.getText("gui-grass-color-attribute"))
-                            .lore(SystemLanguage.getText("gui-current-selected", SystemLanguage.getText(newContainer.grassColorAttribute.name))).build()).listener((event, menu) ->
-                openGrassColorAttributeGUI(player, SystemLanguage.getText("gui-grass-color-attribute"), newContainer)
+                            .lore(SystemLanguage.getText("gui-current-selected", SystemLanguage.getText(newContainer.grassColorAttribute.name))).build()).listener((event, m) ->
+                    openGrassColorAttributeGUI(player, SystemLanguage.getText("gui-grass-color-attribute"), newContainer)
             );
     
     
@@ -258,7 +271,7 @@ public class BiomeGUI {
             ArtButton A = new RGBSelectButton(new ItemBuilder(Material.GRASS_BLOCK)
                     .name(SystemLanguage.getText("gui-grass-block-color"))
                     .lore(getRGBText(newContainer.grassBlockColorRGB)).build(), true, rgb -> newContainer.grassBlockColorRGB = rgb);
-            
+    
             TextInputButton N = new TextInputButton(new ItemBuilder(Material.MUSIC_DISC_13)
                     .name(SystemLanguage.getText("gui-change-environment-sound"))
                     .lore(SystemLanguage.getText("gui-current-selected",
@@ -280,7 +293,7 @@ public class BiomeGUI {
                 }
                 return null;
             });
-            
+    
             TextInputButton L = new TextInputButton(new ItemBuilder(Material.BONE_MEAL)
                     .name(SystemLanguage.getText("gui-edit-particle"))
                     .lore(SystemLanguage.getText("gui-current-selected", CustomBiome.getParticleDataString(newContainer))).build(),
@@ -294,19 +307,18 @@ public class BiomeGUI {
                 }
                 return null;
             });
-            
-            return new ArtButton[]{
-                    H, H, H, H, H, H, H, H, H,
-                    H, F, W, C, S, T, K, O, H,
-                    H, A, N, L, G, G, G, G, H,
-                    H, H, H, H, H, H, H, H, H,
-                    G, G, G, G, G, G, P, B, E,
-            };
+    
+            menu.setButton(0, 10, F);
+            menu.setButton(0, 11, W);
+            menu.setButton(0, 12, C);
+            menu.setButton(0, 13, S);
+            menu.setButton(0, 14, T);
+            menu.setButton(0, 15, K);
+            menu.setButton(0, 16, O);
+            menu.setButton(0, 19, A);
+            menu.setButton(0, 20, N);
+            menu.setButton(0, 21, L);
         });
-    
-        ArtMenu artMenu = artist.createMenu(VanillaSource.getPlugin().getArtGUI(), SystemLanguage.getText("gui-edit-custom-biome", customBiome.getKey()));
-    
-        artMenu.asyncCreate(menu -> {});
     
         artMenu.open(player);
     }
