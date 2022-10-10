@@ -12,6 +12,7 @@ import org.bukkit.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.contan_lang.ContanModule;
 import thpmc.vanilla_source.VanillaSource;
@@ -22,13 +23,18 @@ import thpmc.vanilla_source.api.camera.CameraPositionAt;
 import thpmc.vanilla_source.api.camera.CameraPositionsManager;
 import thpmc.vanilla_source.api.contan.ContanUtil;
 import thpmc.vanilla_source.api.entity.EngineEntity;
+import thpmc.vanilla_source.api.entity.ai.navigation.goal.EntityFollowGoal;
 import thpmc.vanilla_source.api.entity.ai.pathfinding.AsyncAStarMachine;
 import thpmc.vanilla_source.api.entity.ai.pathfinding.BlockPosition;
 import thpmc.vanilla_source.api.entity.controller.EntityController;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
 import thpmc.vanilla_source.api.player.EnginePlayer;
+import thpmc.vanilla_source.api.util.collision.EngineBoundingBox;
 import thpmc.vanilla_source.api.util.math.BezierCurve3D;
 import thpmc.vanilla_source.api.util.math.EasingBezier2D;
+import thpmc.vanilla_source.api.world.block.EngineBlock;
+import thpmc.vanilla_source.api.world.cache.AsyncWorldCache;
+import thpmc.vanilla_source.api.world.cache.EngineChunk;
 import thpmc.vanilla_source.api.world.cache.EngineWorld;
 import thpmc.vanilla_source.biome.gui.BiomeGUI;
 import thpmc.vanilla_source.util.TaskHandler;
@@ -203,111 +209,6 @@ public class TestListener implements Listener {
     
         VanillaSourceAPI api = VanillaSourceAPI.getInstance();
         INMSHandler nmsHandler = api.getNMSHandler();
-    
-        BiomeGUI.openBiomeSelectGUI(player, "&nバイオームを選択", biomeSource -> System.out.println(biomeSource.getKey()));
-    
-        /*
-        BiomeDataContainer container = new BiomeDataContainer();
-        nmsHandler.setDefaultBiomeData(container);
-        container.fogColorRGB = color.asRGB();
-        container.skyColorRGB = color.asRGB();
-        color = Color.GREEN;
-        container.particle = Particle.valueOf("ASH");
-        
-        if (!flag) {
-            nmsHandler.createBiome("test", container);
-            flag = true;
-            player.sendMessage("1");
-        } else {
-            nmsHandler.setBiomeSettings("test", container);
-            player.sendMessage("2");
-        }
-        nmsHandler.setBiomeForBlock(player.getLocation().getBlock(), "test");
-        
-        if (true) {
-            return;
-        }
-        
-        //Artistクラスのインスタンスを作成
-        //GUIの大きさと全てのページに配置するボタンを定義する
-        //ここで定義したボタンは全てのページで表示されます
-        Artist artist = new Artist(() -> {
-        
-            //nullを指定すると空白になりアイテムを配置したりできるようになる
-            ArtButton V = null;
-            //ボタンを作成
-            ArtButton G = new ArtButton(new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name("&a").build());
-        
-            //ページ移動用ボタンを作成
-            PageNextButton N = new PageNextButton(new ItemBuilder(Material.ARROW).name("&r次のページ &7[{NextPage}/{MaxPage}]").build());
-        
-            //ページ移動用ボタンを作成
-            PageBackButton P = new PageBackButton(new ItemBuilder(Material.ARROW).name("&r前のページ &7[{PreviousPage}/{MaxPage}]").build());
-            //戻るボタンを作成
-            //もしこのGUIを開く前に別のGUIを開いていた場合はそのGUIに戻ります
-            MenuBackButton B = new MenuBackButton(new ItemBuilder(Material.OAK_DOOR).name("&r{PreviousName}&7に戻る").build());
-            
-            ArtButton C = new ArtButton(new ItemBuilder(Material.COMMAND_BLOCK).name("&n作成").build()).listener((e, menu) -> {
-                HistoryData historyData = HistoryData.getHistoryData(VanillaSource.getPlugin().getArtGUI(), player);
-                historyData.clearOnClose = false;
-                
-                new AnvilGUI.Builder()
-                        .onClose(p -> {                                               //called when the inventory is closing
-                            player.sendMessage("You closed the inventory.");
-                        })
-                        .onComplete((p, text) -> {                                    //called when the inventory output slot is clicked
-                            names.add(text);
-                            Bukkit.getScheduler().runTaskLater(VanillaSource.getPlugin(), () -> {
-                                historyData.clearOnClose = true;
-                                MenuHistory history = historyData.getCurrentMenu();
-                                if (history == null){
-                                    player.sendMessage("NULL!!");
-                                    return;
-                                }
-                                history.getArtMenu().open(player);
-                                player.sendMessage("OPEN!");
-                            }, 1);
-                            return AnvilGUI.Response.close();
-                        })
-                        .preventClose()                                                    //prevents the inventory from being closed
-                        .text("")                              //sets the text the GUI should start with
-                        .itemLeft(new ItemStack(Material.PAPER))                      //use a custom item for the first slot//use a custom item for the second slot
-                        .onLeftInputClick(p -> player.sendMessage("first sword"))     //called when the left input slot is clicked
-                        .title("Enter your answer.")                                       //set the title of the GUI (only works in 1.14+)
-                        .plugin(VanillaSource.getPlugin())                                          //set the plugin instance
-                        .open(player);
-            });
-        
-            //現在のページを表示するボタンを作成
-            //ReplaceableButtonを継承したボタンの名前は特定の文字列が置き換わるようになります
-            //詳細はReplaceNameManagerを参照
-            ReplaceableButton I = new ReplaceableButton(new ItemBuilder(Material.NAME_TAG).name("&7現在のページ&r[{CurrentPage}/{MaxPage}]").build());
-        
-            //配列として視覚的に表記
-            //配列の長さは必ず9の倍数である必要があります
-            return new ArtButton[]{
-                    V, V, V, V, V, V, V, G, G,
-                    V, V, V, V, V, V, V, G, N,
-                    V, V, V, V, V, V, V, G, I,
-                    V, V, V, V, V, V, V, G, P,
-                    V, V, V, V, V, V, V, G, C,
-                    V, V, V, V, V, V, V, G, B,
-            };
-        });
-    
-        //GUIを作成
-        ArtMenu artMenu = artist.createMenu(VanillaSource.getPlugin().getArtGUI(), "&nテストGUI&r [{CurrentPage}/{MaxPage}]");
-    
-        //非同期でアイテムを配置
-        //GUIを開くたびに実行されます
-        artMenu.asyncCreate(menu -> {
-            for (String name : names) {
-                menu.addButton(new ArtButton(new ItemBuilder(Material.MUSIC_DISC_11).name("&r&n" + name).build()));
-            }
-        });
-    
-        //GUIを開く
-        artMenu.open(player);*/
         
         /*
         Location loc = player.getLocation();
@@ -320,8 +221,6 @@ public class TestListener implements Listener {
         
         Location loc = player.getLocation();
         
-        INMSHandler nmsHandler = THPEngineAPI.getInstance().getNMSHandler();
-        
         for(int x = loc.getBlockX() - 10; x < loc.getBlockX() + 10; x++){
             for(int y = loc.getBlockY() - 10; y < loc.getBlockY() + 10; y++){
                 for(int z = loc.getBlockZ() - 10; z < loc.getBlockZ() + 10; z++){
@@ -330,7 +229,7 @@ public class TestListener implements Listener {
                     if(iBlockData == null) continue;
                     
                     EngineBlock block = new EngineBlock(world, chunk, x, y, z, iBlockData);
-                    nmsHandler.collectBlockCollisions(block, list, new CollideOption(FluidCollisionMode.ALWAYS, true));
+                    nmsHandler.collectBlockCollisions(block, list, new CollideOption(FluidCollisionMode.ALWAYS, false));
                 }
             }
         }
@@ -382,18 +281,32 @@ public class TestListener implements Listener {
         }*/
         
     
-        /*
+        Location location = player.getLocation();
+        player.sendMessage(location.toString());
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
         NMSEntityController entityPlayer = nmsHandler.createNMSEntityController(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
         entityPlayer.setPositionRaw(location.getX(), location.getY(), location.getZ());
-    
+        
     
         TickThread tickThread = VanillaSourceAPI.getInstance().getTickThreadPool().getNextTickThread();
         
-        EngineEntity npc = new EngineEntity(tickThread.getThreadLocalCache().getWorld(location.getWorld().getName()), entityPlayer, tickThread);
+        EngineEntity npc = new EngineEntity(tickThread.getThreadLocalCache().getParallelWorld(api.getDefaultUniverse(), location.getWorld().getName()), entityPlayer, tickThread, null);
         npc.getAIController().goalSelector.registerGoal(0, new EntityFollowGoal(player));
         npc.setAutoClimbHeight(1.0F);
-        tickThread.addEntity(npc);*/
+    
+        BoundingBox bb = player.getBoundingBox();
+        EngineBoundingBox ebb = new EngineBoundingBox(bb.getMinX(), bb.getMinY(), bb.getMinZ(), bb.getMaxX(), bb.getMaxY(), bb.getMaxZ());
+        
+        entityPlayer.resetBoundingBoxForMovement(ebb);
+        
+        tickThread.addEntity(npc);
+        Bukkit.getScheduler().runTaskLater(VanillaSource.getPlugin(), () -> {
+            tickThread.scheduleTask(() -> {
+                //npc.teleport(location.getWorld().getName(), location.getX(), location.getY(), location.getZ());
+                player.sendMessage(entityPlayer.getPosition().toString());
+                return null;
+            });
+        }, 20);
     
         /*
         World world = player.getWorld();

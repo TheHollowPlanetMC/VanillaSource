@@ -154,6 +154,14 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>thpmc</groupId>
+            <artifactId>vanilla_source_v1_19_R1</artifactId>
+            <type>jar</type>
+            <version>${revision}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>2.2.1</version>

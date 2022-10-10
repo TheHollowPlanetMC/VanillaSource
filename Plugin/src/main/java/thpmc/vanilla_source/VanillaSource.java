@@ -5,7 +5,7 @@ import thpmc.vanilla_source.api.biome.BiomeStore;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.tick.MainThreadTimer;
 import thpmc.vanilla_source.api.player.EnginePlayer;
-import thpmc.vanilla_source.command.CommandRegistry;
+//import thpmc.vanilla_source.command.CommandRegistry;
 import thpmc.vanilla_source.config.ImplVSSettings;
 import thpmc.vanilla_source.contan.ContanManager;
 import thpmc.vanilla_source.lang.SystemLanguage;
@@ -86,7 +86,7 @@ public final class VanillaSource extends JavaPlugin {
             getCommand("parallel").setExecutor(new ParallelCommandExecutor());
             getCommand("parallel").setTabCompleter(new ParallelCommandExecutor());
         }
-        CommandRegistry.register(this);
+        //CommandRegistry.register(this);
         
         
         ImplStructureData.loadAllStructureData();
@@ -114,7 +114,7 @@ public final class VanillaSource extends JavaPlugin {
         // Plugin shutdown logic
         if(api != null) api.stopAsyncThreads();
         
-        CommandRegistry.unregister();
+        //CommandRegistry.unregister();
         
         BiomeStore.saveCustomBiomes();
     }
