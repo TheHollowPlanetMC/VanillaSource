@@ -13,6 +13,7 @@ import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkConverter;
 import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.DataPaletteBlock;
+import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.ticks.LevelChunkTicks;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R1.CraftChunk;
@@ -106,16 +107,19 @@ public class MapChunkPacketHandler implements IPacketHandler {
             
 
             DataPaletteBlock<IBlockData>[] cachedDataBlocks = (DataPaletteBlock<IBlockData>[]) blockids.get(chunkSnapshot);
-
-            ChunkSection[] chunkSections = new ChunkSection[16];
-            int nonEmptyChunkSections = 0;
+            
+            int sectionCount = (world.getMaxHeight() - world.getMinHeight()) >> 4;
+            int minSection = world.getMinHeight() >> 4;
+            
+            ChunkSection[] chunkSections = new ChunkSection[sectionCount];
             boolean edited = false;
-
-            for(int index = 0; index < 16; index++){
+            
+            for(int index = 0; index < sectionCount; index++){
+                int sectionY = minSection + index;
 
                 ChunkSection chunkSection = null;
 
-                SectionTypeArray sectionTypeArray = parallelChunk.getSectionTypeArray(index);
+                SectionTypeArray sectionTypeArray = parallelChunk.getSectionTypeArray(sectionY);
                 if(sectionTypeArray != null) {
                     DataPaletteBlock<IBlockData> cachedBlockData = cachedDataBlocks[index];
 
@@ -148,8 +152,7 @@ public class MapChunkPacketHandler implements IPacketHandler {
                         chunkSection = new ChunkSection(index << 4, dataPaletteBlock, biomes);
                     }
                 }
-
-                if(chunkSection != null) nonEmptyChunkSections |= (1 << index);
+                
                 chunkSections[index] = chunkSection;
             }
 

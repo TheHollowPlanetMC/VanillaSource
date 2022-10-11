@@ -9,6 +9,8 @@ import be4rjp.artgui.menu.HistoryData;
 import be4rjp.artgui.menu.MenuHistory;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -36,6 +38,8 @@ import thpmc.vanilla_source.api.world.block.EngineBlock;
 import thpmc.vanilla_source.api.world.cache.AsyncWorldCache;
 import thpmc.vanilla_source.api.world.cache.EngineChunk;
 import thpmc.vanilla_source.api.world.cache.EngineWorld;
+import thpmc.vanilla_source.api.world.parallel.ParallelUniverse;
+import thpmc.vanilla_source.api.world.parallel.ParallelWorld;
 import thpmc.vanilla_source.biome.gui.BiomeGUI;
 import thpmc.vanilla_source.util.TaskHandler;
 import com.mojang.authlib.GameProfile;
@@ -203,6 +207,21 @@ public class TestListener implements Listener {
     boolean flag = false;
     
     @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        
+        VanillaSourceAPI api = VanillaSourceAPI.getInstance();
+        Block block = event.getBlock();
+        ParallelWorld world = api.getEnginePlayer(player).getUniverse().getWorld("world");
+        world.setType(block.getX(), block.getY(), block.getZ(), Material.AIR);
+        world.sendBlockUpdate(block.getX(), block.getY(), block.getZ());
+        world.setSkyLightLevel(block.getX(), block.getY(), block.getZ(), 15);
+        world.setBlockLightLevel(block.getX(), block.getY(), block.getZ(), 15);
+        
+        event.setCancelled(true);
+    }
+    
+    @EventHandler
     public void onPlayerClick(PlayerAnimationEvent event){
         Player player = event.getPlayer();
         if(!player.isSneaking()) return;
@@ -266,9 +285,9 @@ public class TestListener implements Listener {
             }
         });*/
         
-        /*
+        
         Location location = player.getLocation();
-        INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
+        //INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
         
         TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
         ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/event/EventHandler.cntn");
@@ -278,10 +297,10 @@ public class TestListener implements Listener {
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
         
     
-        Location location = player.getLocation();
+        /*Location location = player.getLocation();
         player.sendMessage(location.toString());
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "NPC");
         NMSEntityController entityPlayer = nmsHandler.createNMSEntityController(location.getWorld(), location.getX(), location.getY(), location.getZ(), EntityType.PLAYER, gameProfile);
@@ -297,7 +316,7 @@ public class TestListener implements Listener {
         BoundingBox bb = player.getBoundingBox();
         EngineBoundingBox ebb = new EngineBoundingBox(bb.getMinX(), bb.getMinY(), bb.getMinZ(), bb.getMaxX(), bb.getMaxY(), bb.getMaxZ());
         
-        entityPlayer.resetBoundingBoxForMovement(ebb);
+        //entityPlayer.resetBoundingBoxForMovement(ebb);
         
         tickThread.addEntity(npc);
         Bukkit.getScheduler().runTaskLater(VanillaSource.getPlugin(), () -> {
@@ -306,7 +325,7 @@ public class TestListener implements Listener {
                 player.sendMessage(entityPlayer.getPosition().toString());
                 return null;
             });
-        }, 20);
+        }, 20);*/
     
         /*
         World world = player.getWorld();

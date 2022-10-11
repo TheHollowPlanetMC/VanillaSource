@@ -126,10 +126,6 @@ public class LightUpdatePacketHandler implements IPacketHandler {
             int minSection = lightEngine.c();
             int maxSection = lightEngine.d();
             
-            if (sectionCount != 26) {
-                System.out.println("NOT!!" + sectionCount);
-            }
-            
             List<byte[]> newSkyUpdates = new ArrayList<>();
             List<byte[]> newBlockUpdates = new ArrayList<>();
             int skyUpdateIndex = 0;

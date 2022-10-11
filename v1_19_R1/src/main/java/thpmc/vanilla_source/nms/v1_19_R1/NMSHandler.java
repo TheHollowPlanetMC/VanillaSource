@@ -93,7 +93,7 @@ public class NMSHandler implements INMSHandler {
     public boolean isBlockChangePacket(Object packet) {return packet instanceof PacketPlayOutBlockChange;}
 
     @Override
-    public boolean isLightUpdatePacket(Object packet) {return packet instanceof PacketPlayOutLightUpdate;}
+    public boolean isLightUpdatePacket(Object packet) {return packet instanceof PacketPlayOutLightUpdate || packet instanceof ClientboundLevelChunkWithLightPacket;}
     
     @Override
     public boolean isFlyPacket(Object packet) {return packet instanceof PacketPlayInFlying;}

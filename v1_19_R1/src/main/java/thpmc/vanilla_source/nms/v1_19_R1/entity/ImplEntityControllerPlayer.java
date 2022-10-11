@@ -43,6 +43,8 @@ public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntit
     @Override
     public void setPositionRaw(double x, double y, double z) {
         super.o(x, y, z);
+        AxisAlignedBB aabb = super.al();
+        super.a(aabb);
     }
     
     @Override
