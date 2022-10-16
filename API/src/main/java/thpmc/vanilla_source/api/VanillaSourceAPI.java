@@ -60,7 +60,7 @@ public abstract class VanillaSourceAPI {
         this.watchFogExecutor = Executors.newSingleThreadScheduledExecutor();
         
         this.mainThread = new MainTickThread(0);
-        Bukkit.getScheduler().runTaskTimer(plugin, mainThread::tickAtAsync, 0, 1);
+        Bukkit.getScheduler().runTaskTimer(plugin, mainThread, 0, 1);
         
         this.contanEngine = new ContanEngine(mainThread, new ArrayList<>(tickThreadPool.getAsyncTickRunnerList()));
         ContanUtil.setUpContan(contanEngine);

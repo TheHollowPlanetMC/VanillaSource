@@ -220,6 +220,45 @@ public class TickThread implements Runnable, ContanTickBasedThread {
         tickExecutor.submit(callable);
     }
     
+    public void scheduleTask(Runnable task) {
+        if (task instanceof TickThreadRunnable) {
+            ((TickThreadRunnable) task).runTask();
+        } else {
+            new TickThreadRunnable(this) {
+                @Override
+                public void run() {
+                    task.run();
+                }
+            }.runTask();
+        }
+    }
+    
+    public void scheduleTask(Runnable task, long delay) {
+        if (task instanceof TickThreadRunnable) {
+            ((TickThreadRunnable) task).runTask();
+        } else {
+            new TickThreadRunnable(this) {
+                @Override
+                public void run() {
+                    task.run();
+                }
+            }.runTaskLater(delay);
+        }
+    }
+    
+    public void scheduleTask(Runnable task, long delay, long period) {
+        if (task instanceof TickThreadRunnable) {
+            ((TickThreadRunnable) task).runTask();
+        } else {
+            new TickThreadRunnable(this) {
+                @Override
+                public void run() {
+                    task.run();
+                }
+            }.runTaskTimer(delay, period);
+        }
+    }
+    
     @Override
     public boolean shutdownWithAwait(long l, TimeUnit timeUnit) throws InterruptedException {
         return true;

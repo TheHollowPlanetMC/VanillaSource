@@ -9,11 +9,15 @@ public class TickThreadPool {
     
     private final List<TickThread> asyncTickThreadList;
     
+    private final TickThread utilityThread;
+    
     public TickThreadPool(int poolSize){
         asyncTickThreadList = new ArrayList<>();
         for(int i = 0; i < poolSize; i++){
             asyncTickThreadList.add(new TickThread(i));
         }
+        
+        this.utilityThread = new TickThread(poolSize);
     }
     
     public void startAll(){
@@ -37,6 +41,8 @@ public class TickThreadPool {
     public TickThread getTickThread(int threadNumber) {
         return asyncTickThreadList.get(threadNumber);
     }
+    
+    public TickThread getUtilityThread() {return utilityThread;}
     
     public int getPoolSize(){return asyncTickThreadList.size();}
     
