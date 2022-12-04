@@ -12,6 +12,7 @@ public class CommandRegistry {
         commandManager = new CommandManager(plugin);
         AnnotationManager annotationManager = commandManager.getAnnotationManager();
         annotationManager.register(new ContanCommand());
+        annotationManager.register(new CameraCommand());
     }
     
     public static void unregister() {

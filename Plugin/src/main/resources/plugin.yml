@@ -16,3 +16,5 @@ permissions:
     description: admin command.
   vanilla_source.contan:
     default: op
+  vanilla_source.camera:
+    default: op

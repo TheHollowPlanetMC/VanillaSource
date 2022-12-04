@@ -6,9 +6,12 @@ import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.tick.MainThreadTimer;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 //import thpmc.vanilla_source.command.CommandRegistry;
+import thpmc.vanilla_source.camera.CameraFileManager;
+import thpmc.vanilla_source.command.CommandRegistry;
 import thpmc.vanilla_source.config.ImplVSSettings;
 import thpmc.vanilla_source.contan.ContanManager;
 import thpmc.vanilla_source.lang.SystemLanguage;
+import thpmc.vanilla_source.listener.CameraPositionSettingListener;
 import thpmc.vanilla_source.listener.PlayerJoinQuitListener;
 import thpmc.vanilla_source.command.ParallelCommandExecutor;
 import thpmc.vanilla_source.natives.NativeManager;
@@ -77,6 +80,7 @@ public final class VanillaSource extends JavaPlugin {
         pluginManager.registerEvents(new PlayerJoinQuitListener(), this);
         pluginManager.registerEvents(new ChunkListener(), this);
         pluginManager.registerEvents(new TestListener(), this);
+        pluginManager.registerEvents(new CameraPositionSettingListener(), this);
     
     
         //Register commands.
@@ -86,8 +90,10 @@ public final class VanillaSource extends JavaPlugin {
             getCommand("parallel").setExecutor(new ParallelCommandExecutor());
             getCommand("parallel").setTabCompleter(new ParallelCommandExecutor());
         }
-        //CommandRegistry.register(this);
+        CommandRegistry.register(this);
         
+        //Load camera position data.
+        CameraFileManager.load();
         
         ImplStructureData.loadAllStructureData();
         ParallelStructure.loadAllParallelStructure();
@@ -117,6 +123,8 @@ public final class VanillaSource extends JavaPlugin {
         //CommandRegistry.unregister();
         
         BiomeStore.saveCustomBiomes();
+        
+        CameraFileManager.save();
     }
     
     

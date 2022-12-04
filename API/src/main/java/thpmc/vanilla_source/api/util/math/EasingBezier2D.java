@@ -3,13 +3,13 @@ package thpmc.vanilla_source.api.util.math;
 public class EasingBezier2D {
 
     private final double x1;
-    private final double x2;
-    private final double x3;
+    public final double x2;
+    public final double x3;
     private final double x4;
 
     private final double y1;
-    private final double y2;
-    private final double y3;
+    public final double y2;
+    public final double y3;
     private final double y4;
 
     public EasingBezier2D(double x2, double y2, double x3, double y3) {

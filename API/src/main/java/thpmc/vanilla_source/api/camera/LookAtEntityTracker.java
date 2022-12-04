@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.api.camera;
 
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.util.Vector;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 
@@ -19,6 +20,16 @@ public class LookAtEntityTracker implements CameraPositions {
     @Override
     public int getEndTick() {
         return Integer.MAX_VALUE;
+    }
+    
+    @Override
+    public void save(YamlConfiguration yml) {
+        //None
+    }
+    
+    @Override
+    public void load(YamlConfiguration yml) {
+        //None
     }
     
 }

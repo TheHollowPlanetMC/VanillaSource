@@ -21,6 +21,10 @@ public class EntityManager {
             case PLAYER: {
                 return new ImplEntityControllerPlayer(MinecraftServer.getServer(), worldServer, (GameProfile) data, new PlayerInteractManager(worldServer));
             }
+    
+            case ARMOR_STAND: {
+                return new ImplEntityControllerArmorStand(worldServer, x, y, z);
+            }
             
             case DROPPED_ITEM: {
                 net.minecraft.server.v1_16_R3.ItemStack itemStack = CraftItemStack.asNMSCopy((ItemStack) data);
