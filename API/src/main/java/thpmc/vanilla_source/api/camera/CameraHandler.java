@@ -149,6 +149,7 @@ public class CameraHandler implements TickBase {
         for (NMSEntityController entityController : advanceInitializedEntityMap.values()) {
             Object destroyPacket = nmsHandler.createEntityDestroyPacket(entityController);
             nmsHandler.sendPacket(target.getBukkitPlayer(), destroyPacket);
+            nmsHandler.sendPacket(target.getBukkitPlayer(), nmsHandler.createCameraPacket(nmsHandler.getNMSPlayer(target.getBukkitPlayer())));
         }
     }
     
@@ -165,6 +166,7 @@ public class CameraHandler implements TickBase {
                 NMSEntityController controller = nmsHandler.createNMSEntityController(world, x, y, z, EntityType.ARMOR_STAND, null);
                 Object spawnPacket = nmsHandler.createSpawnEntityLivingPacket(controller);
                 nmsHandler.sendPacket(target.getBukkitPlayer(), spawnPacket);
+                nmsHandler.sendPacket(target.getBukkitPlayer(), nmsHandler.createCameraPacket(controller));
                 
                 return controller;
         });
@@ -183,6 +185,7 @@ public class CameraHandler implements TickBase {
             INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
             Object removePacket = nmsHandler.createEntityDestroyPacket(entityController);
             nmsHandler.sendPacket(target.getBukkitPlayer(), removePacket);
+            nmsHandler.sendPacket(target.getBukkitPlayer(), nmsHandler.createCameraPacket(nmsHandler.getNMSPlayer(target.getBukkitPlayer())));
         }
         
         this.cameraTick = 0;

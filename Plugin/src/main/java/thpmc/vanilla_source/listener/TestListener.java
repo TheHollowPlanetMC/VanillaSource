@@ -206,7 +206,7 @@ public class TestListener implements Listener {
     Color color = Color.BLUE;
     boolean flag = false;
     
-    @EventHandler
+    //@EventHandler
     public void onBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         

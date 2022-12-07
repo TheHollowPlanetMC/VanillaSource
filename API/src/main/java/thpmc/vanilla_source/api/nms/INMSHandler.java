@@ -27,6 +27,8 @@ public interface INMSHandler {
     Channel getChannel(Player player);
     
     void sendPacket(Player player, Object packet);
+    
+    Object getNMSPlayer(Player player);
 
     Object getIBlockDataByCombinedId(int id);
 

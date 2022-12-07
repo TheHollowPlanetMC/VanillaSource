@@ -49,7 +49,7 @@ public class CameraEditor {
         }
     }
     
-    public static void onEnd(Player player, String name) {
+    public static void onEnd(Player player, String name, int endTick) {
         BezierCurve3D endCurve = playerSettingPositionMap.get(player);
         if (endCurve == null) {
             player.sendMessage(SystemLanguage.getText("curve-setting-not-exist"));
@@ -57,7 +57,12 @@ public class CameraEditor {
         }
     
         List<BezierCurve3D> bezierCurve3DList = new ArrayList<>();
-        BezierCurve3D current = endCurve;
+        BezierCurve3D current = endCurve.getPrevious();
+        if (current == null) {
+            player.sendMessage(SystemLanguage.getText("curve-setting-not-exist"));
+            return;
+        }
+        
         while (true) {
             bezierCurve3DList.add(current);
         
@@ -70,7 +75,7 @@ public class CameraEditor {
         Collections.reverse(bezierCurve3DList);
     
         EasingBezier2D easingBezier2D = new EasingBezier2D(0.3, 0, 0, 0.3);
-        Bezier3DPositions positions = new Bezier3DPositions(bezierCurve3DList, easingBezier2D, 400);
+        Bezier3DPositions positions = new Bezier3DPositions(bezierCurve3DList, easingBezier2D, endTick);
     
         EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer(player);
     

@@ -42,6 +42,11 @@ public class NMSHandler implements INMSHandler {
     }
     
     @Override
+    public Object getNMSPlayer(Player player) {
+        return ((CraftPlayer) player).getHandle();
+    }
+    
+    @Override
     public Object getIBlockDataByCombinedId(int id) {return Block.getByCombinedId(id);}
 
     @Override

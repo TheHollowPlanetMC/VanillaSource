@@ -13,6 +13,8 @@ public class CameraPositionAt implements CameraPositions {
         this.position = new Vector(x, y, z);
     }
     
+    public CameraPositionAt(Vector position) { this.position = position; }
+    
     public CameraPositionAt(YamlConfiguration yml) {load(yml);}
     
     @Override

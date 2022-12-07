@@ -35,25 +35,28 @@ public class BezierCurve3D {
     public BezierCurve3D(String data) {
         String[] args = data.replace(" ", "").split("/");
         
-        String[] startAnchorArgs = args[0].split(",");
+        this.length = Double.parseDouble(args[0]);
+        
+        String[] startAnchorArgs = args[1].split(",");
         this.startAnchor = new Vector(Double.parseDouble(startAnchorArgs[0]), Double.parseDouble(startAnchorArgs[1]), Double.parseDouble(startAnchorArgs[2]));
     
-        String[] endAnchorArgs = args[1].split(",");
+        String[] endAnchorArgs = args[2].split(",");
         this.endAnchor = new Vector(Double.parseDouble(endAnchorArgs[0]), Double.parseDouble(endAnchorArgs[1]), Double.parseDouble(endAnchorArgs[2]));
     
-        String[] startControlArgs = args[2].split(",");
+        String[] startControlArgs = args[3].split(",");
         this.startControl = new Vector(Double.parseDouble(startControlArgs[0]), Double.parseDouble(startControlArgs[1]), Double.parseDouble(startControlArgs[2]));
     
-        String[] endControlArgs = args[0].split(",");
+        String[] endControlArgs = args[4].split(",");
         this.endControl = new Vector(Double.parseDouble(endControlArgs[0]), Double.parseDouble(endControlArgs[1]), Double.parseDouble(endControlArgs[2]));
     }
     
     public String toString() {
+        String str0 = String.valueOf(length);
         String str1 = startAnchor.getX() + ", " + startAnchor.getY() + ", " + startAnchor.getZ();
         String str2 = endAnchor.getX() + ", " + endAnchor.getY() + ", " + endAnchor.getZ();
         String str3 = startControl.getX() + ", " + startControl.getY() + ", " + startControl.getZ();
         String str4 = endControl.getX() + ", " + endControl.getY() + ", " + endControl.getZ();
-        return str1 + " / " + str2 + " / " + str3 + " / " + str4;
+        return str0 +  " / " + str1 + " / " + str2 + " / " + str3 + " / " + str4;
     }
     
     
