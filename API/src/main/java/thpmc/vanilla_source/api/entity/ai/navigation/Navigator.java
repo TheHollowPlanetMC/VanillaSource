@@ -3,6 +3,10 @@ package thpmc.vanilla_source.api.entity.ai.navigation;
 import org.bukkit.Location;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import org.contan_lang.runtime.JavaContanFuture;
+import org.contan_lang.variables.ContanObject;
+import org.contan_lang.variables.primitive.ContanVoidObject;
+import thpmc.vanilla_source.api.contan.ContanUtil;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.ai.pathfinding.AsyncAStarMachine;
 import thpmc.vanilla_source.api.entity.ai.pathfinding.BlockPosition;
@@ -25,6 +29,8 @@ public class Navigator {
     private int descendingHeight;
     //Goal
     private BlockPosition navigationGoal;
+    
+    private JavaContanFuture goalFuture;
     
     private CompletableFuture<List<BlockPosition>> pathfindingTask = null;
     
@@ -179,6 +185,17 @@ public class Navigator {
         temp.setDirection(velocity);
         entity.setRotation(temp.getYaw(), temp.getPitch());
         entity.move(velocity);
+        
+        BlockPosition goal = this.navigationGoal;
+        JavaContanFuture future = this.goalFuture;
+        if (future != null && goal != null) {
+            Vector position = entity.getPosition();
+            Vector goalPosition = new Vector(goal.x, goal.y, goal.z);
+            if (position.distanceSquared(goalPosition) < 4) {
+                this.goalFuture = null;
+                future.complete(ContanVoidObject.INSTANCE);
+            }
+        }
     }
     
     
@@ -275,6 +292,12 @@ public class Navigator {
     public void setSpeed(float speed) {this.speed = speed;}
     
     public void setNavigationGoal(BlockPosition navigationGoal) {this.navigationGoal = navigationGoal;}
+    
+    public ContanObject<?> setNavigationGoalWithFuture(BlockPosition navigationGoal) {
+        this.navigationGoal = navigationGoal;
+        this.goalFuture = ContanUtil.createFutureInstance();
+        return goalFuture.getContanInstance();
+    }
     
     public BlockPosition getNavigationGoal() {return navigationGoal;}
 }

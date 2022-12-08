@@ -62,7 +62,7 @@ public interface EngineWorld extends IWorld {
         
         for (int y = start; y > end; y--) {
             Object blockData = chunk.getNMSBlockData(blockX, y, blockZ);
-            if (blockData != null) {
+            if (blockData != null && !VanillaSourceAPI.getInstance().getNMSHandler().getBukkitBlockData(blockData).getMaterial().isAir()) {
                 return new EngineBlock(this, chunk, blockX, y, blockZ, blockData);
             }
         }
