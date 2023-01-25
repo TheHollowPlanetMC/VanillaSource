@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.contan_lang.ContanEngine;
 import org.contan_lang.thread.ContanTickBasedThread;
 import org.contan_lang.variables.primitive.ContanFunctionExpression;
+import org.jetbrains.annotations.NotNull;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.TickBase;
@@ -217,7 +218,8 @@ public class TickThread implements Runnable, ContanTickBasedThread {
     
     @Override
     public <T> void scheduleTask(Callable<T> callable) {
-        tickExecutor.submit(callable);
+        ThreadFutureTask<T> task = new ThreadFutureTask<>(callable);
+        tickExecutor.submit(task);
     }
     
     public void scheduleTask(Runnable task) {
@@ -268,5 +270,20 @@ public class TickThread implements Runnable, ContanTickBasedThread {
     public ContanEngine getContanEngine() {
         return VanillaSourceAPI.getInstance().getContanEngine();
     }
+
+
+    public static class ThreadFutureTask<T> extends FutureTask<T> {
+
+        public ThreadFutureTask(@NotNull Callable<T> callable) {
+            super(callable);
+        }
+
+        @Override
+        protected void setException(Throwable t) {
+            t.printStackTrace();
+        }
+
+    }
+
 }
 
