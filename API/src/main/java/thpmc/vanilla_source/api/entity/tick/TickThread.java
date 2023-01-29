@@ -208,7 +208,8 @@ public class TickThread implements Runnable, ContanTickBasedThread {
     
     @Override
     public <T> void scheduleTask(Callable<T> callable, long l) {
-        Bukkit.getScheduler().runTaskLater(VanillaSourceAPI.getInstance().getPlugin(), () -> tickExecutor.submit(callable), l);
+        ThreadFutureTask<T> task = new ThreadFutureTask<>(callable);
+        Bukkit.getScheduler().runTaskLater(VanillaSourceAPI.getInstance().getPlugin(), () -> tickExecutor.submit(task), l);
     }
     
     @Override

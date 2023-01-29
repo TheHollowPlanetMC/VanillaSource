@@ -18,8 +18,8 @@ public class MainTickThread extends TickThread implements ContanTickBasedThread 
     
     @Override
     public <T> void scheduleTask(Callable<T> callable, long l) {
-        FutureTask<T> future = new FutureTask<>(callable);
-        ThreadUtil.runAtMainThreadLater(future, l);
+        ThreadFutureTask<T> task = new ThreadFutureTask<>(callable);
+        ThreadUtil.runAtMainThreadLater(task, l);
     }
     
     @Override
@@ -53,8 +53,8 @@ public class MainTickThread extends TickThread implements ContanTickBasedThread 
     
     @Override
     public <T> void scheduleTask(Callable<T> callable) {
-        FutureTask<T> future = new FutureTask<>(callable);
-        ThreadUtil.runAtMainThread(future);
+        ThreadFutureTask<T> task = new ThreadFutureTask<>(callable);
+        ThreadUtil.runAtMainThread(task);
     }
     
     @Override
