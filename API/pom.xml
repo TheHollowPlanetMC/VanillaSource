@@ -170,7 +170,7 @@
     <dependency>
       <groupId>com.github.Be4rJP</groupId>
       <artifactId>Contan</artifactId>
-      <version>b1eb4e65cb</version>
+      <version>70f34b6b96</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
