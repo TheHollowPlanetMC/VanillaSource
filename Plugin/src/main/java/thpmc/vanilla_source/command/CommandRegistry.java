@@ -1,24 +1,24 @@
 package thpmc.vanilla_source.command;
 
-import net.propromp.neocommander.api.CommandManager;
-import net.propromp.neocommander.api.annotation.AnnotationManager;
-import thpmc.vanilla_source.VanillaSource;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPIConfig;
+import org.bukkit.plugin.Plugin;
 
 public class CommandRegistry {
     
-    private static CommandManager commandManager;
-    
-    public static void register(VanillaSource plugin) {
-        commandManager = new CommandManager(plugin);
-        AnnotationManager annotationManager = commandManager.getAnnotationManager();
-        annotationManager.register(new ContanCommand());
-        annotationManager.register(new CameraCommand());
+    public static void onLoad() {
+        CommandAPI.onLoad(new CommandAPIConfig().verboseOutput(true));
+
+        CameraCommand.register();
+        ContanCommand.register();
+    }
+
+    public static void onEnable(Plugin plugin) {
+        CommandAPI.onEnable(plugin);
     }
     
-    public static void unregister() {
-        if (commandManager != null) {
-            commandManager.clearCommands();
-        }
+    public static void onDisable() {
+        CommandAPI.onDisable();
     }
     
 }

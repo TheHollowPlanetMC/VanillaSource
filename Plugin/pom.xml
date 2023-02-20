@@ -35,7 +35,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -44,6 +44,12 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>dev.jorel.commandapi</pattern>
+                                    <shadedPattern>thpmc.vanilla_source.relocation.commandapi</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -174,10 +180,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>net.propromp</groupId>
-            <artifactId>neocommander</artifactId>
-            <version>1.5.1</version>
-            <scope>compile</scope>
+            <groupId>dev.jorel</groupId>
+            <artifactId>commandapi-shade</artifactId>
+            <version>8.7.5</version>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>

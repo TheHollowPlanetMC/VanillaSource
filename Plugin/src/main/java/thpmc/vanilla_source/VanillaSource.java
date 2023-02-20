@@ -5,7 +5,6 @@ import thpmc.vanilla_source.api.biome.BiomeStore;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.tick.MainThreadTimer;
 import thpmc.vanilla_source.api.player.EnginePlayer;
-//import thpmc.vanilla_source.command.CommandRegistry;
 import thpmc.vanilla_source.camera.CameraFileManager;
 import thpmc.vanilla_source.command.CommandRegistry;
 import thpmc.vanilla_source.config.ImplVSSettings;
@@ -34,7 +33,13 @@ public final class VanillaSource extends JavaPlugin {
     private static ArtGUI artGUI;
     
     private static ImplVanillaSourceAPI api;
-    
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        CommandRegistry.onLoad();
+    }
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -90,7 +95,7 @@ public final class VanillaSource extends JavaPlugin {
             getCommand("parallel").setExecutor(new ParallelCommandExecutor());
             getCommand("parallel").setTabCompleter(new ParallelCommandExecutor());
         }
-        CommandRegistry.register(this);
+        CommandRegistry.onEnable(this);
         
         //Load camera position data.
         CameraFileManager.load();
@@ -125,6 +130,8 @@ public final class VanillaSource extends JavaPlugin {
         BiomeStore.saveCustomBiomes();
         
         CameraFileManager.save();
+
+        CommandRegistry.onDisable();
     }
     
     

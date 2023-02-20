@@ -1,10 +1,7 @@
 package thpmc.vanilla_source.nms.v1_19_R1;
 
 import com.mojang.serialization.Lifecycle;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.Holder;
-import net.minecraft.core.IRegistry;
-import net.minecraft.core.IRegistryWritable;
+import net.minecraft.core.*;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.MinecraftKey;
@@ -409,6 +406,15 @@ public class NMSHandler implements INMSHandler {
     
         newBiome.a(newFog.a());
         IRegistryWritable<BiomeBase> iRegistryWritable = (IRegistryWritable<BiomeBase>) dedicatedServer.aX().b(IRegistry.aR);
+
+        try {
+            Field frozen = RegistryMaterials.class.getDeclaredField("ca");
+            frozen.setAccessible(true);
+            frozen.set(iRegistryWritable, false);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+
         iRegistryWritable.a(newKey, newBiome.a(), Lifecycle.stable());
         
         return newBiome;

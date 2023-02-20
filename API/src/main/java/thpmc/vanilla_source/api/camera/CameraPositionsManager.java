@@ -20,5 +20,7 @@ public class CameraPositionsManager {
     public static Collection<CameraPositions> getAllPositions() {return cameraPositionsMap.values();}
     
     public static Set<Map.Entry<String, CameraPositions>> getAllPositionEntry() {return cameraPositionsMap.entrySet();}
+
+    public static Collection<String> getAllCameraPositionName() {return cameraPositionsMap.keySet();}
     
 }
