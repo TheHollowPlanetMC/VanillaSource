@@ -1,5 +1,6 @@
 package thpmc.vanilla_source.api.entity.controller;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import thpmc.vanilla_source.api.entity.EngineEntity;
@@ -71,5 +72,17 @@ public interface EntityController {
      * @param player {@link EnginePlayer}
      */
     void hide(EngineEntity engineEntity, EnginePlayer player);
+
+    /**
+     * Get an entity instance wrapped in bukkit api.
+     * @return Bukkit entity.
+     */
+    Entity getBukkitEntity();
+
+    /**
+     * Configure this entity to send metadata.
+     * @param is Whether to send metadata.
+     */
+    void setMetadataChanged(boolean is);
 
 }

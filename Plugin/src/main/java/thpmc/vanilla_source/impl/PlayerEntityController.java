@@ -1,6 +1,7 @@
 package thpmc.vanilla_source.impl;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -81,5 +82,15 @@ public class PlayerEntityController implements EntityController {
     public void hide(EngineEntity engineEntity, EnginePlayer player) {
         //Ignore
     }
-    
+
+    @Override
+    public Entity getBukkitEntity() {
+        return player;
+    }
+
+    @Override
+    public void setMetadataChanged(boolean is) {
+        //Ignore
+    }
+
 }

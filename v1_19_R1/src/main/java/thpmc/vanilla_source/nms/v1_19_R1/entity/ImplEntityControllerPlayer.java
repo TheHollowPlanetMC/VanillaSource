@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.protocol.EnumProtocolDirection;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.server.*;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
@@ -23,6 +24,8 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntityControllerPlayer {
+
+    private boolean isMetadataChanged = false;
     
     public ImplEntityControllerPlayer(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile) {
         super(minecraftserver, worldserver, gameprofile, null);
@@ -87,6 +90,11 @@ public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntit
                     (short) (delta.getX() * 4096), (short) (delta.getY() * 4096), (short) (delta.getZ() * 4096),
                     (byte) ((yawPitch.x * 256.0F) / 360.0F), (byte) ((yawPitch.y * 256.0F) / 360.0F), engineEntity.isOnGround()));
         }
+
+        if (isMetadataChanged) {
+            isMetadataChanged = false;
+            player.sendPacket(new PacketPlayOutEntityMetadata(this.ae(), this.ai(), true));
+        }
     }
     
     @Override
@@ -94,6 +102,7 @@ public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntit
         player.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, this));
         player.sendPacket(new PacketPlayOutNamedEntitySpawn(this));
         player.sendPacket(new PacketPlayOutEntityTeleport(this));
+        player.sendPacket(new PacketPlayOutEntityMetadata(this.ae(), this.ai(), true));
     }
     
     @Override
@@ -101,6 +110,11 @@ public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntit
         player.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, this));
         player.sendPacket(new PacketPlayOutEntityDestroy(super.ae()));
     }
-    
+
+    @Override
+    public void setMetadataChanged(boolean is) {
+        isMetadataChanged = is;
+    }
+
 }
 

@@ -16,6 +16,7 @@ import org.contan_lang.variables.primitive.JavaClassObject;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.contan.functions.Floor;
 import thpmc.vanilla_source.api.entity.tick.TickThread;
+import thpmc.vanilla_source.api.util.Unicode;
 
 import java.util.concurrent.ExecutionException;
 
@@ -50,6 +51,7 @@ public class ContanUtil {
         contanEngine.setRuntimeVariable("World", new JavaClassObject(contanEngine, World.class));
         contanEngine.setRuntimeVariable("Location", new JavaClassObject(contanEngine, Location.class));
         contanEngine.setRuntimeVariable("ContanUtil", new JavaClassObject(contanEngine, ContanUtil.class));
+        contanEngine.setRuntimeVariable("Unicode", new JavaClassObject(contanEngine, Unicode.class));
     }
     
     public static JavaContanFuture createFutureInstance() {

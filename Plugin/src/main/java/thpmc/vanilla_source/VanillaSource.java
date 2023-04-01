@@ -122,6 +122,8 @@ public final class VanillaSource extends JavaPlugin {
     
     @Override
     public void onDisable() {
+        ContanManager.onDisable();
+
         // Plugin shutdown logic
         if(api != null) api.stopAsyncThreads();
         

@@ -1,6 +1,7 @@
 package thpmc.vanilla_source.api.entity;
 
 import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
@@ -551,6 +552,12 @@ public class EngineEntity implements TickBase {
         this.yaw = yaw;
         this.pitch = pitch;
         this.entityController.setRotation(yaw, pitch);
+    }
+
+    public void setRotationLookAt(double x, double y, double z) {
+        Location temp = new Location(null, 0, 0, 0);
+        temp.setDirection(new Vector(x, y, z));
+        this.setRotation(temp.getYaw(), temp.getPitch());
     }
     
     @Override

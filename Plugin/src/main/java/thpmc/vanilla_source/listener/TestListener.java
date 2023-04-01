@@ -12,6 +12,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -378,6 +379,20 @@ public class TestListener implements Listener {
         astar.runPathfindingNative();
         e = System.nanoTime();
         System.out.println("[Rust] iteration = 5000,  Time = " + (e - s) + "ns");*/
+    }
+
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/event/EventHandler.cntn");
+        if (contanModule != null) {
+            try {
+                contanModule.invokeFunction(tickThread, "firePlayerClick", event);
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
 }

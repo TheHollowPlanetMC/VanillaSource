@@ -4,6 +4,7 @@ import org.contan_lang.ContanEngine;
 import org.contan_lang.ContanModule;
 import thpmc.vanilla_source.VanillaSource;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
+import thpmc.vanilla_source.api.entity.tick.TickThread;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -93,6 +95,18 @@ public class ContanManager {
         }
     }
 
+
+    public static void onDisable() {
+        TickThread tickThread = VanillaSourceAPI.getInstance().getMainThread();
+        ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/event/EventHandler.cntn");
+        if (contanModule != null) {
+            try {
+                contanModule.invokeFunction(tickThread, "fireDisable");
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }
 

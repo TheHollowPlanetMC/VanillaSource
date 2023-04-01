@@ -10,6 +10,8 @@ import thpmc.vanilla_source.api.util.collision.EngineEntityBoundingBox;
 import thpmc.vanilla_source.api.util.math.Vec2f;
 
 public class ImplEntityControllerArmorStand extends EntityArmorStand implements NMSArmorStandController {
+
+    private boolean isMetadataChanged = false;
     
     public ImplEntityControllerArmorStand(EntityTypes<? extends EntityArmorStand> entitytypes, World world) {
         super(entitytypes, world);
@@ -59,16 +61,27 @@ public class ImplEntityControllerArmorStand extends EntityArmorStand implements 
                     (short) (delta.getX() * 4096), (short) (delta.getY() * 4096), (short) (delta.getZ() * 4096),
                     (byte) ((yaw * 256.0F) / 360.0F), (byte) ((pitch * 256.0F) / 360.0F), engineEntity.isOnGround()));
         }
+
+        if (isMetadataChanged) {
+            isMetadataChanged = false;
+            player.sendPacket(new PacketPlayOutEntityMetadata(this.getId(), this.getDataWatcher(), true));
+        }
     }
     
     @Override
     public void show(EngineEntity engineEntity, EnginePlayer player) {
         player.sendPacket(new PacketPlayOutSpawnEntityLiving(this));
         player.sendPacket(new PacketPlayOutEntityTeleport(this));
+        player.sendPacket(new PacketPlayOutEntityMetadata(this.getId(), this.getDataWatcher(), true));
     }
     
     @Override
     public void hide(EngineEntity engineEntity, EnginePlayer player) {
         player.sendPacket(new PacketPlayOutEntityDestroy(this.getId()));
+    }
+
+    @Override
+    public void setMetadataChanged(boolean is) {
+        isMetadataChanged = is;
     }
 }

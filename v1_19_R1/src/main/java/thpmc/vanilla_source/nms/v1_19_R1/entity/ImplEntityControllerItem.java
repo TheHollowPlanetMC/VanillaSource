@@ -83,7 +83,12 @@ public class ImplEntityControllerItem extends EntityItem implements NMSItemEntit
     public void hide(EngineEntity engineEntity, EnginePlayer player) {
         player.sendPacket(new PacketPlayOutEntityDestroy(this.ae()));
     }
-    
+
+    @Override
+    public void setMetadataChanged(boolean is) {
+        isMetadataChanged = is;
+    }
+
     @Override
     public void setItemStack(ItemStack itemStack) {
         super.a(CraftItemStack.asNMSCopy(itemStack));
