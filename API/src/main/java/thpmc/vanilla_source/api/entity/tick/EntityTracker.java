@@ -2,13 +2,10 @@ package thpmc.vanilla_source.api.entity.tick;
 
 import org.bukkit.Location;
 import org.bukkit.util.NumberConversions;
-import org.jetbrains.annotations.NotNull;
 import thpmc.vanilla_source.api.VanillaSourceAPI;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.api.world.EngineLocation;
-import thpmc.vanilla_source.api.world.cache.local.ThreadLocalEngineWorld;
-import thpmc.vanilla_source.api.world.cache.local.ThreadLocalParallelWorld;
 
 import java.util.*;
 
@@ -81,7 +78,7 @@ public class EntityTracker {
         trackedEntities.forEach(engineEntity -> engineEntity.playTickResult(enginePlayer, absolute));
     }
     
-    public void removeTrackerEntity(EngineEntity entity) {
+    public void removeTrackedEntity(EngineEntity entity) {
         trackedEntities.remove(entity);
     }
     

@@ -10,11 +10,14 @@ commands:
     description: Type /parallel help
     usage: Type /parallel help
     permission: parallel.admin
+  vanilla_source_hover_text_event:
+    description: ""
+    usage: ""
+    permission: vanilla_source_hover_text
 #--------------------------------------
 permissions:
   parallel.admin:
     description: admin command.
-  vanilla_source.contan:
-    default: op
-  vanilla_source.camera:
-    default: op
+  vanilla_source_hover_text:
+    description: ""
+    default: true

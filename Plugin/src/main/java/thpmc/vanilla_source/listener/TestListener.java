@@ -388,7 +388,7 @@ public class TestListener implements Listener {
         ContanModule contanModule = VanillaSourceAPI.getInstance().getContanEngine().getModule("engine/event/EventHandler.cntn");
         if (contanModule != null) {
             try {
-                contanModule.invokeFunction(tickThread, "firePlayerClick", event);
+                contanModule.invokeFunction(tickThread, "firePlayerJoin", event);
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }

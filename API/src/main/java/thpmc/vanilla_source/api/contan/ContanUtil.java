@@ -52,6 +52,7 @@ public class ContanUtil {
         contanEngine.setRuntimeVariable("Location", new JavaClassObject(contanEngine, Location.class));
         contanEngine.setRuntimeVariable("ContanUtil", new JavaClassObject(contanEngine, ContanUtil.class));
         contanEngine.setRuntimeVariable("Unicode", new JavaClassObject(contanEngine, Unicode.class));
+        contanEngine.setRuntimeVariable("HoverText", new JavaClassObject(contanEngine, HoverText.class));
     }
     
     public static JavaContanFuture createFutureInstance() {

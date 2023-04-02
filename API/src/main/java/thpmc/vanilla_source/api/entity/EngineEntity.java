@@ -3,6 +3,8 @@ package thpmc.vanilla_source.api.entity;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 import org.contan_lang.variables.ContanObject;
@@ -555,8 +557,16 @@ public class EngineEntity implements TickBase {
     }
 
     public void setRotationLookAt(double x, double y, double z) {
+        Location loc;
+        Entity bukkitEntity = this.entityController.getBukkitEntity();
+        if (bukkitEntity instanceof LivingEntity) {
+            loc = ((LivingEntity) bukkitEntity).getEyeLocation();
+        } else {
+            loc = bukkitEntity.getLocation();
+        }
+
         Location temp = new Location(null, 0, 0, 0);
-        temp.setDirection(new Vector(x, y, z));
+        temp.setDirection(new Vector(x - loc.getX(), y - loc.getY(), z - loc.getZ()));
         this.setRotation(temp.getYaw(), temp.getPitch());
     }
     

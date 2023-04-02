@@ -13,12 +13,12 @@ public class Unicode {
         String replacement = source;
 
         if (matcher.find()) {
-            for (int i = 1; i < matcher.groupCount(); i++) {
+            for (int i = 1; i <= matcher.groupCount(); i++) {
                 String group = matcher.group(i);
                 int[] codePoints = new int[1];
                 codePoints[0] = Integer.parseInt(group, 16);
 
-                replacement = replacement.replace("\\\\u" + group, new String(codePoints, 0, 1));
+                replacement = replacement.replace("\\u" + group, new String(codePoints, 0, 1));
             }
         }
 

@@ -122,7 +122,7 @@ public class TickThread implements Runnable, ContanTickBasedThread {
             if (shouldRemove) {
                 for (EnginePlayer enginePlayer : EnginePlayer.getAllPlayers()) {
                     EntityTracker entityTracker = getEntityTracker(enginePlayer);
-                    entityTracker.removeTrackerEntity(entity);
+                    entityTracker.removeTrackedEntity(entity);
                     entity.hide(enginePlayer);
                 }
             }

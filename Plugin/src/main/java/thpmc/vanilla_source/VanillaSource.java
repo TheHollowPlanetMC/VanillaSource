@@ -7,6 +7,7 @@ import thpmc.vanilla_source.api.entity.tick.MainThreadTimer;
 import thpmc.vanilla_source.api.player.EnginePlayer;
 import thpmc.vanilla_source.camera.CameraFileManager;
 import thpmc.vanilla_source.command.CommandRegistry;
+import thpmc.vanilla_source.command.HoverTextCommandExecutor;
 import thpmc.vanilla_source.config.ImplVSSettings;
 import thpmc.vanilla_source.contan.ContanManager;
 import thpmc.vanilla_source.lang.SystemLanguage;
@@ -95,6 +96,7 @@ public final class VanillaSource extends JavaPlugin {
             getCommand("parallel").setExecutor(new ParallelCommandExecutor());
             getCommand("parallel").setTabCompleter(new ParallelCommandExecutor());
         }
+        getCommand("vanilla_source_hover_text_event").setExecutor(new HoverTextCommandExecutor());
         CommandRegistry.onEnable(this);
         
         //Load camera position data.
