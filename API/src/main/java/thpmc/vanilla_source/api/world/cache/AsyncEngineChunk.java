@@ -28,7 +28,7 @@ public class AsyncEngineChunk implements EngineChunk {
     private final Set<EngineEntity>[] entitySlices;
     
     public AsyncEngineChunk(Chunk chunk) {
-        this.chunkSnapshot = chunk.getChunkSnapshot();
+        this.chunkSnapshot = chunk.getChunkSnapshot(true, true, true);
         this.chunkX = chunkSnapshot.getX();
         this.chunkZ = chunkSnapshot.getZ();
         
