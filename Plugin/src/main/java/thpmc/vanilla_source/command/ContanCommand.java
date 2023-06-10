@@ -36,7 +36,7 @@ public class ContanCommand {
 
                             //Compile and run script.
                             try {
-                                ContanModule contanModule = contanEngine.compile(".command", (String) args[0]);
+                                ContanModule contanModule = contanEngine.compile(".command", (String) args.args()[0]);
                                 Evaluator globalEvaluator = contanModule.getGlobalEvaluator();
                                 Environment environment = new Environment(contanEngine, contanModule.getModuleEnvironment(),
                                         contanEngine.getMainThread(), globalEvaluator, true);
@@ -70,7 +70,7 @@ public class ContanCommand {
                 new CommandAPICommand("run")
                         .withArguments(new TextArgument("module").replaceSuggestions(ArgumentSuggestions.strings(info -> ContanManager.loadedModuleNames.toArray(new String[0]))))
                         .executes((sender, args) -> {
-                            String moduleName = (String) args[0];
+                            String moduleName = (String) args.args()[0];
 
                             ContanEngine contanEngine = VanillaSourceAPI.getInstance().getContanEngine();
                             ContanModule contanModule = contanEngine.getModule(moduleName);
@@ -114,7 +114,7 @@ public class ContanCommand {
                 new CommandAPICommand("reload")
                         .withArguments(new TextArgument("module").replaceSuggestions(ArgumentSuggestions.strings(info -> ContanManager.loadedModuleNames.toArray(new String[0]))))
                         .executes((sender, args) -> {
-                            String moduleName = (String) args[0];
+                            String moduleName = (String) args.args()[0];
 
                             StringBuilder script = new StringBuilder();
 

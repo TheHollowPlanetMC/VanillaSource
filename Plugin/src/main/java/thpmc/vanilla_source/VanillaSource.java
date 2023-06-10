@@ -38,7 +38,7 @@ public final class VanillaSource extends JavaPlugin {
     @Override
     public void onLoad() {
         super.onLoad();
-        CommandRegistry.onLoad();
+        CommandRegistry.onLoad(this);
     }
 
     @Override
@@ -97,7 +97,7 @@ public final class VanillaSource extends JavaPlugin {
             getCommand("parallel").setTabCompleter(new ParallelCommandExecutor());
         }
         getCommand("vanilla_source_hover_text_event").setExecutor(new HoverTextCommandExecutor());
-        CommandRegistry.onEnable(this);
+        CommandRegistry.onEnable();
         
         //Load camera position data.
         CameraFileManager.load();

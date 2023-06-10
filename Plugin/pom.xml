@@ -168,6 +168,14 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>thpmc</groupId>
+            <artifactId>vanilla_source_v1_20_R1</artifactId>
+            <type>jar</type>
+            <version>${revision}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>2.2.1</version>
@@ -181,8 +189,8 @@
         </dependency>
         <dependency>
             <groupId>dev.jorel</groupId>
-            <artifactId>commandapi-shade</artifactId>
-            <version>8.7.5</version>
+            <artifactId>commandapi-bukkit-shade</artifactId>
+            <version>9.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.mojang</groupId>

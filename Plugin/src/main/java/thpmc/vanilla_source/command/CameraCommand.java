@@ -32,7 +32,8 @@ public class CameraCommand {
                 new CommandAPICommand("create")
                         .withArguments(new StringArgument("name"), new IntegerArgument("endTick"))
                         .executesPlayer((sender, args) -> {
-                            CameraEditor.onEnd(sender, (String) args[0], (Integer) args[1]);
+                            Object[] argObjects = args.args();
+                            CameraEditor.onEnd(sender, (String) argObjects[0], (Integer) argObjects[1]);
                         }),
 
 
@@ -46,7 +47,7 @@ public class CameraCommand {
                 new CommandAPICommand("play")
                         .withArguments(new StringArgument("cameraName").replaceSuggestions(ArgumentSuggestions.strings(CameraPositionsManager.getAllCameraPositionName())))
                         .executesPlayer((sender, args) -> {
-                            CameraPositions cameraPositions = CameraPositionsManager.getCameraPositionsByName((String) args[0]);
+                            CameraPositions cameraPositions = CameraPositionsManager.getCameraPositionsByName((String) args.args()[0]);
                             if (cameraPositions == null) {
                                 sender.sendMessage(SystemLanguage.getText("camera-not-found"));
                                 return;

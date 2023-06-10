@@ -427,7 +427,7 @@ public class NMSHandler implements INMSHandler {
         }
     
         newBiome.a(newFog.a());
-        IRegistryWritable<BiomeBase> iRegistryWritable = (IRegistryWritable<BiomeBase>) dedicatedServer.aV().b(Registries.ap);
+        IRegistryWritable<BiomeBase> iRegistryWritable = (IRegistryWritable<BiomeBase>) dedicatedServer.aV().d(Registries.ap);
 
         try {
             Field frozen = RegistryMaterials.class.getDeclaredField("l");

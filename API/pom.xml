@@ -63,7 +63,7 @@
           <includes><include>**/*</include></includes>
           <repositoryName>VanillaSource</repositoryName>
           <repositoryOwner>TheHollowPlanetMC</repositoryOwner>
-          <userName>Be4rJP</userName>
+          <userName>bea4dev</userName>
         </configuration>
         <executions>
           <execution>

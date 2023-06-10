@@ -8,6 +8,9 @@ import net.minecraft.server.*;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.phys.AxisAlignedBB;
+import net.minecraft.world.phys.Vec3D;
+import org.bukkit.Location;
+import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 import thpmc.vanilla_source.api.entity.EngineEntity;
 import thpmc.vanilla_source.api.entity.dummy.network.EmptySocket;
@@ -45,14 +48,20 @@ public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntit
     
     @Override
     public void setPositionRaw(double x, double y, double z) {
-        super.o(x, y, z);
-        AxisAlignedBB aabb = super.am();
-        super.a(aabb);
+        super.e(x, y, z);
     }
     
     @Override
     public void setRotation(float yaw, float pitch) {
-        super.getBukkitEntity().setRotation(yaw, pitch);
+        NumberConversions.checkFinite(pitch, "pitch not finite");
+        NumberConversions.checkFinite(yaw, "yaw not finite");
+        yaw = Location.normalizeYaw(yaw);
+        pitch = Location.normalizePitch(pitch);
+        super.a_(yaw);
+        super.b_(pitch);
+        super.M = yaw;
+        super.N = pitch;
+        super.n(yaw);
     }
     
     @Override
@@ -78,9 +87,7 @@ public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntit
     
     @Override
     public void playTickResult(EngineEntity engineEntity, EnginePlayer player, boolean absolute) {
-    
-        Vec2f yawPitch = this.getYawPitch();
-        player.sendPacket(new PacketPlayOutEntityHeadRotation(this, (byte) ((yawPitch.x * 256.0F) / 360.0F)));
+        player.sendPacket(new PacketPlayOutEntityHeadRotation(this, (byte) ((super.M * 256.0F) / 360.0F)));
         
         if (absolute) {
             player.sendPacket(new PacketPlayOutEntityTeleport(this));
@@ -88,7 +95,7 @@ public class ImplEntityControllerPlayer extends EntityPlayer implements NMSEntit
             Vector delta = engineEntity.getMoveDelta();
             player.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook(super.af(),
                     (short) (delta.getX() * 4096), (short) (delta.getY() * 4096), (short) (delta.getZ() * 4096),
-                    (byte) ((yawPitch.x * 256.0F) / 360.0F), (byte) ((yawPitch.y * 256.0F) / 360.0F), engineEntity.isOnGround()));
+                    (byte) ((super.M * 256.0F) / 360.0F), (byte) ((super.N * 256.0F) / 360.0F), engineEntity.isOnGround()));
         }
 
         if (isMetadataChanged) {
