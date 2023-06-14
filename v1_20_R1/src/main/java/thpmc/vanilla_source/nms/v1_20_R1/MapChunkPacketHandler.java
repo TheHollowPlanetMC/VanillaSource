@@ -41,7 +41,6 @@ public class MapChunkPacketHandler implements IPacketHandler {
     private static Field blockids;
     private static Field biome;
 
-    private static Field blockIds;
     
     private static Field emptyBlockIDs;
 
@@ -65,9 +64,6 @@ public class MapChunkPacketHandler implements IPacketHandler {
             biome = CraftChunkSnapshot.class.getDeclaredField("biome");
             blockids.setAccessible(true);
             biome.setAccessible(true);
-
-            blockIds = ChunkSection.class.getDeclaredField("i");
-            blockIds.setAccessible(true);
             
             emptyBlockIDs = CraftChunk.class.getDeclaredField("emptyBlockIDs");
             emptyBlockIDs.setAccessible(true);
