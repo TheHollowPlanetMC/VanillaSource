@@ -91,7 +91,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <version>1.20.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -145,30 +145,6 @@
         </dependency>
         <dependency>
             <groupId>thpmc</groupId>
-            <artifactId>vanilla_source_v1_15_R1</artifactId>
-            <type>jar</type>
-            <version>${revision}</version>
-            <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>thpmc</groupId>
-            <artifactId>vanilla_source_v1_16_R3</artifactId>
-            <type>jar</type>
-            <version>${revision}</version>
-            <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>thpmc</groupId>
-            <artifactId>vanilla_source_v1_19_R1</artifactId>
-            <type>jar</type>
-            <version>${revision}</version>
-            <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>thpmc</groupId>
             <artifactId>vanilla_source_v1_20_R1</artifactId>
             <type>jar</type>
             <version>${revision}</version>
@@ -178,7 +154,7 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>2.2.1</version>
+            <version>3.0.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

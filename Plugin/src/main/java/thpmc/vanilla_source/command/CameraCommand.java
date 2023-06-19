@@ -63,12 +63,12 @@ public class CameraCommand {
                             CameraHandler cameraHandler = new CameraHandler(enginePlayer, tickThread, ContanUtil.getEmptyClassInstance());
                             CameraPositionAt lookAt = new CameraPositionAt(sender.getLocation().toVector());
                             cameraHandler.setCameraPositions(cameraPositions);
-                                cameraHandler.setLookAtPositions(lookAt);
+                            cameraHandler.setLookAtPositions(lookAt);
 
-                                tickThread.addEntity(cameraHandler);
+                            tickThread.addEntity(cameraHandler);
 
-                                Bukkit.getScheduler().runTaskLater(VanillaSource.getPlugin(), cameraHandler::end, cameraPositions.getEndTick());
-                            })
+                            Bukkit.getScheduler().runTaskLater(VanillaSource.getPlugin(), cameraHandler::end, cameraPositions.getEndTick());
+                        })
                 )
                 .withPermission("vanilla_source.camera")
                 .register();

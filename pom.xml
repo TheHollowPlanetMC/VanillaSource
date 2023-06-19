@@ -22,9 +22,6 @@
 
   <modules>
     <module>API</module>
-    <module>v1_15_R1</module>
-    <module>v1_16_R3</module>
-    <module>v1_19_R1</module>
     <module>v1_20_R1</module>
     <module>Plugin</module>
   </modules>
