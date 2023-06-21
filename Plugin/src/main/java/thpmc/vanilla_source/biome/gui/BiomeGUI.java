@@ -99,7 +99,6 @@ public class BiomeGUI {
                 ArtButton biomeButton = new ArtButton(new ItemBuilder(Material.GRASS_BLOCK).name(biomeSource.getKey()).build());
                 biomeButton.listener((e, m) -> {
                     onSelect.accept(biomeSource);
-                    player.closeInventory();
                 });
                 menu.addButton(biomeButton);
             }
@@ -172,7 +171,6 @@ public class BiomeGUI {
                 biomeButton.listener((e, m) -> {
                     if (e.getClick() == ClickType.LEFT) {
                         onSelect.accept(customBiome);
-                        player.closeInventory();
                     } else if (e.getClick() == ClickType.RIGHT) {
                         openCustomBiomeEditor(player, customBiome);
                     }

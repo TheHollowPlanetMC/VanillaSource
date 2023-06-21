@@ -8,22 +8,14 @@ import thpmc.vanilla_source.structure.ParallelStructure;
 import thpmc.vanilla_source.structure.ImplStructureData;
 import thpmc.vanilla_source.structure.StructureData;
 import thpmc.vanilla_source.util.RegionBlocks;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.session.SessionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import thpmc.vanilla_source.world_edit.WorldEditUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,29 +129,10 @@ public class ParallelCommandExecutor implements CommandExecutor, TabExecutor {
             }
             if(args[1].equals("create")) {
                 Player player = (Player) sender;
-                com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
-                SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
-                LocalSession localSession = sessionManager.get(wePlayer);
-    
-                com.sk89q.worldedit.world.World selectionWorld = localSession.getSelectionWorld();
-                Region region;
-                try {
-                    if (selectionWorld == null) throw new IncompleteRegionException();
-                    region = localSession.getSelection(selectionWorld);
-                } catch (IncompleteRegionException ex) {
-                    sender.sendMessage(ChatColor.GREEN + "範囲が選択されていません。");
+                RegionBlocks regionBlocks = WorldEditUtil.getSelectedRegion(player);
+                if (regionBlocks == null) {
                     return true;
                 }
-    
-                BlockVector3 max = region.getMaximumPoint();
-                BlockVector3 min = region.getMinimumPoint();
-    
-                World world = BukkitAdapter.adapt(region.getWorld());
-    
-                Vector maxLocation = new Vector(max.getX(), max.getY(), max.getZ());
-                Vector minLocation = new Vector(min.getX(), min.getY(), min.getZ());
-    
-                RegionBlocks regionBlocks = new RegionBlocks(minLocation.toLocation(world), maxLocation.toLocation(world));
     
                 ImplStructureData implStructureData = (ImplStructureData) StructureData.getStructureData(args[2]);
                 if (implStructureData != null) {
@@ -168,7 +141,7 @@ public class ParallelCommandExecutor implements CommandExecutor, TabExecutor {
                 }
                 implStructureData = new ImplStructureData(args[2]);
     
-                implStructureData.setBlockData(minLocation.toLocation(world), regionBlocks.getBlocks());
+                implStructureData.setBlockData(regionBlocks.getMinimum().toLocation(player.getWorld()), regionBlocks.getBlocks());
                 sender.sendMessage(ChatColor.GREEN + "作成しました。");
                 return true;
             }
@@ -194,25 +167,10 @@ public class ParallelCommandExecutor implements CommandExecutor, TabExecutor {
             //parallel structure create [name]
             if(args[1].equals("create")) {
                 Player player = (Player) sender;
-                com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
-                SessionManager sessionManager = WorldEdit.getInstance().getSessionManager();
-                LocalSession localSession = sessionManager.get(wePlayer);
-            
-                com.sk89q.worldedit.world.World selectionWorld = localSession.getSelectionWorld();
-                Region region;
-                try {
-                    if (selectionWorld == null) throw new IncompleteRegionException();
-                    region = localSession.getSelection(selectionWorld);
-                } catch (IncompleteRegionException ex) {
-                    sender.sendMessage(ChatColor.GREEN + "範囲が選択されていません。");
+                RegionBlocks regionBlocks = WorldEditUtil.getSelectedRegion(player);
+                if (regionBlocks == null) {
                     return true;
                 }
-                
-                BlockVector3 min = region.getMinimumPoint();
-            
-                World world = BukkitAdapter.adapt(region.getWorld());
-                
-                Vector minLocation = new Vector(min.getX(), min.getY(), min.getZ());
             
                 ParallelStructure parallelStructure = ParallelStructure.getParallelStructure(args[2]);
                 if (parallelStructure != null) {
@@ -220,7 +178,7 @@ public class ParallelCommandExecutor implements CommandExecutor, TabExecutor {
                     return true;
                 }
                 parallelStructure = new ParallelStructure(args[2]);
-                parallelStructure.setBaseLocation(minLocation.toLocation(world));
+                parallelStructure.setBaseLocation(regionBlocks.getMinimum().toLocation(player.getWorld()));
                 
                 sender.sendMessage(ChatColor.GREEN + "作成しました。");
                 return true;

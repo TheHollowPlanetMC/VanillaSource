@@ -61,3 +61,7 @@ ok-cancel-override-setting-ok-lore: '&7同じ名前の設定が上書きされ�
 ok-cancel-override-setting-cancel: '&c&n上書きしない'
 ok-cancel-override-setting-cancel-lore: '&7設定の保存をキャンセルします'
 camera-not-found: '&c指定されたカメラが見つかりません'
+world-edit-is-required: '&c&nこの機能を実行するにはWorldEditが必要です'
+world-edit-not-selected: '&c&n範囲が指定されていません'
+select-biome: '&nバイオームを選択してください'
+biome-applied: '&n&aバイオームを適用しました'

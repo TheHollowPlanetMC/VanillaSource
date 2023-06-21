@@ -7,6 +7,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class RegionBlocks {
     private final World world;
@@ -34,5 +35,20 @@ public class RegionBlocks {
         }
         
         return blocks;
+    }
+
+    public Vector getMaximum() {return maximum;}
+
+    public Vector getMinimum() {return minimum;}
+
+    public void apply(Consumer<Block> consumer) {
+        for (int y = minimum.getBlockY(); y <= maximum.getBlockY(); y++) {
+            for (int x = minimum.getBlockX(); x <= maximum.getBlockX(); x++) {
+                for (int z = minimum.getBlockZ(); z <= maximum.getBlockZ(); z++) {
+                    Block block = world.getBlockAt(x, y, z);
+                    consumer.accept(block);
+                }
+            }
+        }
     }
 }

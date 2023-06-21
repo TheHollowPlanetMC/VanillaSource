@@ -102,6 +102,6 @@ public interface INMSHandler {
     
     void setBiomeSettings(String name, BiomeDataContainer container);
     
-    void setBiomeForBlock(Block block, String name);
+    void setBiomeForBlock(Block block, Object biome);
     
 }

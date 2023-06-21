@@ -26,6 +26,7 @@ import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.VoxelShapes;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_20_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_20_R1.CraftParticle;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
@@ -349,34 +350,34 @@ public class NMSHandler implements INMSHandler {
         IRegistry<BiomeBase> registryWritable = dedicatedServer.aV().d(Registries.ap);
         BiomeBase forestBiome = registryWritable.a(oldKey);
     
-        BiomeBase.a newBiome = new BiomeBase.a();
-        newBiome.a(Objects.requireNonNull(forestBiome).c());
+        BiomeBase.a builder = new BiomeBase.a();
+        builder.a(Objects.requireNonNull(forestBiome).c());
     
         Field biomeSettingMobsField = null;
         try {
             biomeSettingMobsField = BiomeBase.class.getDeclaredField("k");
             biomeSettingMobsField.setAccessible(true);
             BiomeSettingsMobs biomeSettingMobs = (BiomeSettingsMobs) biomeSettingMobsField.get(forestBiome);
-            newBiome.a(biomeSettingMobs);
+            builder.a(biomeSettingMobs);
         
             Field biomeSettingGenField = BiomeBase.class.getDeclaredField("j");
             biomeSettingGenField.setAccessible(true);
             BiomeSettingsGeneration biomeSettingGen = (BiomeSettingsGeneration) biomeSettingGenField.get(forestBiome);
-            newBiome.a(biomeSettingGen);
+            builder.a(biomeSettingGen);
         } catch (Exception e) {
             e.printStackTrace();
         }
     
-        newBiome.a(0.2F);
-        newBiome.b(0.05F);
+        builder.a(0.2F);
+        builder.b(0.05F);
         
         switch (container.temperatureAttribute) {
             case NORMAL: {
-                newBiome.a(BiomeBase.TemperatureModifier.a);
+                builder.a(BiomeBase.TemperatureModifier.a);
                 break;
             }
             case FROZEN: {
-                newBiome.a(BiomeBase.TemperatureModifier.b);
+                builder.a(BiomeBase.TemperatureModifier.b);
                 break;
             }
         }
@@ -426,7 +427,7 @@ public class NMSHandler implements INMSHandler {
             }
         }
     
-        newBiome.a(newFog.a());
+        builder.a(newFog.a());
         IRegistryWritable<BiomeBase> iRegistryWritable = (IRegistryWritable<BiomeBase>) dedicatedServer.aV().d(Registries.ap);
 
         try {
@@ -437,11 +438,12 @@ public class NMSHandler implements INMSHandler {
             throw new IllegalStateException(e);
         }
 
-        iRegistryWritable.a(newKey, newBiome.a(), Lifecycle.stable());
+        BiomeBase biomeBase = builder.a();
+        iRegistryWritable.a(newKey, biomeBase, Lifecycle.stable());
 
         iRegistryWritable.l();
         
-        return newBiome;
+        return biomeBase;
     }
     
     @Override
@@ -539,9 +541,9 @@ public class NMSHandler implements INMSHandler {
     }
     
     @Override
-    public void setBiomeForBlock(org.bukkit.block.Block block, String name) {
+    public void setBiomeForBlock(org.bukkit.block.Block block, Object biome) {
         Chunk chunk = (Chunk) ((CraftChunk) block.getChunk()).getHandle(ChunkStatus.n);
-        Objects.requireNonNull(chunk).setBiome(block.getX() >> 2, block.getY() >> 2, block.getZ() >> 2, Holder.a((BiomeBase) getNMSBiomeByKey("custom:" + name)));
+        Objects.requireNonNull(chunk).setBiome(block.getX() >> 2, block.getY() >> 2, block.getZ() >> 2, Holder.a((BiomeBase) biome));
     }
     
     @Override
