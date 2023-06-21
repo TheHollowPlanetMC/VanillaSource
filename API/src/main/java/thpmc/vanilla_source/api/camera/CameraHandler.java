@@ -31,7 +31,7 @@ public class CameraHandler implements TickBase {
 
     private final ContanClassInstance scriptHandle;
     
-    private final Map<CameraPositions, NMSEntityController> advanceInitializedEntityMap = new HashMap<>();
+    private NMSEntityController entityController = null;
     
     
     private int cameraTick = 0;
@@ -65,6 +65,10 @@ public class CameraHandler implements TickBase {
     
     @Override
     public void tick() {
+        if (end) {
+            return;
+        }
+
         invokeScriptFunction("onTick");
     
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
@@ -105,6 +109,12 @@ public class CameraHandler implements TickBase {
             lookAtTick++;
         }
         lastLookAtPosition = lookAtPosition;
+
+        //end
+        if (this.cameraPositions == null && this.lookAtPositions == null) {
+            end();
+            return;
+        }
         
         Vector direction = lookAtPosition.clone().add(cameraPosition.clone().multiply(-1.0));
         Location temp = new Location(null, cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ());
@@ -147,11 +157,9 @@ public class CameraHandler implements TickBase {
         
         //Remove all entity.
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
-        for (NMSEntityController entityController : advanceInitializedEntityMap.values()) {
-            Object destroyPacket = nmsHandler.createEntityDestroyPacket(entityController);
-            nmsHandler.sendPacket(target.getBukkitPlayer(), destroyPacket);
-            nmsHandler.sendPacket(target.getBukkitPlayer(), nmsHandler.createCameraPacket(nmsHandler.getNMSPlayer(target.getBukkitPlayer())));
-        }
+        Object destroyPacket = nmsHandler.createEntityDestroyPacket(entityController);
+        nmsHandler.sendPacket(target.getBukkitPlayer(), nmsHandler.createCameraPacket(nmsHandler.getNMSPlayer(target.getBukkitPlayer())));
+        nmsHandler.sendPacket(target.getBukkitPlayer(), destroyPacket);
     }
     
     
@@ -163,14 +171,17 @@ public class CameraHandler implements TickBase {
     private NMSEntityController createAndSpawnEntity(World world, double x, double y, double z) {
         INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
         
-        return advanceInitializedEntityMap.computeIfAbsent(cameraPositions, key -> {
-                NMSEntityController controller = nmsHandler.createNMSEntityController(world, x, y, z, EntityType.ARMOR_STAND, null);
-                Object spawnPacket = nmsHandler.createSpawnEntityLivingPacket(controller);
-                nmsHandler.sendPacket(target.getBukkitPlayer(), spawnPacket);
-                nmsHandler.sendPacket(target.getBukkitPlayer(), nmsHandler.createCameraPacket(controller));
-                
-                return controller;
-        });
+        if (entityController == null) {
+            NMSEntityController controller = nmsHandler.createNMSEntityController(world, x, y, z, EntityType.ARMOR_STAND, null);
+            Object spawnPacket = nmsHandler.createSpawnEntityLivingPacket(controller);
+            nmsHandler.sendPacket(target.getBukkitPlayer(), spawnPacket);
+            nmsHandler.sendPacket(target.getBukkitPlayer(), nmsHandler.createCameraPacket(controller));
+
+            this.entityController = controller;
+            return controller;
+        } else {
+            return this.entityController;
+        }
     }
 
     
@@ -181,7 +192,6 @@ public class CameraHandler implements TickBase {
     
     public ContanClassInstance setCameraPositions(CameraPositions cameraPositions) {
         //Remove entity.
-        NMSEntityController entityController = advanceInitializedEntityMap.get(cameraPositions);
         if (entityController != null) {
             INMSHandler nmsHandler = VanillaSourceAPI.getInstance().getNMSHandler();
             Object removePacket = nmsHandler.createEntityDestroyPacket(entityController);

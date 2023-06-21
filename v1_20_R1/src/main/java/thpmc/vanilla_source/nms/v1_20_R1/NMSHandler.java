@@ -438,6 +438,8 @@ public class NMSHandler implements INMSHandler {
         }
 
         iRegistryWritable.a(newKey, newBiome.a(), Lifecycle.stable());
+
+        iRegistryWritable.l();
         
         return newBiome;
     }

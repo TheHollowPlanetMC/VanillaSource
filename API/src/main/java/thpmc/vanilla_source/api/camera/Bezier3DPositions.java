@@ -37,7 +37,9 @@ public class Bezier3DPositions implements CameraPositions {
     
     public Bezier3DPositions(YamlConfiguration yml) {load(yml);}
 
-    
+
+    private double previous = 0.0;
+
     @Override
     public Vector getTickPosition(int tick) {
         double t = (double) tick / (double) endTick;

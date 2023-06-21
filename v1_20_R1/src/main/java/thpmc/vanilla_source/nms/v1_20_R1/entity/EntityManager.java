@@ -25,6 +25,10 @@ public class EntityManager {
                 net.minecraft.world.item.ItemStack itemStack = CraftItemStack.asNMSCopy((ItemStack) data);
                 return new ImplEntityControllerItem(worldServer, x, y, z, itemStack);
             }
+
+            case ARMOR_STAND: {
+                return new ImplEntityControllerArmorStand(worldServer, x, y, z);
+            }
         }
         
         throw new IllegalArgumentException("Entity type " + type + " is not supported.");

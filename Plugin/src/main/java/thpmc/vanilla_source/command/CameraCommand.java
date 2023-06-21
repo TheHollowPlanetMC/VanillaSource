@@ -66,8 +66,6 @@ public class CameraCommand {
                             cameraHandler.setLookAtPositions(lookAt);
 
                             tickThread.addEntity(cameraHandler);
-
-                            Bukkit.getScheduler().runTaskLater(VanillaSource.getPlugin(), cameraHandler::end, cameraPositions.getEndTick());
                         })
                 )
                 .withPermission("vanilla_source.camera")
