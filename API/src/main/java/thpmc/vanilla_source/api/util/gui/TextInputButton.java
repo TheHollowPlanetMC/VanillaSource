@@ -28,9 +28,9 @@ public class TextInputButton extends ArtButton {
             historyData.clearOnClose = false;
             
             new AnvilGUI.Builder()
-                .onComplete((p, text) -> {
+                    .onClick((slot, stateSnapshot) -> {
                     if (inputListener != null) {
-                        String incorrectText = inputListener.onInput(p, text);
+                        String incorrectText = inputListener.onInput(stateSnapshot.getPlayer(), stateSnapshot.getText());
                         if (incorrectText != null) {
                             if (incorrectText.equals("back")) {
                                 Bukkit.getScheduler().runTaskLater(VanillaSourceAPI.getInstance().getPlugin(), () -> {

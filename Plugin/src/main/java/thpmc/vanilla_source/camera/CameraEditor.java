@@ -74,7 +74,7 @@ public class CameraEditor {
         }
         Collections.reverse(bezierCurve3DList);
     
-        EasingBezier2D easingBezier2D = new EasingBezier2D(0.3, 0, 0.3, 1);
+        EasingBezier2D easingBezier2D = new EasingBezier2D(0.3, 0, 0.7, 1);
         Bezier3DPositions positions = new Bezier3DPositions(bezierCurve3DList, easingBezier2D, endTick);
     
         EnginePlayer enginePlayer = EnginePlayer.getEnginePlayer(player);
