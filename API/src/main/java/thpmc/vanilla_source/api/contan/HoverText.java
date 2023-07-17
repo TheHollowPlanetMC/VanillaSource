@@ -55,6 +55,10 @@ public class HoverText {
         this.joinedTextList.add(hoverText);
     }
 
+    public void setFont(String font) {
+        this.textComponent.setFont(font);
+    }
+
     public void sendMessage(Player player) {
         setAllowed(player);
         player.spigot().sendMessage(textComponent);
